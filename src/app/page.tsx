@@ -5,6 +5,8 @@ import { latestHandoff } from '@/lib/handoff';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { SessionCta } from '@/components/SessionCta';
+import { HomeSearch } from '@/components/HomeSearch';
+import { allTopics, searchIndex } from '@/lib/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,9 +42,15 @@ export default function Home() {
   const focusId = firstTopicWithContent(candidates.map((t) => t.id));
   const focus = candidates.find((t) => t.id === focusId) ?? null;
 
+  // The search corpus is a few hundred rows, small enough to ship whole and
+  // match in the browser — which is what makes it feel instant (SPEC §8).
+  const index = searchIndex();
+  const strands = Object.fromEntries(allTopics().map((t) => [t.id, t.strand_id]));
+
   return (
     <>
-      <div className="mb-6">
+      <div className="mb-6 space-y-4">
+        <HomeSearch index={index} strands={strands} />
         <SessionCta
           openSessionId={open?.id ?? null}
           answered={open?.cursor ?? 0}

@@ -70,6 +70,16 @@ export interface SeedDrill {
   payload: DrillPayload;
 }
 
+/** A vocabulary card. Categories mirror §2's `vocab.category` enum. */
+export interface SeedVocab {
+  term: string;
+  gloss: string;
+  category: 'connector' | 'work_noun' | 'verb_pattern' | 'collocation' | 'set_phrase' | 'false_friend';
+  level: LevelId;
+  /** Must sit in construction/consulting context, like every other example. */
+  example: string;
+}
+
 export const LEVELS: { id: LevelId; ordinal: number }[] = [
   { id: 'A1', ordinal: 1 },
   { id: 'A2', ordinal: 2 },

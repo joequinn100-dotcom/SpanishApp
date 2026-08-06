@@ -7,7 +7,9 @@ import { PREREQS } from './prereqs';
 import { ERRORS } from './errors';
 import { ERROR_DRILLS } from './drills-errors';
 import { TOPIC_DRILLS } from './drills-topics';
+import { VOCAB } from './vocab';
 import { LEVELS, STRANDS, type SeedTopic, type SeedDrill } from './types';
+export { VOCAB };
 
 export const TOPICS: SeedTopic[] = [...A_TOPICS, ...B_TOPICS, ...C_TOPICS];
 export const DRILLS: SeedDrill[] = [...ERROR_DRILLS, ...TOPIC_DRILLS];
@@ -41,6 +43,7 @@ export function seed(db: DB): {
   prereqs: number;
   errors: number;
   drills: number;
+  vocab: number;
 } {
   return tx(db, () => {
     const level = db.prepare('INSERT OR REPLACE INTO level (id, ordinal) VALUES (?, ?)');
@@ -150,6 +153,26 @@ export function seed(db: DB): {
       });
     }
 
+    // Vocabulary. Like topic_state, the schedule columns are written once and
+    // never overwritten — a re-seed must not reset a word's ease or due date.
+    const vocab = db.prepare(`
+      INSERT INTO vocab (term, gloss_en, category, level_id, example_es, stage, ease,
+                         interval_days, due_at, reps, lapses)
+      VALUES (@term, @gloss, @category, @level, @example, 'new', 2.5, 0, NULL, 0, 0)
+      ON CONFLICT(term) DO UPDATE SET
+        gloss_en = excluded.gloss_en, category = excluded.category,
+        level_id = excluded.level_id, example_es = excluded.example_es
+    `);
+    for (const v of VOCAB) {
+      vocab.run({
+        term: v.term,
+        gloss: v.gloss,
+        category: v.category,
+        level: v.level,
+        example: v.example,
+      });
+    }
+
     recomputeAvailability(db);
 
     return {
@@ -157,6 +180,7 @@ export function seed(db: DB): {
       prereqs: PREREQS.length,
       errors: ERRORS.length,
       drills: DRILLS.length,
+      vocab: VOCAB.length,
     };
   });
 }

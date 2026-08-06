@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  VOCAB,
   DRILLS,
   ERRORS,
   LEVELS,
@@ -203,6 +204,12 @@ describe('register: no Peninsular Spanish reaches the seed', () => {
       { where: `${e.code}.wrong`, text: e.wrong },
       { where: `${e.code}.right`, text: e.right },
     ]),
+    // Vocabulary examples are Spanish shown to the user, so they are held to
+    // the same register rule as everything else.
+    ...VOCAB.flatMap((v) => [
+      { where: `vocab[${v.term}].term`, text: v.term },
+      { where: `vocab[${v.term}].example`, text: v.example },
+    ]),
     // Authored drills never reached the §5 register verifier, so this suite is
     // the only thing standing between them and the user.
     ...DRILLS.flatMap((d, i) => {
@@ -369,5 +376,100 @@ describe('seeding into SQLite', () => {
         .run('b2.mood.subj_imperfecto', 'does.not.exist', 'hard'),
     ).toThrow(/FOREIGN KEY/i);
     db.close();
+  });
+});
+
+describe('vocabulary', () => {
+  const CATEGORIES = ['connector', 'work_noun', 'verb_pattern', 'collocation', 'set_phrase', 'false_friend'];
+
+  it('has enough words for the SRS to have something to schedule', () => {
+    expect(VOCAB.length).toBeGreaterThanOrEqual(60);
+  });
+
+  it('has no duplicate terms — `term` is the unique key in SQLite', () => {
+    const terms = VOCAB.map((v) => v.term.toLowerCase());
+    expect(new Set(terms).size).toBe(terms.length);
+  });
+
+  it('uses only the categories §2 declares', () => {
+    for (const v of VOCAB) expect(CATEGORIES, v.term).toContain(v.category);
+  });
+
+  it('uses only real CEFR levels', () => {
+    for (const v of VOCAB) expect(levelIds.has(v.level), v.term).toBe(true);
+  });
+
+  it('gives every word a gloss and an example sentence', () => {
+    for (const v of VOCAB) {
+      expect(v.gloss.length, v.term).toBeGreaterThan(2);
+      expect(v.example.length, v.term).toBeGreaterThan(25);
+    }
+  });
+
+  it('uses the word in its own example — an example that omits it teaches nothing', () => {
+    // Matched on the most distinctive token rather than the whole phrase,
+    // because a verb is glossed as an infinitive and used conjugated
+    // («subsanar» → «subsanamos») and a phrase inflects inside itself
+    // («ceñirse al presupuesto» → «nos ceñimos al…»). Where that token is
+    // itself a verb, an irregular stem («poner» → «pusimos») means only the
+    // opening letters can be relied on.
+    const strip = (x: string) => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const GRAMMAR = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'en', 'a', 'al', 'de', 'del', 'que', 'por', 'se', 'su']);
+
+    for (const v of VOCAB) {
+      const tokens = strip(v.term).split(/\s+/).filter((w) => !GRAMMAR.has(w));
+      const head = tokens.sort((a, b) => b.length - a.length)[0];
+      const needle = /(arse|erse|irse|ar|er|ir)$/.test(head)
+        ? head.replace(/(arse|erse|irse|ar|er|ir)$/, '').slice(0, 5)
+        : head;
+      expect(strip(v.example).includes(needle), `${v.term} → ${v.example}`).toBe(true);
+    }
+  });
+
+  it('sits every example in a work context', () => {
+    const domain =
+      /obra|plano|cliente|proveedor|contratista|presupuesto|cronograma|informe|reuni[óo]n|expediente|valoriz|supervis|ingenier|concreto|cimentaci|encofrado|vaciado|licitaci|adenda|contrato|partida|alcance|metrado|cuadrilla|equipo|entrega|material|seguridad|acta|consulta|costo|plazo|capataz|proyecto|estructura|tuber|instalaci|acabado|avance|obra|montaje|procura|grúa|fachada|losa|suelos|municipalidad|consorcio|residente|postor|comit[ée]|frente|ducto|acero|ensayo|prueba|inspecci|coordinaci|facturar|especificaci|riesgo|contingencia|sobrecosto|penalidad|observaci|firma|carpeta|agenda|decisi[óo]n|sistema|nivel|campo/i;
+    for (const v of VOCAB) {
+      expect(domain.test(v.example), `${v.term}: ${v.example}`).toBe(true);
+    }
+  });
+
+  it('covers the connector band the B2 exam listens for', () => {
+    const connectors = VOCAB.filter((v) => v.category === 'connector');
+    expect(connectors.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('covers the false friends that cost money', () => {
+    const ff = VOCAB.filter((v) => v.category === 'false_friend').map((v) => v.term);
+    for (const must of ['actualmente', 'eventualmente', 'realizar', 'asistir a']) {
+      expect(ff).toContain(must);
+    }
+  });
+});
+
+describe('seeding vocabulary into SQLite', () => {
+  it('writes every word as a new card', () => {
+    const db = freshDb();
+    const r = seed(db);
+    expect(r.vocab).toBe(VOCAB.length);
+    const row = db.prepare("SELECT count(*) AS n FROM vocab WHERE stage = 'new'").get() as { n: number };
+    expect(row.n).toBe(VOCAB.length);
+  });
+
+  it('never resets a learner’s schedule on re-seed', () => {
+    // The whole reason the schedule columns are excluded from the upsert: a
+    // seed change must not wipe the ease and due date a month of reviews built.
+    const db = freshDb();
+    seed(db);
+    db.prepare(
+      "UPDATE vocab SET stage = 'using', ease = 2.9, interval_days = 21, due_at = '2026-09-01T00:00:00.000Z', reps = 4 WHERE term = ?",
+    ).run('sin embargo');
+
+    seed(db);
+
+    const v = db.prepare('SELECT stage, ease, interval_days, reps FROM vocab WHERE term = ?').get('sin embargo') as {
+      stage: string; ease: number; interval_days: number; reps: number;
+    };
+    expect(v).toEqual({ stage: 'using', ease: 2.9, interval_days: 21, reps: 4 });
   });
 });
