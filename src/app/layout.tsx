@@ -20,7 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Fluen<span className="text-teal-400">cia</span>
             </Link>
             <nav className="flex gap-4 text-sm text-slate-400">
-              <Link href="/" className="transition hover:text-slate-100">Curriculum</Link>
+              <Link href="/" className="transition hover:text-slate-100">Progress</Link>
+              <Link href="/curriculum" className="transition hover:text-slate-100">Curriculum</Link>
               <Link href="/errors" className="transition hover:text-slate-100">Error log</Link>
             </nav>
             <div className="flex-1" />
