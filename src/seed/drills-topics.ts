@@ -79,12 +79,14 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       accept: [
         'nos coordinábamos con la oficina de colombia todos los jueves',
         'coordinábamos con la oficina colombiana todos los jueves',
+        'solíamos coordinar con la oficina de colombia todos los jueves',
+        'solíamos coordinar con la oficina de colombia cada jueves',
       ],
       distractors: [
         {
-          answer: 'Solíamos coordinar con la oficina de Colombia cada jueves.',
+          answer: 'Coordinamos con la oficina de Colombia todos los jueves.',
           feedback:
-            'Correct Spanish, and «soler» is a good verb to own — but the imperfect alone already carries "used to", so this drill wants «coordinábamos».',
+            'That is the present (or, for an -ar verb, possibly the preterite — the nosotros forms are identical). Either way it does not say the habit is over. The imperfect «coordinábamos» is what carries "used to".',
         },
       ],
       explanation:
@@ -187,7 +189,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       sentence: 'El cliente aprueba el adicional esta semana.',
       answer: 'Le pedimos al cliente que apruebe el adicional esta semana.',
       explanation:
-        '«Pedir que» is a verb of influence, so its clause goes into the subjunctive: aprueba → apruebe.\n\nNotice the doubled indirect object: «le pedimos al cliente». Spanish names the recipient twice, as a pronoun and as a full phrase, and the pronoun is not optional.\n\nNote also that the stem change survives into the subjunctive. «Aprobar» is not stem-changing, but many verbs of this shape are — «poder» gives «pueda», «cerrar» gives «cierre», «devolver» gives «devuelva» — because the subjunctive is built from the yo form, which already carries the change.\n\n«El adicional» is standard Peruvian contracting vocabulary for a variation or change order — «un adicional de obra». It is a noun here, not an adjective.',
+        '«Pedir que» is a verb of influence, so its clause goes into the subjunctive: aprueba → apruebe.\n\nNotice the doubled indirect object: «le pedimos al cliente». Spanish names the recipient twice, as a pronoun and as a full phrase, and the pronoun is not optional.\n\nNote also that the stem change survives into the subjunctive. «Aprobar» is o→ue, so «aprueba» in the indicative gives «apruebe» here — and the same holds for «poder» → «pueda», «cerrar» → «cierre», «devolver» → «devuelva», because the present subjunctive is built from the yo form, which already carries the change. The change appears in the same four persons as in the indicative (apruebe, apruebes, apruebe, aprueben) and disappears in nosotros: «aprobemos», never «apruebemos».\n\n«El adicional» is standard Peruvian contracting vocabulary for a variation or change order — «un adicional de obra». It is a noun here, not an adjective.',
     },
   },
   {
@@ -199,14 +201,14 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       prompt: 'Translate into Spanish.',
       context: 'Recommending a course of action in a meeting.',
       sentence: 'I recommend that we review the assumptions before we send the estimate.',
-      answer: 'Recomiendo que revisemos los supuestos antes de enviar el estimado.',
+      answer: 'Recomiendo que revisemos los supuestos antes de enviar el presupuesto.',
       accept: [
-        'recomiendo que revisemos las premisas antes de enviar el estimado',
+        'recomiendo que revisemos las premisas antes de enviar el presupuesto',
         'recomiendo que revisemos los supuestos antes de enviar la estimación',
       ],
       distractors: [
         {
-          answer: 'Recomiendo que revisamos los supuestos antes de enviar el estimado.',
+          answer: 'Recomiendo que revisamos los supuestos antes de enviar el presupuesto.',
           feedback:
             '«Recomendar que» is a verb of influence and takes the subjunctive: revisemos.',
         },
@@ -223,18 +225,18 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'One clause has the wrong mood. Rewrite the sentence.',
       context: 'Stating what you believe and what you doubt in the same breath.',
-      sentence: 'Creo que el cronograma sea realista, aunque no estoy seguro de que alcanza el plazo.',
+      sentence: 'Creo que el cronograma sea realista, aunque no estoy seguro de que se cumpla el plazo.',
       answer:
-        'Creo que el cronograma es realista, aunque no estoy seguro de que alcance el plazo.',
+        'Creo que el cronograma es realista, aunque no estoy seguro de que se cumpla el plazo.',
       distractors: [
         {
-          answer: 'Creo que el cronograma es realista, aunque no estoy seguro de que alcanza el plazo.',
+          answer: 'Creo que el cronograma es realista, aunque no estoy seguro de que se cumple el plazo.',
           feedback:
-            'The first clause is fixed but the second is not. «No estar seguro de que» expresses doubt, so it takes the subjunctive: alcance.',
+            'The first clause is fixed but the second is not. «No estar seguro de que» expresses doubt, so it takes the subjunctive: se cumpla.',
         },
       ],
       explanation:
-        'Both clauses are wrong, in opposite directions, which is the useful shape for this drill.\n\n«Creer que» in the affirmative is an assertion — you are claiming the schedule is realistic — so it takes the indicative: «creo que es realista». Negate it and the assertion disappears: «no creo que sea realista» takes the subjunctive.\n\n«No estar seguro de que» works the other way round. The negation puts it into doubt, so the subjunctive follows: «no estoy seguro de que alcance». Affirmative «estoy seguro de que alcanza» would take the indicative.\n\nThe rule underneath both is the same one: assert with the indicative, withhold assertion with the subjunctive. Negation flips which one applies, so the tell is not the verb but whether the sentence commits to the claim.',
+        'Both clauses are wrong, in opposite directions, which is the useful shape for this drill.\n\n«Creer que» in the affirmative is an assertion — you are claiming the schedule is realistic — so it takes the indicative: «creo que es realista». Negate it and the assertion disappears: «no creo que sea realista» takes the subjunctive.\n\n«No estar seguro de que» works the other way round. The negation puts it into doubt, so the subjunctive follows: «no estoy seguro de que se cumpla». Affirmative «estoy seguro de que se cumple» would take the indicative.\n\nOn the wording: «cumplir el plazo» is the standard collocation for meeting a deadline, and «el plazo se cumple» is how you say it impersonally, with the deadline as subject. «Cumplir con el plazo» is equally current. Avoid «alcanzar el plazo», which is a calque of English "reach the deadline" and does not mean meeting it.\n\nThe rule underneath both is the same one: assert with the indicative, withhold assertion with the subjunctive. Negation flips which one applies, so the tell is not the verb but whether the sentence commits to the claim.',
     },
   },
   {
@@ -313,7 +315,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'When both objects become pronouns, the indirect one comes first and the direct one second: «me lo», «te la», «nos los». But «le» and «les» cannot stand before an l-pronoun, so they change to «se»: «se lo», «se la», «se los», «se las».\n\nThe reason is purely phonetic — «le lo» was avoided historically for how it sounded — which is why the rule looks arbitrary and has to be memorised rather than derived.\n\nThe cost is ambiguity: «se los mandé» could mean you sent them to him, to her, to you (usted) or to them. Spanish resolves it by adding the phrase back: «se los mandé al contratista», «se los mandé a ellos». That is not redundancy, it is how the language repairs the information the «se» destroyed.\n\nNote that this «se» has nothing to do with the reflexive «se». Same spelling, unrelated job.',
+        'When both objects become pronouns, the indirect one comes first and the direct one second: «me lo», «te la», «nos los». But «le» and «les» cannot stand before an l-pronoun, so they change to «se»: «se lo», «se la», «se los», «se las».\n\nThe «se» here is not the reflexive pronoun wearing a disguise, and it is not a euphony rule either, whatever you may have been told. Historically the form was «ge lo» (from Latin ILLI ILLUM); «ge» later fell together with «se» in pronunciation and the spelling followed. So the two «se»s are separate words that ended up identical by accident. That is why the rule cannot be derived from anything and simply has to be memorised.\n\nThe cost is ambiguity: «se los mandé» could mean you sent them to him, to her, to you (usted) or to them. Spanish resolves it by adding the phrase back: «se los mandé al contratista», «se los mandé a ellos». That is not redundancy, it is how the language repairs the information the «se» destroyed.\n\nNote that this «se» has nothing to do with the reflexive «se». Same spelling, unrelated job.',
     },
   },
   {
@@ -420,7 +422,6 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       sentence: 'This is the clause under which the client can suspend the work.',
       answer: 'Esta es la cláusula según la cual el cliente puede suspender los trabajos.',
       accept: [
-        'ésta es la cláusula según la cual el cliente puede suspender los trabajos',
         'esta es la cláusula en virtud de la cual el cliente puede suspender los trabajos',
       ],
       distractors: [
@@ -466,21 +467,21 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Join the two sentences with a concessive connector, keeping both facts.',
       context: 'Reporting mixed progress.',
-      sentence: 'Avanzamos con la estructura. El acabado sigue retrasado.',
-      answer: 'Avanzamos con la estructura; sin embargo, el acabado sigue retrasado.',
+      sentence: 'Avanzamos con la estructura. Los acabados siguen retrasados.',
+      answer: 'Avanzamos con la estructura; sin embargo, los acabados siguen retrasados.',
       accept: [
-        'avanzamos con la estructura, pero el acabado sigue retrasado',
-        'avanzamos con la estructura; no obstante, el acabado sigue retrasado',
+        'avanzamos con la estructura, pero los acabados siguen retrasados',
+        'avanzamos con la estructura; no obstante, los acabados siguen retrasados',
       ],
       distractors: [
         {
-          answer: 'Avanzamos con la estructura; por lo tanto, el acabado sigue retrasado.',
+          answer: 'Avanzamos con la estructura; por lo tanto, los acabados siguen retrasados.',
           feedback:
             '«Por lo tanto» makes the delay a consequence of the progress, which is not what the two facts say. The relationship is a contrast.',
         },
       ],
       explanation:
-        'The two facts pull against each other, so the connector must be adversative: sin embargo, no obstante, pero, aunque.\n\nThey are not interchangeable in structure. «Pero» is a conjunction and joins two clauses with a comma: «avanzamos con la estructura, pero el acabado sigue retrasado». «Sin embargo» and «no obstante» are adverbials and need stronger punctuation before them: a semicolon or a full stop, then a comma.\n\nGetting that punctuation right is worth real marks in a B2 written task, and getting it wrong is one of the most visible errors an otherwise strong writer makes.\n\nIn register terms, «sin embargo» is the neutral written choice, «no obstante» is more formal, and «pero» is the everyday one. In a client report, «sin embargo» is almost always the right pick.',
+        'The two facts pull against each other, so the connector must be adversative: sin embargo, no obstante, pero, aunque.\n\nThey are not interchangeable in structure. «Pero» is a conjunction and joins two clauses with a comma: «avanzamos con la estructura, pero los acabados siguen retrasados». «Sin embargo» and «no obstante» are adverbials and need stronger punctuation before them: a semicolon or a full stop, then a comma.\n\nGetting that punctuation right is worth real marks in a B2 written task, and getting it wrong is one of the most visible errors an otherwise strong writer makes.\n\nIn register terms, «sin embargo» is the neutral written choice, «no obstante» is more formal, and «pero» is the everyday one. In a client report, «sin embargo» is almost always the right pick.',
     },
   },
   {
@@ -496,12 +497,13 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       accept: [
         'en resumen, el cronograma se mantiene, aunque hay que revisar el costo',
         'en síntesis, el cronograma se mantiene, aunque el costo debe revisarse',
+        'en resumen, el cronograma se mantiene, aunque el costo debe ser revisado',
       ],
       distractors: [
         {
-          answer: 'En resumen, el cronograma se mantiene, aunque el costo debe ser revisado.',
+          answer: 'En resumen, el cronograma se mantiene, aunque el costo debe revisar.',
           feedback:
-            'Not wrong, but the passive with «ser» is heavy in Spanish. «Debe revisarse» is what a native writer reaches for.',
+            '«Revisar» here has no subject doing the reviewing. Spanish needs either the reflexive passive «debe revisarse» or an explicit agent.',
         },
       ],
       explanation:
@@ -572,18 +574,18 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       sentence: 'I would like you to review the assumptions before the committee meets.',
       answer: 'Quisiera que revisara los supuestos antes de que se reúna el comité.',
       accept: [
-        'quisiera que revisaras los supuestos antes de que se reúna el comité',
         'me gustaría que revisara los supuestos antes de que se reúna el comité',
+        'quisiera que revise los supuestos antes de que se reúna el comité',
       ],
       distractors: [
         {
-          answer: 'Quisiera que revise los supuestos antes de que se reúna el comité.',
+          answer: 'Quisiera que revisaras los supuestos antes de que se reúna el comité.',
           feedback:
-            '«Quisiera» is a past subjunctive form, so its clause follows into the imperfect subjunctive: revisara.',
+            'The form is right but the person is not. This is a senior client contact, so the request stays in usted: «que revisara», not «que revisaras».',
         },
       ],
       explanation:
-        '«Quisiera» is the imperfect subjunctive of querer used as a politeness form, and it is one of the most useful single words in professional Spanish. It is softer than «quiero» and less tentative than «me gustaría», and it is exactly the register for a request to a client.\n\nBecause «quisiera» is itself a past subjunctive, the clause below it takes the imperfect subjunctive too: «quisiera que revisara». Using «revise» there is the most common error in this construction.\n\n«Revisara» here is the usted form, which is what the situation calls for. Note that Spanish drops the pronoun, so «que revisara» carries the "you" in the ending alone.\n\n«Antes de que» always takes the subjunctive, and «se reúna» is present subjunctive because the committee meeting is still ahead. Two different subjunctive tenses in one sentence, each licensed by its own trigger — which is what B2 control of this system actually looks like.',
+        '«Quisiera» is the imperfect subjunctive of querer used as a politeness form, and it is one of the most useful single words in professional Spanish. It is softer than «quiero» and less tentative than «me gustaría», and it is exactly the register for a request to a client.\n\nBecause «quisiera» is itself a past subjunctive, the clause below it normally takes the imperfect subjunctive too: «quisiera que revisara». That is the sequence to default to. It is worth knowing, though, that the NGLE records «quisiera que revise» as acceptable when the reviewing is still ahead — «quisiera» is functioning as a present-tense politeness form here, not as a real past, so the present subjunctive can follow it. Both are accepted by this drill. The imperfect is the safer and more formal of the two.\n\n«Revisara» here is the usted form, which is what the situation calls for. Note that Spanish drops the pronoun, so «que revisara» carries the "you" in the ending alone — and note that the usted and yo endings are identical in this tense, so context is the only thing distinguishing "you review" from "I review". The tú form would be «revisaras», which is the wrong register for a senior client contact.\n\n«Antes de que» always takes the subjunctive, and «se reúna» is present subjunctive because the committee meeting is still ahead. Two different subjunctive tenses in one sentence, each licensed by its own trigger — which is what B2 control of this system actually looks like.',
     },
   },
 ];

@@ -75,7 +75,6 @@ export const ERROR_DRILLS: SeedDrill[] = [
       answer: 'La fusión de los dos contratistas creó mucha incertidumbre.',
       accept: [
         'la fusión de los dos contratistas generó mucha incertidumbre',
-        'la fusión de las dos contratistas creó mucha incertidumbre',
       ],
       distractors: [
         {
@@ -177,7 +176,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         {
           answer: 'aprobé',
           feedback:
-            'That is the yo form — it says *you* approved the change. The subject is «el supervisor», so the ending is -ó.',
+            'That is the yo form — it says *I* approved the change. The subject is «el supervisor», so the ending is -ó.',
           errorCode: 'verb.preterito_persona',
         },
         {
@@ -277,19 +276,18 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'One verb is in the wrong mood. Rewrite the sentence.',
       context: 'Explaining a delay in a weekly report.',
-      sentence: 'Los planos fueran tarde porque el proveedor cambió el alcance.',
+      sentence: 'Los planos llegaran tarde porque el proveedor cambió el alcance.',
       answer: 'Los planos llegaron tarde porque el proveedor cambió el alcance.',
-      accept: ['los planos fueron tarde porque el proveedor cambió el alcance'],
       distractors: [
         {
-          answer: 'Los planos fueran tarde porque el proveedor cambiara el alcance.',
+          answer: 'Los planos llegaran tarde porque el proveedor cambiara el alcance.',
           feedback:
             'This moves in the wrong direction — now both verbs are subjunctive. «Porque» introducing a real, stated reason takes the indicative.',
           errorCode: 'mood.subj_leak_past',
         },
       ],
       explanation:
-        '«Fueran» is imperfect subjunctive; the sentence reports something that happened, so it needs the indicative. «Llegaron tarde» is the natural phrasing — «los planos fueron tarde» is grammatical but reads oddly, because ser + tarde describes an event\'s timing rather than a delivery arriving late.\n\nThe subordinate clause matters too. «Porque» stating a real reason always takes the indicative: «porque el proveedor cambió el alcance». The subjunctive appears with «porque» only under negation, where the reason is being denied: «no lo hicimos porque nos lo pidieran, sino porque era necesario».\n\nThis is the shape of the error to watch for in your own writing: the leak usually lands on the main verb of a perfectly factual report, and the surrounding clause is untouched. If the sentence answers "what happened?", every verb in it is indicative unless a listed trigger says otherwise.',
+        '«Llegaran» is imperfect subjunctive; the sentence reports something that happened, so it needs the indicative: «llegaron». Mood is the only thing wrong here — the verb, the person and the tense are all already right, so the fix is a single vowel.\n\nThe subordinate clause matters too. «Porque» stating a real reason always takes the indicative: «porque el proveedor cambió el alcance». The subjunctive appears with «porque» only under negation, where the reason is being denied: «no lo hicimos porque nos lo pidieran, sino porque era necesario».\n\nThis is the shape of the error to watch for in your own writing: the leak usually lands on the main verb of a perfectly factual report, and the surrounding clause is untouched. If the sentence answers "what happened?", every verb in it is indicative unless a listed trigger says otherwise.',
     },
   },
   {
@@ -368,7 +366,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Termina» is a finite third-person present form — it needs its own subject doing the finishing. What the sentence describes is a state, so it needs the participle, and after estar the participle agrees in gender and number with the subject: los trabajos están terminados.\n\nThe agreement is what makes this drill worth doing twice. Learners fix the form and forget the ending, producing «están terminado», which is a second error rather than a correction.\n\n«Desde el martes» is the right preposition for a state that began at a point and continues: desde el martes, desde marzo, desde la última reunión. If you wanted to give the duration instead of the starting point, Spanish uses «hace»: «los trabajos están terminados hace tres días» — or more idiomatically, «terminamos hace tres días».',
+        '«Termina» is a finite third-person present form — it needs its own subject doing the finishing. What the sentence describes is a state, so it needs the participle, and after estar the participle agrees in gender and number with the subject: los trabajos están terminados.\n\nThe agreement is what makes this drill worth doing twice. Learners fix the form and forget the ending, producing «están terminado», which is a second error rather than a correction.\n\n«Desde el martes» is the right preposition for a state that began at a point and continues: desde el martes, desde marzo, desde la última reunión. If you wanted to give the elapsed time instead of the starting point, Spanish uses «desde hace» with a continuing state: «los trabajos están terminados desde hace tres días». Bare «hace tres días» marks the moment an event happened, so it pairs with a preterite: «terminamos hace tres días».',
     },
   },
   {
@@ -419,7 +417,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Después is an adverb. To connect it to anything — a noun, a pronoun or an infinitive — it needs the preposition «de»: después de la inspección, después de firmar, después de eso.\n\nBare «después» is correct only when it stands alone with nothing following it: «primero vaciamos la losa y después revisamos el acabado». The moment a complement appears, «de» is obligatory.\n\nThe same pattern governs a whole family of adverbs that behave identically: antes de, dentro de, cerca de, lejos de, encima de, debajo de, además de, a pesar de. English attaches its complement directly ("after the inspection"), which is exactly why the «de» goes missing — there is nothing in the English to translate it from.\n\nOne further form to keep separate: when a full clause with its own subject follows, you need «después de que» — «después de que el cliente apruebe el cambio». And note that clause takes the subjunctive when it points at an unrealised future.',
+        'Después is an adverb. To connect it to anything — a noun, a pronoun or an infinitive — it needs the preposition «de»: después de la inspección, después de firmar, después de eso.\n\nBare «después» is correct only when it stands alone with nothing following it: «primero vaciamos la losa y después revisamos los acabados». The moment a complement appears, «de» is obligatory.\n\nThe same pattern governs a whole family of adverbs that behave identically: antes de, dentro de, cerca de, lejos de, encima de, debajo de, además de, a pesar de. English attaches its complement directly ("after the inspection"), which is exactly why the «de» goes missing — there is nothing in the English to translate it from.\n\nOne further form to keep separate: when a full clause with its own subject follows, you need «después de que» — «después de que el cliente apruebe el cambio». And note that clause takes the subjunctive when it points at an unrealised future.',
     },
   },
   {
@@ -467,7 +465,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'An infinitive is a complement like any other, so «de» is required: después de firmar.\n\nThis is also a reminder of the wider rule that any preposition in Spanish takes the infinitive, never a conjugated verb and never a gerund: antes de firmar, sin firmar, para firmar, al firmar. English uses -ing after prepositions ("after signing"), which is why the gerund «firmando» feels right and is wrong.\n\n«Al + infinitive» is worth knowing as a compact alternative for simultaneity: «al firmar la adenda, arrancamos» means "on signing the addendum, we start".\n\nOn vocabulary: «la adenda» is the standard term in Peruvian and broader Latin American contracting for a contract addendum. «El adendum» appears but is a Latinism you can skip.',
+        'An infinitive is a complement like any other, so «de» is required: después de firmar.\n\nThis is also a reminder of the wider rule that any preposition in Spanish takes the infinitive, never a conjugated verb and never a gerund: antes de firmar, sin firmar, para firmar, al firmar. English uses -ing after prepositions ("after signing"), which is why the gerund «firmando» feels right and is wrong.\n\n«Al + infinitive» is worth knowing as a compact alternative for simultaneity: «al firmar la adenda, arrancamos» means "on signing the addendum, we start".\n\nOn vocabulary: «la adenda» is the standard term in Peruvian and broader Latin American contracting for a contract addendum. «El adéndum» appears too — note the accent, since Spanish spells the Latinism with one — but «la adenda» is what you will see in contracts here.',
     },
   },
 
@@ -482,7 +480,6 @@ export const ERROR_DRILLS: SeedDrill[] = [
       context: 'Proposing a meeting.',
       sentence: 'Quiero ___ con el equipo de Colombia antes del viernes.',
       answer: 'reunirme',
-      accept: ['me reunir'],
       distractors: [
         {
           answer: 'reunir',
@@ -561,7 +558,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Otro and otra never take an indefinite article. «Otra reunión», «otro plano», «otra semana» — never «una otra reunión».\n\nThe reason is that «otro» already contains the indefiniteness that «un» would supply; Spanish treats them as competing for the same slot. English "another" is literally an + other fused into one word, so the English form hides the article and you have nothing to warn you off adding a second one.\n\nThe definite article, by contrast, is perfectly normal and changes the meaning: «el otro plano» is the other one of a known pair, while «otro plano» is one more, unspecified. Both are correct and they mean different things.\n\nThe same restriction applies to «cierto» in the singular («cierto riesgo», not «un cierto riesgo» in careful writing) and to «medio» («medio día», not «un medio día»).',
+        'Otro and otra never take an indefinite article. «Otra reunión», «otro plano», «otra semana» — never «una otra reunión».\n\nThe reason is that «otro» already contains the indefiniteness that «un» would supply; Spanish treats them as competing for the same slot. English "another" is literally an + other fused into one word, so the English form hides the article and you have nothing to warn you off adding a second one.\n\nThe definite article, by contrast, is perfectly normal and changes the meaning: «el otro plano» is the other one of a known pair, while «otro plano» is one more, unspecified. Both are correct and they mean different things.\n\nA similar preference applies to «cierto» in the singular: careful writing prefers «cierto riesgo» to «un cierto riesgo», though the article is not ungrammatical there — it is a style point, not a rule like «otro».',
     },
   },
   {
@@ -607,19 +604,13 @@ export const ERROR_DRILLS: SeedDrill[] = [
       ],
       distractors: [
         {
-          answer: 'Presentamos la valorización tres semanas atrás.',
-          feedback:
-            '«Atrás» is used this way in some regions but reads as a calque of English here. The neutral Latin American form is «hace tres semanas».',
-          errorCode: 'verb.hace_ago',
-        },
-        {
           answer: 'Presentamos la valorización antes tres semanas.',
           feedback: '«Antes» means "before", not "ago". "Ago" is «hace + time».',
           errorCode: 'verb.hace_ago',
         },
       ],
       explanation:
-        'Spanish has no word for "ago". It uses «hace» — the third-person present of hacer — followed by the amount of time: hace tres semanas, hace un mes, hace dos años.\n\n«Hace» is frozen in the singular no matter how much time follows: «hace tres semanas», never «hacen tres semanas». It is not agreeing with anything; it is an impersonal form.\n\nIt can sit at either end of the sentence. «Presentamos la valorización hace tres semanas» and «Hace tres semanas presentamos la valorización» are both natural, with the fronted version putting slightly more weight on the elapsed time.\n\nTwo neighbouring constructions to keep separate. «Hace tres semanas que presentamos» means the same thing with «que». But «hace tres semanas que trabajamos en esto», with a *present* tense verb, means something different: we have been working on it for three weeks and still are. Same «hace», and the tense of the main verb is what decides.',
+        'Spanish has no word for "ago". «Tres semanas atrás» is also correct and standard across Latin America, but the everyday form is «hace» — the third-person present of hacer — followed by the amount of time: hace tres semanas, hace un mes, hace dos años.\n\n«Hace» is frozen in the singular no matter how much time follows: «hace tres semanas», never «hacen tres semanas». It is not agreeing with anything; it is an impersonal form.\n\nIt can sit at either end of the sentence. «Presentamos la valorización hace tres semanas» and «Hace tres semanas presentamos la valorización» are both natural, with the fronted version putting slightly more weight on the elapsed time.\n\nTwo neighbouring constructions to keep separate. «Hace tres semanas que presentamos» means the same thing with «que». But «hace tres semanas que trabajamos en esto», with a *present* tense verb, means something different: we have been working on it for three weeks and still are. Same «hace», and the tense of the main verb is what decides.',
     },
   },
   {
@@ -709,7 +700,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Confirmamos que…» sets up an assertion, and an assertion in the conditional contradicts itself: you cannot confirm a hypothesis. «Incluiremos» is the form the sentence needs.\n\nThis is the professional cost of the error, which is why it sits at severity 4 rather than 2. A conditional inside a confirmation reads to a Spanish-speaking client as deliberate hedging — as though you are leaving yourself an exit. That is a worse impression than a grammatical slip, because it looks like intent.\n\nWhere the conditional does belong in this register is in softening a *request* or a *proposal*: «propondríamos incluir la partida» is a genuine, useful hedge before a decision is made. Once the decision is made, the hedge has to come off.\n\nNote «la partida» in the construction sense — a budget line item or work package. «El alcance» is scope. Both are core vocabulary in your context and neither is a false friend, but «partida» has enough other meanings that the collocation is worth fixing as a unit.',
+        '«Confirmamos que…» sets up an assertion, and an assertion in the conditional contradicts itself: you cannot confirm a hypothesis. «Incluiremos» is the form the sentence needs.\n\nThe professional cost here is larger than the grammatical one. A conditional inside a confirmation reads to a Spanish-speaking client as deliberate hedging — as though you are leaving yourself an exit. That is a worse impression than a grammatical slip, because it looks like intent.\n\nWhere the conditional does belong in this register is in softening a *request* or a *proposal*: «propondríamos incluir la partida» is a genuine, useful hedge before a decision is made. Once the decision is made, the hedge has to come off.\n\nNote «la partida» in the construction sense — a budget line item or work package. «El alcance» is scope. Both are core vocabulary in your context and neither is a false friend, but «partida» has enough other meanings that the collocation is worth fixing as a unit.',
     },
   },
   {
@@ -796,7 +787,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Sequence of tenses is a mechanical consequence, not a stylistic choice. Move the main verb back and the subordinate subjunctive moves with it: quiere que entregue → quería que entregara.\n\nThe derivation again: entregaron (third-person plural preterite) → drop -ron → entrega- → add -ra → entregara. Every verb in Spanish, including every irregular, forms the imperfect subjunctive this way with no exceptions at all. Fuera, tuviera, pudiera, dijera, condujera, quisiera — all from fueron, tuvieron, pudieron, dijeron, condujeron, quisieron.\n\nThis is why the error sits at severity 5. It is not a rare form; it is required every time you report a past instruction, a past wish, a past doubt or a past requirement, which in a consulting context is most of what you say about last week. Not having it forces you to paraphrase around a whole region of the language.\n\n«El vaciado» is the pour — «antes del vaciado», with «de + el» contracting to «del» obligatorily.',
+        'Sequence of tenses is a mechanical consequence, not a stylistic choice. Move the main verb back and the subordinate subjunctive moves with it: quiere que entregue → quería que entregara.\n\nThe derivation again: entregaron (third-person plural preterite) → drop -ron → entrega- → add -ra → entregara. Every verb in Spanish, including every irregular, forms the imperfect subjunctive this way with no exceptions at all. Fuera, tuviera, pudiera, dijera, condujera, quisiera — all from fueron, tuvieron, pudieron, dijeron, condujeron, quisieron.\n\nThis is why the form is worth the effort of drilling. It is not rare; it is required every time you report a past instruction, a past wish, a past doubt or a past requirement, which in a consulting context is most of what you say about last week. Not having it forces you to paraphrase around a whole region of the language.\n\n«El vaciado» is the pour — «antes del vaciado», with «de + el» contracting to «del» obligatorily.',
     },
   },
   {
@@ -808,18 +799,12 @@ export const ERROR_DRILLS: SeedDrill[] = [
       prompt: 'Translate into Spanish.',
       context: 'Explaining to your director why the schedule slipped.',
       sentence: 'They asked us to redo the structural calculation before they would sign it.',
-      answer: 'Nos pidieron que rehiciéramos el cálculo estructural antes de firmarlo.',
+      answer: 'Nos pidieron que rehiciéramos el cálculo estructural antes de que lo firmaran.',
       accept: [
-        'nos pidieron que rehiciéramos el cálculo estructural antes de que lo firmaran',
-        'nos pidieron que rehiciésemos el cálculo estructural antes de firmarlo',
+        'nos pidieron que rehiciésemos el cálculo estructural antes de que lo firmaran',
+        'nos pidieron rehacer el cálculo estructural antes de que lo firmaran',
       ],
       distractors: [
-        {
-          answer: 'Nos pidieron rehacer el cálculo estructural antes de firmarlo.',
-          feedback:
-            'Grammatical and natural — but it dodges the structure this drill is for. With «pedir que» and a stated subject, Spanish uses a subjunctive clause: que rehiciéramos.',
-          errorCode: 'mood.subj_imperfecto_missing',
-        },
         {
           answer: 'Nos pidieron que rehacemos el cálculo estructural antes de firmarlo.',
           feedback: '«Pedir que» requires the subjunctive, and a past main verb requires the imperfect subjunctive.',
@@ -827,7 +812,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Rehiciéramos» comes from «rehicieron», the third-person plural preterite of rehacer, which inherits hacer\'s irregular stem: hicieron → hiciera, rehicieron → rehiciera. The accent on «rehiciéramos» is obligatory.\n\nThe English sentence hides two things Spanish makes explicit. First, "asked us to" is a verb of influence, so Spanish needs «pedir que + subjunctive» rather than an infinitive when the subject of the second verb is stated or contrastive. Second, "before they would sign it" is not a conditional at all in Spanish — it is a time clause. Because the two subjects are the same in «antes de firmarlo», an infinitive is the natural choice; if you want to make the signers explicit you need «antes de que lo firmaran», with the subjunctive that «antes de que» always takes.\n\n«Antes de que» is one of the handful of conjunctions that takes the subjunctive unconditionally, whether the event is past or future — unlike «después de que», which takes the indicative for real past events.',
+        '«Rehiciéramos» comes from «rehicieron», the third-person plural preterite of rehacer, which inherits hacer\'s irregular stem: hicieron → hiciera, rehicieron → rehiciera. The accent on «rehiciéramos» is obligatory.\n\nThe English sentence hides two things Spanish makes explicit. First, "asked us to" is a verb of influence, so Spanish needs «pedir que + subjunctive» rather than an infinitive when the subject of the second verb is stated or contrastive.\n\nSecond, and this is the trap: the subjects are not the same. They ask, we redo, *they* sign. An infinitive after «antes de» takes its subject from the nearest clause — so «antes de firmarlo» says we sign it, which reverses the English. Different subjects force «antes de que» and a conjugated verb: «antes de que lo firmaran».\n\n«Antes de que» is one of the handful of conjunctions that takes the subjunctive unconditionally, whether the event is past or future — unlike «después de que», which takes the indicative for real past events.',
     },
   },
 
@@ -905,7 +890,11 @@ export const ERROR_DRILLS: SeedDrill[] = [
     topicId: 'a1.verb.gustar',
     kind: 'drill_translate',
     difficulty: 3,
-    targetsError: 'pron.doler_le',
+    // Deliberately not tagged `pron.doler_le`. This item probes the gustar-family
+    // inversion through *faltar*; a miss here is not evidence that the learner
+    // treats «doler» as reflexive, and tagging it would write that claim into the
+    // error log, which drives scheduling.
+    targetsError: null,
     payload: {
       prompt: 'Translate into Spanish.',
       context: 'Explaining a resourcing problem.',
@@ -920,7 +909,6 @@ export const ERROR_DRILLS: SeedDrill[] = [
           answer: 'Los capataces faltan dos personas en el turno noche.',
           feedback:
             'Faltar works like gustar and doler: the missing people are the subject, and the foremen are an indirect object. «A los capataces les faltan…»',
-          errorCode: 'pron.doler_le',
         },
       ],
       explanation:
@@ -948,7 +936,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Sé» with an accent is a verb — the first-person present of saber ("I know") or the informal command of ser ("be"). «Se» without an accent is a pronoun: reflexive, impersonal, passive, or the substitute for «le» before another third-person pronoun.\n\nThis is a diacritic accent, which is a specific category: the accent does not mark stress, because both words are single stressed syllables. It exists purely to separate two identical spellings. The same job is done by él/el, tú/tu, mí/mi, sí/si, más/mas, dé/de, té/te and aún/aun.\n\nBecause the accent carries no phonetic information, it is invisible in speech and can only be got right in writing — which makes it exactly the kind of error that survives fluency. The fix is a substitution test: if you can replace the word with "I know", it takes the accent.\n\nNote also «si» without an accent here, meaning "whether". «Sí» with an accent means "yes". Two diacritic pairs in one short sentence.',
+        '«Sé» with an accent is a verb — the first-person present of saber ("I know") or the informal command of ser ("be"). «Se» without an accent is a pronoun: reflexive, impersonal, passive, or the substitute for «le» before another third-person pronoun.\n\nThis is a diacritic accent (the *tilde diacrítica*), which is a specific category: it does not follow the ordinary stress rules, which would leave both spellings bare. What it marks is that the accented member of the pair is a tonic word — «sé» carries its own stress as a verb — while the unaccented member is a clitic, pronounced leaning on the word beside it. In writing, its practical job is to separate two identical spellings. The same job is done by él/el, tú/tu, mí/mi, sí/si, más/mas, dé/de, té/te and aún/aun.\n\nBecause the stress difference is slight and easy to miss, the accent is effectively invisible in speech and can only be got right in writing — which makes it exactly the kind of error that survives fluency. The fix is a substitution test: if you can replace the word with "I know", it takes the accent.\n\nNote also «si» without an accent here, meaning "whether". «Sí» with an accent means "yes". Two diacritic pairs in one short sentence.',
     },
   },
   {
@@ -970,7 +958,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'The sentence has both words in the wrong places, which is the useful case. «Se lo envío» uses the pronoun: «se» here is standing in for «le», because Spanish does not allow «le lo» and replaces the first pronoun with «se». «No sé» uses the verb.\n\nThat «le → se» substitution is worth stating on its own, since it is the least intuitive use of «se» in the language. «Le envío el documento» becomes «se lo envío», never «le lo envío». It is purely phonetic in origin and applies whenever an indirect «le/les» meets a direct «lo/la/los/las».\n\nThe substitution test again: replace with "I know" and see whether the sentence survives. «I know it I send tomorrow» does not; «I do not know the file number» does.\n\n«El expediente» is the file or case record — standard in Peruvian administrative and contractual usage, and worth having alongside «el acta», «la valorización» and «la adenda».',
+        'The sentence has both words in the wrong places, which is the useful case. «Se lo envío» uses the pronoun: «se» here is standing in for «le», because Spanish does not allow «le lo» and replaces the first pronoun with «se». «No sé» uses the verb.\n\nThat «le → se» substitution is worth stating on its own, since it is the least intuitive use of «se» in the language. «Le envío el documento» becomes «se lo envío», never «le lo envío». The substitution applies whenever an indirect «le/les» meets a direct «lo/la/los/las». It is often explained as a matter of euphony, but the real history is that the older form was «ge lo» (from Latin ILLI ILLUM), and «ge» merged with «se» in pronunciation. This «se» and the reflexive «se» are unrelated words that ended up spelled alike.\n\nThe substitution test again: replace with "I know" and see whether the sentence survives. «I know it I send tomorrow» does not; «I do not know the file number» does.\n\n«El expediente» is the file or case record — standard in Peruvian administrative and contractual usage, and worth having alongside «el acta», «la valorización» and «la adenda».',
     },
   },
 
@@ -1000,7 +988,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Every preposition in Spanish takes the infinitive: para iniciar, sin firmar, antes de revisar, después de vaciar, al llegar, por no avisar, a pesar de tener.\n\nThere are no exceptions to this. Where English uses "-ing" after a preposition ("before starting", "without signing"), Spanish uses the bare infinitive — and where English uses an infinitive, Spanish often does too, which is why the rule feels inconsistent until you see that Spanish is the simpler of the two.\n\nThe conjugated form only becomes possible when you insert «que» and build a full clause with its own subject: «para que el cliente inicie los trabajos», which then takes the subjunctive. That is the choice point: same subject → preposition + infinitive; different subject → «que» + conjugated verb.\n\n«Al + infinitive» deserves a note of its own, because it has no English equivalent and is very useful: «al llegar a obra» means "on arriving at site" or "when we got to site", compressing a whole time clause into two words.',
+        'Every preposition in Spanish takes the infinitive: para iniciar, sin firmar, antes de revisar, después de vaciar, al llegar, por no avisar, a pesar de tener.\n\nThe rule is near-absolute, and the handful of exceptions are worth knowing rather than fearing: «según» takes a conjugated verb («según acordamos», «según indica el expediente»), «excepto», «salvo» and «menos» can front a full clause, and a small set of fixed phrases like «desde que» and «hasta que» carry «que» precisely because a clause follows. Outside those, treat it as exceptionless. Where English uses "-ing" after a preposition ("before starting", "without signing"), Spanish uses the bare infinitive — and where English uses an infinitive, Spanish often does too, which is why the rule feels inconsistent until you see that Spanish is the simpler of the two.\n\nThe conjugated form only becomes possible when you insert «que» and build a full clause with its own subject: «para que el cliente inicie los trabajos», which then takes the subjunctive. That is the choice point: same subject → preposition + infinitive; different subject → «que» + conjugated verb.\n\n«Al + infinitive» deserves a note of its own, because it has no English equivalent and is very useful: «al llegar a obra» means "on arriving at site" or "when we got to site", compressing a whole time clause into two words.',
     },
   },
   {
@@ -1035,18 +1023,18 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Complete the sentence. Write «a» or leave it blank by writing «—».',
       context: 'Describing a staffing decision.',
-      sentence: 'Contratamos ___ dos ingenieros peruanos para la supervisión.',
+      sentence: 'Contratamos ___ los dos ingenieros que nos recomendó el cliente.',
       answer: 'a',
       distractors: [
         {
           answer: '—',
           feedback:
-            'A specific human direct object takes the personal «a». Two identified engineers are people, so the «a» is required.',
+            'A specific human direct object takes the personal «a». These are two identified engineers — the client named them — so the «a» is required.',
           errorCode: 'pron.personal_a',
         },
       ],
       explanation:
-        'Spanish marks a direct object that is a specific person with «a». «Contratamos a dos ingenieros», «vimos al supervisor», «llamé a la cliente». English has no equivalent, so there is nothing prompting you to include it.\n\nThe condition is specificity as much as humanness. «Buscamos un ingeniero» with no «a» means you want *an* engineer, any engineer — you are describing a vacancy. «Buscamos a un ingeniero» means you are looking for a particular one who exists. Both sentences are correct and they mean different things, which is why this is worth getting right rather than just remembering as a rule.\n\nIt extends to pets and personified entities, and to indefinite pronouns referring to people: «no vi a nadie», «¿conoces a alguien en la municipalidad?». The «a» before «nadie» and «alguien» is obligatory.\n\nOne exception worth knowing: «tener» normally drops it. «Tenemos dos ingenieros en obra», not «a dos ingenieros» — unless you are stressing a relationship: «tengo a mi hermano trabajando aquí».',
+        'Spanish marks a direct object that is a specific person with «a». «Vimos al supervisor», «llamé a la cliente», «contratamos a los dos ingenieros que nos recomendó el cliente». English has no equivalent, so there is nothing prompting you to include it.\n\nThe condition is specificity as much as humanness, and this item is built to make that visible. «Los dos ingenieros que nos recomendó el cliente» are particular, identified people, so the «a» is obligatory. Strip the identification away and it stops being obligatory: «contratamos dos ingenieros» describes filling two posts with anyone qualified, and is perfectly good Spanish without the «a». «Buscamos un ingeniero» means you are describing a vacancy; «buscamos a un ingeniero» means there is a particular one you are trying to find. The pairs are correct in both directions and they mean different things, which is why this is worth understanding rather than memorising.\n\nIt extends to pets and personified entities, and to indefinite pronouns referring to people: «no vi a nadie», «¿conoces a alguien en la municipalidad?». The «a» before «nadie» and «alguien» is obligatory.\n\nOne exception worth knowing: «tener» normally drops it. «Tenemos dos ingenieros en obra», not «a dos ingenieros» — unless you are stressing a relationship: «tengo a mi hermano trabajando aquí».',
     },
   },
   {
@@ -1104,18 +1092,18 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Correct the sentence.',
       context: 'Chasing an outstanding response.',
-      sentence: 'El proveedor no ha respondiendo a nuestras últimas dos consultas.',
-      answer: 'El proveedor no ha respondido a nuestras últimas dos consultas.',
+      sentence: 'El proveedor no ha respondiendo a nuestras dos últimas consultas.',
+      answer: 'El proveedor no ha respondido a nuestras dos últimas consultas.',
       distractors: [
         {
-          answer: 'El proveedor no está respondiendo a nuestras últimas dos consultas.',
+          answer: 'El proveedor no está respondiendo a nuestras dos últimas consultas.',
           feedback:
             'That is a valid sentence, but it changes the meaning to an ongoing pattern. The original reports that no answer has arrived: «no ha respondido».',
           errorCode: 'verb.perfecto_gerundio',
         },
       ],
       explanation:
-        '«Haber» takes the participle: «no ha respondido». The gerund cannot follow it.\n\nThe distractor is worth reading twice, because it is not ungrammatical — it is a different claim. «No ha respondido» reports a completed absence of response up to now. «No está respondiendo» describes an ongoing behaviour, and in a client email that difference is the difference between a factual chase and an accusation.\n\n«Responder a» takes the preposition: «responder a una consulta», «responder a un correo». Dropping it is a separate error and a common one, since English "answer" is transitive.\n\n«Nuestras últimas dos consultas» — note that Spanish puts the ordinal-like «últimas» before the number, the reverse of English "last two". «Las dos últimas consultas» is also correct and slightly more common.',
+        '«Haber» takes the participle: «no ha respondido». The gerund cannot follow it.\n\nThe distractor is worth reading twice, because it is not ungrammatical — it is a different claim. «No ha respondido» reports a completed absence of response up to now. «No está respondiendo» describes an ongoing behaviour, and in a client email that difference is the difference between a factual chase and an accusation.\n\n«Responder a» takes the preposition: «responder a una consulta», «responder a un correo». Dropping it is a separate error and a common one, since English "answer" is transitive.\n\n«Nuestras dos últimas consultas» — note the order. Spanish normally puts the number before «último/a», the reverse of English "last two": las dos últimas consultas, los tres últimos informes. «Las últimas dos consultas» is heard and is not an error, but the numeral-first order is the standard one and the safer default in writing.',
     },
   },
 
@@ -1145,7 +1133,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Spanish routinely names the indirect object twice: once as a full phrase and once as a pronoun. «Le enviamos el informe al cliente». To an English speaker this looks redundant, and grammatically it is — but it is not optional. Leaving out the «le» makes the sentence sound incomplete to a native ear.\n\nThe doubling is obligatory when the indirect object comes after the verb, which is the normal order. It is also obligatory whenever the indirect object is a pronoun: «le enviamos el informe a él».\n\nDirect objects behave differently and are the source of the confusion. They are only doubled when fronted for emphasis: «el informe lo enviamos el martes». In neutral order you would simply say «enviamos el informe», with no pronoun.\n\nSo the practical rule is: indirect objects double by default, direct objects do not. Getting this right is one of the things that most separates fluent-sounding Spanish from correct-but-foreign Spanish, which is why it sits in the B2 band.',
+        'Spanish routinely names the indirect object twice: once as a full phrase and once as a pronoun. «Le enviamos el informe al cliente». To an English speaker this looks redundant, and grammatically it is — but leaving out the «le» makes the sentence sound incomplete to a native ear.\n\nWith a postverbal indirect object the clitic is strongly preferred rather than strictly obligatory — the NGLE treats «Envió flores a su madre» as well formed. It becomes genuinely obligatory when the indirect object is fronted («Al cliente le enviamos el informe») or is a stressed pronoun («le enviamos el informe a él»). It is also obligatory whenever the indirect object is a pronoun: «le enviamos el informe a él».\n\nDirect objects behave differently and are the source of the confusion. They are only doubled when fronted for emphasis: «el informe lo enviamos el martes». In neutral order you would simply say «enviamos el informe», with no pronoun.\n\nSo the practical rule is: indirect objects double by default, direct objects do not. Getting this right is one of the things that most separates fluent-sounding Spanish from correct-but-foreign Spanish, which is why it sits in the B2 band.',
     },
   },
   {
@@ -1158,12 +1146,15 @@ export const ERROR_DRILLS: SeedDrill[] = [
       context: 'Describing a coordination step across two countries.',
       sentence: 'We explained the change to the Chilean team on Friday.',
       answer: 'Le explicamos el cambio al equipo chileno el viernes.',
-      accept: ['el viernes le explicamos el cambio al equipo chileno'],
+      accept: [
+        'el viernes le explicamos el cambio al equipo chileno',
+        'explicamos el cambio al equipo chileno el viernes',
+      ],
       distractors: [
         {
-          answer: 'Explicamos el cambio al equipo chileno el viernes.',
+          answer: 'Le explicamos el cambio a el equipo chileno el viernes.',
           feedback:
-            'Understandable, but the doubled pronoun is missing. Spanish wants «le explicamos… al equipo chileno».',
+            '«A + el» always contracts to «al». The doubled pronoun is right; the contraction is not optional.',
           errorCode: 'pron.io_redundant',
         },
       ],
@@ -1219,6 +1210,40 @@ export const ERROR_DRILLS: SeedDrill[] = [
       ],
       explanation:
         '«Esperar» takes a direct object: «esperamos la aprobación». No preposition. The same verb also means "to hope" and "to expect", and it keeps the same government in all three senses.\n\n«Seguir + gerundio» is the natural way to say something is still happening: «seguimos esperando», «seguimos revisando», «sigue pendiente». It is more idiomatic than «todavía estamos + gerundio», and noticeably more so than a bare «todavía» with a simple present.\n\n«La aprobación del cliente» — «de + el» contracts to «del» without exception.\n\nOne related trap: «esperar a que» *does* take a preposition, but only when a clause follows. «Esperamos a que el cliente apruebe» — and the clause is subjunctive, because the approval has not happened.',
+    },
+  },
+
+  /* ============ pron.doler_le (appended — see drillKey: never insert) ============ */
+  {
+    topicId: 'a1.verb.gustar',
+    kind: 'drill_translate',
+    difficulty: 3,
+    targetsError: 'pron.doler_le',
+    payload: {
+      prompt: 'Translate into Spanish.',
+      context: 'Explaining to the site manager why a welder has been moved off the night shift.',
+      sentence: "The welder's back has been hurting since Monday, so we moved him to the day shift.",
+      answer: 'Al soldador le duele la espalda desde el lunes; lo pasamos al turno de día.',
+      accept: [
+        'al soldador le duele la espalda desde el lunes, así que lo pasamos al turno de día',
+        'al soldador le duele la espalda desde el lunes; por eso lo pasamos al turno de día',
+      ],
+      distractors: [
+        {
+          answer: 'El soldador se duele la espalda desde el lunes; lo pasamos al turno de día.',
+          feedback:
+            'Doler takes no reflexive pronoun. The back is the subject and the welder is an indirect object, so it is «le duele», never «se duele».',
+          errorCode: 'pron.doler_le',
+        },
+        {
+          answer: 'Al soldador le duele su espalda desde el lunes; lo pasamos al turno de día.',
+          feedback:
+            'Spanish uses the definite article for body parts, not the possessive. The «le» already tells you whose back it is: «le duele la espalda».',
+          errorCode: 'pron.body_part_article',
+        },
+      ],
+      explanation:
+        'Two things have to be right at once here, which is why this item sits at the production end of the doler set.\n\nFirst, the structure. Doler is a gustar-family verb: the thing that hurts is the grammatical subject and the person who feels it is an indirect object. So the sentence is literally "to the welder, the back hurts" — «al soldador le duele la espalda». The pronoun «le» is obligatory even though «al soldador» is already there; Spanish doubles the indirect object as a matter of course. «Se duele» is not an alternative — it is a different verb, «dolerse de» (to lament), and it is rare and literary.\n\nSecond, the article. Where English says "his back", Spanish says «la espalda». The indirect object pronoun has already established whose back it is, so a possessive on top of it is redundant and sounds foreign. This holds across the body: «me duele la cabeza», «le duelen las rodillas», «se lastimó la mano». Reserve «su espalda» for cases where ownership is genuinely in contrast.\n\nThird, agreement. The verb agrees with the body part, not with the person: «le duele la espalda» but «le duelen las rodillas». Because English makes the person the subject of "hurt", the pull towards «duelen» after a plural person is strong and worth resisting deliberately.\n\nOn «desde el lunes»: a state that began at a point and is still going takes «desde» plus that point. English reaches for a perfect continuous ("has been hurting"); Spanish is content with the simple present, because «desde» already carries the continuity. «Le duele desde el lunes», not «le ha estado doliendo».',
     },
   },
 ];
