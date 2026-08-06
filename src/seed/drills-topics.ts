@@ -55,7 +55,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
   {
     topicId: 'b1.verb.imperfecto',
     kind: 'drill_transform',
-    difficulty: 3,
+    difficulty: 2,
     targetsError: null,
     payload: {
       prompt: 'Rewrite as a habit that no longer holds. Begin with «Antes».',
@@ -159,17 +159,18 @@ export const TOPIC_DRILLS: SeedDrill[] = [
   {
     topicId: 'b1.mood.subj_presente',
     kind: 'drill_cloze',
-    difficulty: 2,
+    difficulty: 3,
     targetsError: null,
     payload: {
-      prompt: 'Complete with the indicative or the subjunctive, whichever the sentence licenses.',
+      prompt:
+        'Give the two verb forms in order, separated by a comma — indicative or subjunctive, whichever each clause licenses.',
       context: 'Two statements about the same fact.',
       sentence: 'Sé que el plazo ___ (ser) ajustado, pero dudo que ___ (haber) otra opción.',
-      answer: 'es ajustado, pero dudo que haya',
-      accept: ['es, pero dudo que haya', 'es ajustado pero dudo que haya'],
+      answer: 'es, haya',
+      accept: ['es haya'],
       distractors: [
         {
-          answer: 'sea ajustado, pero dudo que hay',
+          answer: 'sea, hay',
           feedback:
             'The two are swapped. «Saber que» asserts a fact and takes the indicative; «dudar que» questions one and takes the subjunctive.',
         },
@@ -343,7 +344,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
   {
     topicId: 'b1.pron.od_oi',
     kind: 'drill_error_spot',
-    difficulty: 4,
+    difficulty: 3,
     targetsError: null,
     payload: {
       prompt: 'Correct the pronoun placement.',
@@ -379,6 +380,11 @@ export const TOPIC_DRILLS: SeedDrill[] = [
           answer: 'cual',
           feedback:
             '«Cual» never stands alone. It needs an article — «el cual» — and in a short defining clause like this, plain «que» is what Spanish uses.',
+        },
+        {
+          answer: 'quien',
+          feedback:
+            '«Quien» refers only to people, and the antecedent here is «el informe». Even with a human antecedent it cannot introduce a defining clause with no preposition: «el ingeniero que llamó», not «el ingeniero quien llamó».',
         },
       ],
       explanation:

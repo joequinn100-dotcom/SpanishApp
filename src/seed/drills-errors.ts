@@ -26,7 +26,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Complete the noun phrase.',
       context: 'Opening line of a progress note to the client.',
-      sentence: 'El contratista programó ___ nueva demostración del sistema contra incendios.',
+      sentence: 'El contratista programó ___ demostración del sistema contra incendios para el jueves.',
       answer: 'una',
       distractors: [
         {
@@ -37,7 +37,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Gender belongs to the noun, and every word that modifies it must agree: article, demonstrative, quantifier and adjective, however far from the noun they sit.\n\nThe -ión ending is one of the reliable ones: it is feminine in effectively every case you will meet at work — la construcción, la instalación, la negociación, la ampliación, la observación. Because the ending is predictable, the article is too, which makes this one of the few gender questions you never have to memorise word by word.\n\nThe reason the error appears here specifically is distance. By the time the noun arrives, the article has already been committed to, so a wrong guess made two words earlier propagates through the whole phrase: «un nuevo demostración» is one mistake showing up twice. Storing nouns as article + noun — «la demostración», not «demostración» — removes the guess.',
+        'Gender belongs to the noun, and every word that modifies it must agree: article, demonstrative, quantifier and adjective, however far from the noun they sit.\n\nThe -ión ending is one of the reliable ones: it is feminine in effectively every case you will meet at work — la construcción, la instalación, la negociación, la ampliación, la observación. Because the ending is predictable, the article is too, which makes this one of the few gender questions you never have to memorise word by word.\n\nNote that nothing before the blank tells you the gender — that is deliberate. In real writing the article is committed to before the noun arrives, and a wrong guess then propagates through everything that agrees with it: «un nuevo demostración» is one mistake showing up twice. Storing nouns as article + noun — «la demostración», not «demostración» — removes the guess at source.',
     },
   },
   {
@@ -495,7 +495,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
   {
     topicId: 'a1.pron.reflexivos_basico',
     kind: 'drill_error_spot',
-    difficulty: 3,
+    difficulty: 2,
     targetsError: 'pron.reflexive_dropped',
     payload: {
       prompt: 'Correct the sentence.',
@@ -518,7 +518,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
   {
     topicId: 'a1.pron.reflexivos_basico',
     kind: 'drill_translate',
-    difficulty: 3,
+    difficulty: 4,
     targetsError: 'pron.reflexive_dropped',
     payload: {
       prompt: 'Translate into Spanish.',
@@ -642,7 +642,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Correct the sentence.',
       context: 'Giving background in a claim meeting.',
-      sentence: 'El cliente aprobó el diseño hacen seis meses.',
+      sentence: 'El cliente aprobó el diseño desde hace seis meses.',
       answer: 'El cliente aprobó el diseño hace seis meses.',
       distractors: [
         {
@@ -653,7 +653,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Hace» is impersonal and invariable in this construction. «Seis meses» is not its subject, so it never becomes «hacen».\n\nThe distractor is the other half of the same error and worth seeing: «hace seis meses atrás» stacks two markers of pastness. It is heard in speech in several countries, but it is redundant, and in writing it reads as a slip.\n\nThe main verb stays in the preterite. «Hace» locates the event in time; it does not change the tense of anything. «Aprobó… hace seis meses» is a completed act at a point in the past, which is exactly what the preterite is for.',
+        '«Hace» and «desde hace» are not interchangeable, and the verb tense is what decides between them.\n\nBare «hace + time» locates a completed event at a point in the past, so it pairs with the preterite: «aprobó el diseño hace seis meses». «Desde hace + time» measures a situation that started then and is *still going*, so it pairs with the present: «el expediente está en revisión desde hace seis meses», «esperamos la orden de compra desde hace dos semanas». An approval is a moment, not a situation, so «desde hace» cannot apply to it.\n\nThe English does not help here. "Six months ago" and "for six months" are clearly different in English, but learners reach for «desde» because it is the word they know for "since" — and "since" is the word English uses for the continuing case.\n\nThe distractor covers the other half of the same territory: «hace seis meses atrás» stacks two markers of pastness. It is heard in speech in several countries, but it is redundant, and in writing it reads as a slip.\n\nAlso note that «hace» is impersonal and invariable — «hace seis meses», never «hacen seis meses». It is not agreeing with anything.',
     },
   },
 
@@ -969,9 +969,9 @@ export const ERROR_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: 'verb.infinitive_after_prep',
     payload: {
-      prompt: 'Complete with the correct form of the verb.',
+      prompt: 'Complete the sentence with one of: iniciar / iniciamos / iniciando.',
       context: 'Setting out a condition in an email.',
-      sentence: 'Necesitamos la aprobación del cliente para ___ (iniciar) los trabajos.',
+      sentence: 'Necesitamos la aprobación del cliente para ___ los trabajos.',
       answer: 'iniciar',
       distractors: [
         {
@@ -1021,7 +1021,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: 'pron.personal_a',
     payload: {
-      prompt: 'Complete the sentence. Write «a» or leave it blank by writing «—».',
+      prompt: 'Complete the sentence with «a», «al», or «—» for nothing.',
       context: 'Describing a staffing decision.',
       sentence: 'Contratamos ___ los dos ingenieros que nos recomendó el cliente.',
       answer: 'a',
@@ -1030,6 +1030,12 @@ export const ERROR_DRILLS: SeedDrill[] = [
           answer: '—',
           feedback:
             'A specific human direct object takes the personal «a». These are two identified engineers — the client named them — so the «a» is required.',
+          errorCode: 'pron.personal_a',
+        },
+        {
+          answer: 'al',
+          feedback:
+            '«A + el» contracts to «al», but only before the singular «el». Before «los», «la» or «las» there is no contraction: a los ingenieros, a la supervisora, a las contratistas.',
           errorCode: 'pron.personal_a',
         },
       ],
@@ -1077,6 +1083,12 @@ export const ERROR_DRILLS: SeedDrill[] = [
           answer: 'revisando',
           feedback:
             'After haber the verb takes the participle, not the gerund. «Hemos revisado», never «hemos revisando».',
+          errorCode: 'verb.perfecto_gerundio',
+        },
+        {
+          answer: 'revisar',
+          feedback:
+            'Haber is not a modal — it does not take a bare infinitive. Only the participle can follow it: «hemos revisado».',
           errorCode: 'verb.perfecto_gerundio',
         },
       ],
@@ -1170,7 +1182,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
     difficulty: 3,
     targetsError: 'prep.buscar_para',
     payload: {
-      prompt: 'Remove the preposition that does not belong.',
+      prompt: 'Correct the sentence.',
       context: 'Describing a procurement task.',
       sentence: 'Estamos buscando para un proveedor local de encofrados.',
       answer: 'Estamos buscando un proveedor local de encofrados.',
