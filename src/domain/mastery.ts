@@ -145,7 +145,15 @@ export function topicTransition(state: TopicState, event: TopicEvent, now: strin
       if (state.status === 'mastered' && !event.correct) return regressTopic(s);
 
       // First attempt logged is what moves available → studying.
-      if (s.status === 'available') s = { ...s, status: 'studying' };
+      //
+      // `locked` promotes too, which §4 does not spell out but the warm-up
+      // forces: §4 guarantees the top-severity errors appear "regardless of the
+      // topic being studied", so a warm-up item can belong to a topic the graph
+      // has not opened yet. Leaving it locked would produce a locked topic
+      // carrying attempts and an accuracy — incoherent, and it would hide real
+      // evidence from the mastery gate. The graph gates what gets *recommended*;
+      // it does not get to deny work that actually happened.
+      if (s.status === 'available' || s.status === 'locked') s = { ...s, status: 'studying' };
 
       if (
         s.status === 'studying' &&

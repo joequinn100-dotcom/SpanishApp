@@ -58,6 +58,18 @@ describe('topic: available → studying', () => {
       expect(s.firstSeen).toBe(T0);
     }
   });
+
+  it('promotes a locked topic too, because warm-up items ignore the graph', () => {
+    // §4 guarantees the top-severity errors appear "regardless of the topic
+    // being studied", so a warm-up item can belong to a topic that is still
+    // locked. A locked topic carrying attempts and an accuracy is incoherent.
+    const s = topicTransition(
+      newTopicState('locked'),
+      { type: 'attempt', correct: true, rollingAccuracy: 1 },
+      T0,
+    );
+    expect(s.status).toBe('studying');
+  });
 });
 
 describe('topic: studying → consolidating', () => {

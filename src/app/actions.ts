@@ -1,9 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { tx } from '@/db';
 import { db } from '@/lib/queries';
 import { recomputeAvailability } from '@/seed';
+import { startSession, submitAnswer, openSession } from '@/lib/practice';
+import { finishSession } from '@/lib/handoff';
 import type { TopicStatus } from '@/domain/mastery';
 
 /**
@@ -79,4 +82,47 @@ export async function resetPlacement() {
     recomputeAvailability(database);
   });
   revalidatePath('/', 'layout');
+}
+
+/* ------------------------------------------------------------------ *
+ * Practice loop (Phase 2)
+ * ------------------------------------------------------------------ */
+
+/**
+ * Open a session, or resume the one already running.
+ *
+ * `startSession` is idempotent by design — clicking "Start" twice must not
+ * produce two open sessions, because the cursor lives on the session row and
+ * two cursors would mean two truths about where you are.
+ */
+export async function beginSession(focusTopicId?: string | null) {
+  const s = startSession(focusTopicId ?? null);
+  revalidatePath('/', 'layout');
+  redirect(`/practice/${s.id}`);
+}
+
+/**
+ * Grade one answer. Every consequence is written in the same transaction.
+ *
+ * Deliberately does NOT revalidate. The cursor has already advanced in SQLite,
+ * so revalidating would swap the item under the learner's feet and unmount the
+ * feedback they are still reading. The runner refreshes on "Next" instead,
+ * which is the moment the new item is actually wanted.
+ */
+export async function answer(sessionId: number, submitted: string, latencyMs?: number) {
+  return submitAnswer(sessionId, submitted, latencyMs);
+}
+
+/** End the session and write the SPEC §7 handoff to disk and to the row. */
+export async function endSession(sessionId: number) {
+  finishSession(sessionId);
+  revalidatePath('/', 'layout');
+  redirect(`/practice/${sessionId}/summary`);
+}
+
+/** Abandon without a handoff is not offered — ending always produces one. */
+export async function endOpenSession() {
+  const s = openSession();
+  if (!s) return;
+  await endSession(s.id);
 }

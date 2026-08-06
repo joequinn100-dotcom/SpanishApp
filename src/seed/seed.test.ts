@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { ERRORS, LEVELS, PREREQS, STRANDS, TOPICS, seed, recomputeAvailability } from './index';
+import {
+  DRILLS,
+  ERRORS,
+  LEVELS,
+  PREREQS,
+  STRANDS,
+  TOPICS,
+  seed,
+  recomputeAvailability,
+} from './index';
 import { migrate, openDatabase } from '@/db';
 import type { DB } from '@/db';
 
@@ -194,6 +203,22 @@ describe('register: no Peninsular Spanish reaches the seed', () => {
       { where: `${e.code}.wrong`, text: e.wrong },
       { where: `${e.code}.right`, text: e.right },
     ]),
+    // Authored drills never reached the §5 register verifier, so this suite is
+    // the only thing standing between them and the user.
+    ...DRILLS.flatMap((d, i) => {
+      const where = `drill[${i}] ${d.topicId}`;
+      return [
+        { where: `${where}.sentence`, text: d.payload.sentence },
+        { where: `${where}.answer`, text: d.payload.answer },
+        { where: `${where}.explanation`, text: d.payload.explanation },
+        { where: `${where}.context`, text: d.payload.context ?? '' },
+        ...(d.payload.accept ?? []).map((a) => ({ where: `${where}.accept`, text: a })),
+        ...(d.payload.distractors ?? []).flatMap((x) => [
+          { where: `${where}.distractor`, text: x.answer },
+          { where: `${where}.distractor.feedback`, text: x.feedback },
+        ]),
+      ];
+    }),
   ];
 
   it('contains no vosotros pronoun or clitic', () => {

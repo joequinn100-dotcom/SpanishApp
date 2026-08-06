@@ -14,8 +14,12 @@ let seeded = false;
 export function db() {
   const database = getDb();
   if (!seeded) {
-    const n = database.prepare('SELECT count(*) AS n FROM topic').get() as { n: number };
-    if (n.n === 0) seed(database);
+    // Seed when either half is empty: a database created before Phase 2 has
+    // topics but no drills, and seeding is idempotent, so re-running is free.
+    const n = database
+      .prepare('SELECT (SELECT count(*) FROM topic) AS t, (SELECT count(*) FROM content) AS c')
+      .get() as { t: number; c: number };
+    if (n.t === 0 || n.c === 0) seed(database);
     seeded = true;
   }
   return database;

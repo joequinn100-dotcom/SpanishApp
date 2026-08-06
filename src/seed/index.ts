@@ -5,9 +5,12 @@ import { B_TOPICS } from './topics-breakthrough';
 import { C_TOPICS } from './topics-mastery';
 import { PREREQS } from './prereqs';
 import { ERRORS } from './errors';
-import { LEVELS, STRANDS, type SeedTopic } from './types';
+import { ERROR_DRILLS } from './drills-errors';
+import { TOPIC_DRILLS } from './drills-topics';
+import { LEVELS, STRANDS, type SeedTopic, type SeedDrill } from './types';
 
 export const TOPICS: SeedTopic[] = [...A_TOPICS, ...B_TOPICS, ...C_TOPICS];
+export const DRILLS: SeedDrill[] = [...ERROR_DRILLS, ...TOPIC_DRILLS];
 export { PREREQS, ERRORS, LEVELS, STRANDS };
 
 export function slugify(id: string): string {
@@ -20,7 +23,25 @@ export function slugify(id: string): string {
  * because the seed will be re-run whenever the topic list grows — for example
  * when the remaining book units are expanded into migration 002.
  */
-export function seed(db: DB): { topics: number; prereqs: number; errors: number } {
+/**
+ * Stable identity for an authored drill.
+ *
+ * The index is part of the key deliberately. Keying on the sentence alone would
+ * mean that editing a typo orphans the old row and its attempt history; keying
+ * on position means an edit updates the row in place. The cost is that
+ * reordering the arrays reshuffles identities, so drills are appended, never
+ * inserted in the middle.
+ */
+export function drillKey(d: SeedDrill, index: number): string {
+  return `${d.topicId}#${d.targetsError ?? 'topic'}#${index}`;
+}
+
+export function seed(db: DB): {
+  topics: number;
+  prereqs: number;
+  errors: number;
+  drills: number;
+} {
   return tx(db, () => {
     const level = db.prepare('INSERT OR REPLACE INTO level (id, ordinal) VALUES (?, ?)');
     for (const l of LEVELS) level.run(l.id, l.ordinal);
@@ -98,9 +119,45 @@ export function seed(db: DB): { topics: number; prereqs: number; errors: number 
       });
     }
 
+    // Authored drills (see SeedDrill). `attempt` rows reference content.id, so
+    // re-seeding must never delete and reinsert — it updates in place, keyed by
+    // seed_key, which keeps every historical attempt pointing at live content.
+    const drill = db.prepare(`
+      INSERT INTO content (topic_id, kind, difficulty, payload, targets_error,
+                           gauntlet_score, gauntlet_log, verified_at, retired,
+                           provenance, seed_key)
+      VALUES (@topicId, @kind, @difficulty, @payload, @targetsError,
+              0, @log, @verifiedAt, 0, 'authored', @seedKey)
+      ON CONFLICT(seed_key) DO UPDATE SET
+        topic_id = excluded.topic_id, kind = excluded.kind,
+        difficulty = excluded.difficulty, payload = excluded.payload,
+        targets_error = excluded.targets_error
+    `);
+    const log = JSON.stringify({
+      rounds: [],
+      note: 'Authored, not gauntlet-verified. Verified by the seed test suite only.',
+    });
+    for (const [i, d] of DRILLS.entries()) {
+      drill.run({
+        topicId: d.topicId,
+        kind: d.kind,
+        difficulty: d.difficulty,
+        payload: JSON.stringify(d.payload),
+        targetsError: d.targetsError,
+        log,
+        verifiedAt: now,
+        seedKey: drillKey(d, i),
+      });
+    }
+
     recomputeAvailability(db);
 
-    return { topics: TOPICS.length, prereqs: PREREQS.length, errors: ERRORS.length };
+    return {
+      topics: TOPICS.length,
+      prereqs: PREREQS.length,
+      errors: ERRORS.length,
+      drills: DRILLS.length,
+    };
   });
 }
 

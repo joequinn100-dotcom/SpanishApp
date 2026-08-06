@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { nextUp, progress, topErrors } from '@/lib/progress';
+import { firstTopicWithContent, openSession, planOf, streak } from '@/lib/practice';
+import { latestHandoff } from '@/lib/handoff';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
+import { SessionCta } from '@/components/SessionCta';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,8 +28,42 @@ export default function Home() {
   const errors = topErrors(4);
   const pct = Math.round((p.masteredTopics / p.totalTopics) * 100);
 
+  // Resume state (Build Principle 4). Both of these read from SQLite, so
+  // "where you left off" survives a restart, a crash and a closed laptop.
+  const open = openSession();
+  const openPlan = open ? planOf(open) : null;
+  const last = latestHandoff();
+  // Search deeper than the four shown: content coverage is partial, and the
+  // best topic with drills written for it is often below the visible fold.
+  const candidates = nextUp(15);
+  const focusId = firstTopicWithContent(candidates.map((t) => t.id));
+  const focus = candidates.find((t) => t.id === focusId) ?? null;
+
   return (
     <>
+      <div className="mb-6">
+        <SessionCta
+          openSessionId={open?.id ?? null}
+          answered={open?.cursor ?? 0}
+          total={openPlan?.items.length ?? 0}
+          focusTopicId={focus?.id ?? null}
+          focusTopicName={focus?.name_en ?? null}
+          streak={streak().current}
+        />
+        {!open && last && (
+          <p className="mt-2 text-xs text-slate-500">
+            Last session: {last.handoff.duration_min} min, {last.handoff.xp} XP.{' '}
+            {last.handoff.next_recommendation.why}{' '}
+            <Link
+              href={`/practice/${last.sessionId}/summary`}
+              className="text-teal-500 hover:text-teal-300"
+            >
+              handoff →
+            </Link>
+          </p>
+        )}
+      </div>
+
       {/* Headline: completion, and time against the exam. SPEC §8 — visible
           convergence on a target is the mechanic that works for an adult with
           a certification date. */}

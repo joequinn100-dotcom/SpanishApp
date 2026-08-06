@@ -1,3 +1,5 @@
+import type { DrillKind, DrillPayload } from '@/domain/grading';
+
 export type LevelId = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
 export type StrandId =
@@ -47,6 +49,25 @@ export interface SeedError {
   /** Real counts, because §4's weight formula multiplies by log(1+occurrences). */
   occurrences: number;
   note?: string;
+}
+
+/**
+ * An authored drill.
+ *
+ * SPEC §5 assumes all content arrives through the gauntlet. These do not — they
+ * are written by hand so the practice loop has something to run before an API
+ * key exists, and every row is marked `provenance = 'authored'` so the gauntlet
+ * can re-verify or replace them later. The test suite is the interim gate:
+ * register, work context, and answer-key consistency are all enforced there.
+ */
+export interface SeedDrill {
+  topicId: string;
+  kind: DrillKind;
+  /** 1 = recognition, 5 = unaided production under a twist. */
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  /** The error code this item probes, when it was written to probe one. */
+  targetsError: string | null;
+  payload: DrillPayload;
 }
 
 export const LEVELS: { id: LevelId; ordinal: number }[] = [
