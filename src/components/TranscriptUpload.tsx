@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useRef } from 'react';
-import { previewTranscript, uploadTranscript } from '@/app/actions';
+import { extractPdf, previewTranscript, uploadTranscript } from '@/app/actions';
 
 /**
  * The upload box (SPEC §6: "paste or upload").
@@ -20,16 +20,38 @@ export function TranscriptUpload() {
   const [source, setSource] = useState<'lorena' | 'self_recording' | 'other'>('lorena');
   const [title, setTitle] = useState('');
   const [pending, start] = useTransition();
+  const [notice, setNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const text = await file.text();
-    setRaw(text);
-    setTitle((t) => t || file.name.replace(/\.[^.]+$/, ''));
+    setNotice(null);
     setChecked(false);
     setSpeakers([]);
+    setTitle((t) => t || file.name.replace(/\.[^.]+$/, ''));
+
+    if (!/\.pdf$/i.test(file.name)) {
+      setRaw(await file.text());
+      return;
+    }
+
+    // PDFs are read on the server: the extractor is large, and shipping it to
+    // the browser would cost every visitor who never uploads one.
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    }
+    start(async () => {
+      const r = await extractPdf(btoa(binary));
+      setRaw(r.text);
+      setNotice(
+        r.looksScanned
+          ? `Read ${r.pages} ${r.pages === 1 ? 'page' : 'pages'} but found almost no text. This is probably a scan rather than a text PDF — it would need OCR, which the app does not do. Paste the text instead if you have it.`
+          : `Read ${r.pages} ${r.pages === 1 ? 'page' : 'pages'}. Check the speaker labels survived before analysing.`,
+      );
+    });
   }
 
   function check() {
@@ -55,9 +77,9 @@ export function TranscriptUpload() {
     <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-6">
       <h2 className="text-xs uppercase tracking-[0.14em] text-teal-400">Add a class transcript</h2>
       <p className="mt-2 max-w-2xl text-sm text-slate-400">
-        Paste the transcript or drop in a <code className="text-slate-300">.txt</code>,{' '}
-        <code className="text-slate-300">.md</code> or <code className="text-slate-300">.vtt</code>{' '}
-        file. The app pulls out your turns only, proposes what it thinks went wrong and what went
+        Paste the transcript or choose a <code className="text-slate-300">.pdf</code>,{' '}
+        <code className="text-slate-300">.txt</code>, <code className="text-slate-300">.md</code> or{' '}
+        <code className="text-slate-300">.vtt</code> file. The app pulls out your turns only, proposes what it thinks went wrong and what went
         right, and waits for you to confirm each one. Nothing touches your error log until you say so.
       </p>
 
@@ -71,12 +93,20 @@ export function TranscriptUpload() {
         <input
           ref={fileRef}
           type="file"
-          accept=".txt,.md,.vtt,.srt,text/plain"
+          accept=".txt,.md,.vtt,.srt,.pdf,text/plain,application/pdf"
           onChange={onFile}
           className="hidden"
         />
-        <span className="text-xs text-slate-600">or paste below · {words} words</span>
+        <span className="text-xs text-slate-600">
+          {pending ? 'Reading the file…' : `or paste below · ${words} words`}
+        </span>
       </div>
+
+      {notice && (
+        <p className="mt-3 rounded-lg border-l-2 border-amber-600 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">
+          {notice}
+        </p>
+      )}
 
       <textarea
         value={raw}

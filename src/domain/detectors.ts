@@ -195,7 +195,11 @@ const POSITIVES: PositiveRule[] = [
     topicId: 'b2.mood.subj_imperfecto',
     errorCode: 'mood.subj_imperfecto_missing',
     pattern: new RegExp(
-      `\\bsi\\s+[^.!?\\n]{0,40}?\\b([a-záéíóúñü]{3,}(?:ara|aras|áramos|aran|iera|ieras|iéramos|ieran))${EOW}`,
+      // Unaccented variants are included because some PDFs arrive with the
+      // diacritics stripped by the producing tool. «tuvieramos» is still the
+      // learner using the imperfect subjunctive, and the finding is proposed
+      // rather than applied, so the human settles any doubt.
+      `\\bsi\\s+[^.!?\\n]{0,40}?\\b([a-záéíóúñü]{3,}(?:ara|aras|[áa]ramos|aran|iera|ieras|i[ée]ramos|ieran))${EOW}`,
       'gi',
     ),
     explain:

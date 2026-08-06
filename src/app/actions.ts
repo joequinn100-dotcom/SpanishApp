@@ -178,3 +178,19 @@ export async function reviewVocabCard(vocabId: number, recall: Recall) {
   revalidatePath('/', 'layout');
   return result;
 }
+
+/**
+ * Pull the text out of an uploaded PDF.
+ *
+ * Takes base64 because a server action cannot receive a File directly. Class
+ * transcripts are a few hundred KB, so the ~33% encoding overhead is not worth
+ * a separate upload route.
+ */
+export async function extractPdf(base64: string): Promise<{
+  text: string;
+  pages: number;
+  looksScanned: boolean;
+}> {
+  const { extractPdfText } = await import('@/lib/pdf');
+  return extractPdfText(new Uint8Array(Buffer.from(base64, 'base64')));
+}
