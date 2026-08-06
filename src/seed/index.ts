@@ -8,8 +8,9 @@ import { ERRORS } from './errors';
 import { ERROR_DRILLS } from './drills-errors';
 import { TOPIC_DRILLS } from './drills-topics';
 import { VOCAB } from './vocab';
+import { GAUNTLET } from './gauntlet';
 import { LEVELS, STRANDS, type SeedTopic, type SeedDrill } from './types';
-export { VOCAB };
+export { VOCAB, GAUNTLET };
 
 export const TOPICS: SeedTopic[] = [...A_TOPICS, ...B_TOPICS, ...C_TOPICS];
 export const DRILLS: SeedDrill[] = [...ERROR_DRILLS, ...TOPIC_DRILLS];
@@ -130,26 +131,33 @@ export function seed(db: DB): {
                            gauntlet_score, gauntlet_log, verified_at, retired,
                            provenance, seed_key)
       VALUES (@topicId, @kind, @difficulty, @payload, @targetsError,
-              0, @log, @verifiedAt, 0, 'authored', @seedKey)
+              @score, @log, @verifiedAt, 0, 'authored', @seedKey)
       ON CONFLICT(seed_key) DO UPDATE SET
         topic_id = excluded.topic_id, kind = excluded.kind,
         difficulty = excluded.difficulty, payload = excluded.payload,
-        targets_error = excluded.targets_error
+        targets_error = excluded.targets_error,
+        gauntlet_score = excluded.gauntlet_score,
+        gauntlet_log = excluded.gauntlet_log,
+        verified_at = excluded.verified_at
     `);
-    const log = JSON.stringify({
+    const unverified = JSON.stringify({
       rounds: [],
-      note: 'Authored, not gauntlet-verified. Verified by the seed test suite only.',
+      note: 'Authored, not gauntlet-verified. Checked by the seed test suite only.',
     });
     for (const [i, d] of DRILLS.entries()) {
+      const key = drillKey(d, i);
+      // A drill carries a score only if the §5 panel actually gave it one.
+      const g = GAUNTLET[key];
       drill.run({
         topicId: d.topicId,
         kind: d.kind,
         difficulty: d.difficulty,
         payload: JSON.stringify(d.payload),
         targetsError: d.targetsError,
-        log,
-        verifiedAt: now,
-        seedKey: drillKey(d, i),
+        score: g ? g.score : 0,
+        log: g ? JSON.stringify(g) : unverified,
+        verifiedAt: g ? g.verifiedAt : now,
+        seedKey: key,
       });
     }
 
