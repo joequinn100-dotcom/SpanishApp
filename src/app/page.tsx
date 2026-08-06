@@ -6,6 +6,8 @@ import { SeverityDots, StatusPill } from '@/components/StatusPill';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { SessionCta } from '@/components/SessionCta';
 import { HomeSearch } from '@/components/HomeSearch';
+import { DailyQuest } from '@/components/DailyQuest';
+import { gameState } from '@/lib/game';
 import { allTopics, searchIndex } from '@/lib/queries';
 
 export const dynamic = 'force-dynamic';
@@ -45,12 +47,14 @@ export default function Home() {
   // The search corpus is a few hundred rows, small enough to ship whole and
   // match in the browser — which is what makes it feel instant (SPEC §8).
   const index = searchIndex();
+  const game = gameState();
   const strands = Object.fromEntries(allTopics().map((t) => [t.id, t.strand_id]));
 
   return (
     <>
       <div className="mb-6 space-y-4">
         <HomeSearch index={index} strands={strands} />
+        <DailyQuest game={game} />
         <SessionCta
           openSessionId={open?.id ?? null}
           answered={open?.cursor ?? 0}
@@ -77,7 +81,7 @@ export default function Home() {
       {/* Headline: completion, and time against the exam. SPEC §8 — visible
           convergence on a target is the mechanic that works for an adult with
           a certification date. */}
-      <section className="mb-8 grid gap-6 rounded-xl border border-slate-800 bg-slate-900/40 p-6 sm:grid-cols-[auto_minmax(0,1fr)]">
+      <section className="mb-8 grid grid-cols-1 gap-6 rounded-xl border border-slate-800 bg-slate-900/40 p-6 sm:grid-cols-[auto_minmax(0,1fr)]">
         <div className="relative grid place-items-center">
           <Ring done={p.masteredTopics} total={p.totalTopics} />
           <div className="absolute text-center">
@@ -102,7 +106,7 @@ export default function Home() {
             still live, {p.errorsResolved} cleared.
           </p>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
               { n: p.masteredTopics, l: 'mastered', tone: 'text-teal-400' },
               { n: p.errorsLive, l: 'live errors', tone: 'text-red-400' },
@@ -127,7 +131,7 @@ export default function Home() {
             full curriculum →
           </Link>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {p.byLevel.map((l) => (
             <div key={l.level} className="rounded-lg border border-slate-800 bg-slate-900/40 p-3">
               <div className="flex items-baseline justify-between">
@@ -148,7 +152,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Resume: what to do next, ranked by leverage in the graph */}
         <section>
           <h2 className="mb-3 border-b border-slate-800 pb-1.5 text-sm font-semibold uppercase tracking-widest text-slate-400">

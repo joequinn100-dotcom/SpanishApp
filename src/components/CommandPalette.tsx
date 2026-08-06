@@ -52,10 +52,17 @@ export function CommandPalette({ index }: { index: SearchDoc[] }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-400 transition hover:border-teal-600 hover:text-slate-200"
+        className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/60 px-2.5 py-1.5 text-sm text-slate-400 transition hover:border-teal-600 hover:text-slate-200 sm:px-3"
+        aria-label="Search topics and errors"
       >
-        <span>Search topics, errors…</span>
-        <kbd className="rounded border border-slate-700 px-1.5 py-0.5 font-mono text-[11px] text-slate-500">
+        {/* The label is a luxury on a phone; the icon and the shortcut are not. */}
+        <span className="hidden lg:inline">Search topics, errors…</span>
+        <svg viewBox="0 0 24 24" className="h-4 w-4 lg:hidden" fill="none" stroke="currentColor"
+             strokeWidth="1.8" aria-hidden>
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+        </svg>
+        <kbd className="hidden rounded border border-slate-700 px-1.5 py-0.5 font-mono text-[11px] text-slate-500 sm:inline">
           ⌘K
         </kbd>
       </button>

@@ -38,7 +38,7 @@ export default function VocabPage() {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {[
           { n: stats.due, l: 'due now', tone: 'text-teal-400' },
           { n: stats.new, l: 'not started', tone: 'text-slate-300' },
@@ -64,7 +64,7 @@ export default function VocabPage() {
             </span>
           )}
         </h2>
-        <ul className="grid gap-1.5 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {all.map((v) => (
             <li
               key={v.id}

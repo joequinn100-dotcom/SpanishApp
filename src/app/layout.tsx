@@ -21,14 +21,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body className="min-h-screen bg-slate-950 text-slate-200 antialiased">
         <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/85 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3">
+          {/* Seven nav links plus a search button overflow a phone, so the bar
+              wraps rather than pushing the whole app sideways. */}
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 sm:px-6">
             <Link href="/" className="font-serif text-xl tracking-tight">
               Fluen<span className="text-teal-400">cia</span>
             </Link>
-            <nav className="flex gap-4 text-sm text-slate-400">
+            <nav className="order-3 flex w-full flex-wrap gap-x-4 gap-y-1 text-sm text-slate-400 sm:order-none sm:w-auto">
               <Link href="/" className="transition hover:text-slate-100">Progress</Link>
+              <Link href="/timeline" className="transition hover:text-slate-100">Timeline</Link>
               <Link href="/curriculum" className="transition hover:text-slate-100">Curriculum</Link>
               <Link href="/errors" className="transition hover:text-slate-100">Error log</Link>
+              <Link href="/achievements" className="transition hover:text-slate-100">Awards</Link>
               <Link href="/vocab" className="inline-flex items-center gap-1.5 transition hover:text-slate-100">
                 Vocab
                 {vocabDue > 0 && (
@@ -50,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CommandPalette index={index} />
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
       </body>
     </html>
   );

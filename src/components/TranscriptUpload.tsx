@@ -90,7 +90,7 @@ export function TranscriptUpload() {
         className="mt-3 w-full resize-y rounded-lg border border-slate-700 bg-slate-950/60 px-4 py-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition placeholder:text-slate-700 focus:border-teal-500/60"
       />
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <label className="text-xs text-slate-500">
           Class date
           <input

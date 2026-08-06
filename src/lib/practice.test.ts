@@ -223,12 +223,38 @@ describe('streak', () => {
     expect(streak().current).toBe(2);
   });
 
-  it('resets after a gap', async () => {
+  it('spends a freeze to bridge a single missed day', async () => {
+    // §8: "a broken streak is where these apps lose users". The freeze is the
+    // mechanism, and it is spent silently — one you have to remember to
+    // activate is one that never gets used on the day it was needed.
+    const { touchStreak, streak, FREEZES_PER_MONTH } = await practice();
+    const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    touchStreak(day(3));
+    touchStreak(day(2));
+    expect(streak().current).toBe(2);
+
+    touchStreak(day(0)); // day(1) was missed
+    expect(streak().current).toBe(3);
+    expect(streak().freezes).toBe(FREEZES_PER_MONTH - 1);
+  });
+
+  it('breaks the streak once the gap exceeds the freezes available', async () => {
     const { touchStreak, streak } = await practice();
-    touchStreak(new Date(Date.now() - 5 * 86_400_000).toISOString());
-    touchStreak(new Date().toISOString());
+    const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    touchStreak(day(9));
+    touchStreak(day(0)); // eight days missed, two freezes
     expect(streak().current).toBe(1);
     expect(streak().longest).toBe(1);
+  });
+
+  it('never spends a freeze on an unbroken run', async () => {
+    const { touchStreak, streak, FREEZES_PER_MONTH } = await practice();
+    const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    touchStreak(day(2));
+    touchStreak(day(1));
+    touchStreak(day(0));
+    expect(streak().current).toBe(3);
+    expect(streak().freezes).toBe(FREEZES_PER_MONTH);
   });
 });
 
@@ -419,5 +445,38 @@ describe('spaced reviews — the consolidating → mastered gate', () => {
       .get('b1.verb.imperfecto') as { status: string; reviews_passed: number };
     expect(st.status).toBe('consolidating');
     expect(st.reviews_passed).toBe(1);
+  });
+});
+
+describe('daily quest activity', () => {
+  it('counts nothing before anything is done today', async () => {
+    const { todayActivity } = await practice();
+    expect(todayActivity()).toEqual({ warmupItems: 0, topicItems: 0, vocabReviews: 0 });
+  });
+
+  it('counts warm-up and topic items separately, from the stored plan', async () => {
+    const { startSession, currentItem, submitAnswer, sessionById, todayActivity, planOf } =
+      await practice();
+    const s = startSession('b1.verb.imperfecto');
+    const plan = planOf(sessionById(s.id)!);
+
+    // Answer through the warm-up and into the topic block.
+    const firstTopic = plan.items.findIndex((i) => i.source === 'topic');
+    for (let i = 0; i <= firstTopic; i++) {
+      const item = currentItem(sessionById(s.id)!)!;
+      submitAnswer(s.id, item.payload.answer);
+    }
+
+    const a = todayActivity();
+    expect(a.warmupItems).toBeGreaterThan(0);
+    expect(a.topicItems).toBe(1);
+  });
+
+  it('counts vocabulary reviews', async () => {
+    const { todayActivity } = await practice();
+    const { reviewCard } = await import('./vocab');
+    const id = (db.prepare('SELECT id FROM vocab LIMIT 1').get() as { id: number }).id;
+    reviewCard(id, 'good');
+    expect(todayActivity().vocabReviews).toBe(1);
   });
 });

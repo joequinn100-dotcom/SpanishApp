@@ -51,7 +51,7 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
         {!saved && <FinishSessionForm sessionId={session.id} />}
       </section>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Panel title="Worked on">
           {handoff.worked_on.length === 0 && <Empty>Nothing logged.</Empty>}
           {handoff.worked_on.map((w) => (

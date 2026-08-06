@@ -61,7 +61,7 @@ export default function Home() {
             <span className="flex-1" />
             <LevelPlacement level={level} />
           </h2>
-          <ul className="grid gap-1.5 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
             {list.map((t) => (
               <li key={t.id}>
                 <Link

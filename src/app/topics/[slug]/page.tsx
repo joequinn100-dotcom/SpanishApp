@@ -55,7 +55,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   const Diagram = diagramFor(topic.id, topic.strand_id);
 
   return (
-    <article className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <article className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div>
         <div className="flex items-center gap-3">
           <span
