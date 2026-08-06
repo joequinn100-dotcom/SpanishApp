@@ -13,9 +13,12 @@ import {
 import { grade, errorOutcome, rollingAccuracy, type DrillPayload, type Grade } from '@/domain/grading';
 import {
   planSession,
+  reviewOutcome,
   sessionProgress,
   warmupGuaranteeHeld,
+  REVIEW_ITEMS,
   type ContentRef,
+  type DueReview,
   type SessionPlan,
 } from '@/domain/session';
 
@@ -89,6 +92,51 @@ export function firstTopicWithContent(candidates: string[]): string | null {
   return null;
 }
 
+/**
+ * Consolidating topics whose next spaced review has come due (SPEC §4).
+ *
+ * `next_review_at` has been written since Phase 2 and read by nothing, which
+ * meant a topic could enter the consolidation window and never leave it — the
+ * `consolidating → mastered` edge was unreachable through the app. This is the
+ * query that closes it.
+ */
+export function dueReviews(now: string = new Date().toISOString()): DueReview[] {
+  const rows = db()
+    .prepare(
+      `SELECT topic_id AS topicId, next_review_at AS dueAt
+         FROM topic_state
+        WHERE status = 'consolidating'
+          AND next_review_at IS NOT NULL
+          AND next_review_at <= ?
+        ORDER BY next_review_at`,
+    )
+    .all(now) as { topicId: string; dueAt: string }[];
+
+  return rows.map((r) => ({
+    ...r,
+    // A review is unaided, so it draws on everything written for the topic,
+    // including the error-targeting items — breadth is the point.
+    content: db()
+      .prepare(
+        `SELECT id, topic_id AS topicId, kind, difficulty, targets_error AS targetsError
+           FROM content WHERE topic_id = ? AND retired = 0
+          ORDER BY difficulty DESC`,
+      )
+      .all(r.topicId) as ContentRef[],
+  }));
+}
+
+/** How many reviews are waiting — surfaced on the home page. */
+export function dueReviewCount(now: string = new Date().toISOString()): number {
+  const r = db()
+    .prepare(
+      `SELECT count(*) AS n FROM topic_state
+        WHERE status = 'consolidating' AND next_review_at IS NOT NULL AND next_review_at <= ?`,
+    )
+    .get(now) as { n: number };
+  return r.n;
+}
+
 function contentByError(): Map<string, ContentRef[]> {
   const rows = db()
     .prepare(
@@ -158,6 +206,7 @@ export function startSession(focusTopicId: string | null): SessionRow {
     contentByError: contentByError(),
     topicContent: focusTopicId ? contentForTopic(focusTopicId) : [],
     focusTopicId,
+    due: dueReviews(now),
     now,
   });
 
@@ -194,7 +243,7 @@ export interface CurrentItem {
   index: number;
   total: number;
   fraction: number;
-  source: 'warmup' | 'topic';
+  source: 'warmup' | 'topic' | 'review';
   contentId: number;
   kind: string;
   difficulty: number;
@@ -293,6 +342,7 @@ export function submitAnswer(sessionId: number, answer: string, latencyMs?: numb
 
     const item = currentItem(s);
     if (!item) throw new Error('That session has no item left to answer.');
+    const plan = planOf(s);
 
     const now = new Date().toISOString();
     const g = grade(item.payload, answer, item.errorCode);
@@ -330,6 +380,16 @@ export function submitAnswer(sessionId: number, answer: string, latencyMs?: numb
       }
     }
 
+    // A review is judged as a block, not item by item, so this runs once the
+    // last item of the block has been answered. It has to happen here rather
+    // than at session end: a session abandoned after the review still finished
+    // the review, and §4's gate should not depend on pressing a button.
+    if (item.source === 'review') {
+      applyReview(sessionId, item.topicId, plan, now, notes, () => {
+        xp += XP.TOPIC_MASTERED;
+      });
+    }
+
     if (xp > 0) {
       database
         .prepare('INSERT INTO xp_event (session_id, amount, reason, occurred_at) VALUES (?,?,?,?)')
@@ -341,6 +401,112 @@ export function submitAnswer(sessionId: number, answer: string, latencyMs?: numb
 
     return { ...g, xp, notes };
   });
+}
+
+/**
+ * Close out a spaced review once every item in its block has been answered.
+ *
+ * §4: "2 clean spaced reviews (+3d, +10d) AND ≥ 1 spontaneous correct use".
+ * `topicTransition` owns both halves — this only supplies the verdict and lets
+ * the state machine decide whether that was enough.
+ */
+function applyReview(
+  sessionId: number,
+  topicId: string,
+  plan: SessionPlan,
+  now: string,
+  notes: string[],
+  onMastered: () => void,
+) {
+  const database = db();
+
+  // Answers in this session, joined back to the plan by the item index that
+  // was written alongside each attempt.
+  const answers = (
+    database
+      .prepare(
+        `SELECT a.item_index AS idx, a.correct AS correct
+           FROM attempt a WHERE a.session_id = ? AND a.item_index IS NOT NULL`,
+      )
+      .all(sessionId) as { idx: number; correct: number }[]
+  )
+    .map((r) => {
+      const planned = plan.items[r.idx];
+      return planned
+        ? { source: planned.source, topicId: planned.topicId, correct: r.correct === 1 }
+        : null;
+    })
+    .filter((x) => x !== null);
+
+  const passed = reviewOutcome(answers, plan, topicId);
+  if (passed === null) return; // block not finished yet
+
+  const row = database
+    .prepare(
+      `SELECT status, accuracy, attempts, correct, spontaneous, first_seen, last_seen,
+              mastered_at, consolidating_since, reviews_passed, next_review_at
+         FROM topic_state WHERE topic_id = ?`,
+    )
+    .get(topicId) as
+    | {
+        status: TopicStatus;
+        accuracy: number;
+        attempts: number;
+        correct: number;
+        spontaneous: number;
+        first_seen: string | null;
+        last_seen: string | null;
+        mastered_at: string | null;
+        consolidating_since: string | null;
+        reviews_passed: number;
+        next_review_at: string | null;
+      }
+    | undefined;
+  if (!row || row.status !== 'consolidating') return;
+
+  const before: TopicState = {
+    status: row.status,
+    accuracy: row.accuracy,
+    attempts: row.attempts,
+    correct: row.correct,
+    spontaneous: row.spontaneous,
+    firstSeen: row.first_seen,
+    lastSeen: row.last_seen,
+    masteredAt: row.mastered_at,
+    consolidatingSince: row.consolidating_since,
+    reviewsPassed: row.reviews_passed,
+    nextReviewAt: row.next_review_at,
+  };
+  const after = topicTransition(before, { type: 'review', passed }, now);
+
+  database
+    .prepare(
+      `UPDATE topic_state
+          SET status = ?, mastered_at = ?, consolidating_since = ?,
+              reviews_passed = ?, next_review_at = ?
+        WHERE topic_id = ?`,
+    )
+    .run(
+      after.status,
+      after.masteredAt,
+      after.consolidatingSince,
+      after.reviewsPassed,
+      after.nextReviewAt,
+      topicId,
+    );
+
+  if (!passed) {
+    notes.push('Review not clean — the two-review sequence restarts. Next one in 3 days.');
+  } else if (after.status === 'mastered') {
+    notes.push('Topic mastered. Two clean reviews and spontaneous evidence, both cleared.');
+    onMastered();
+  } else if (after.spontaneous < 1) {
+    notes.push(
+      `Review passed (${after.reviewsPassed}/2). Mastery also needs one spontaneous correct use — that comes from a transcript, not a drill.`,
+    );
+  } else {
+    notes.push(`Review passed (${after.reviewsPassed}/2). Next one in 10 days.`);
+  }
 }
 
 /** Rolling accuracy over this topic's last 20 attempts (SPEC §2). */

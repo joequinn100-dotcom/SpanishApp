@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { nextUp, progress, topErrors } from '@/lib/progress';
-import { firstTopicWithContent, openSession, planOf, streak } from '@/lib/practice';
+import { dueReviewCount, firstTopicWithContent, openSession, planOf, streak } from '@/lib/practice';
 import { latestHandoff } from '@/lib/handoff';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
@@ -50,6 +50,7 @@ export default function Home() {
           focusTopicId={focus?.id ?? null}
           focusTopicName={focus?.name_en ?? null}
           streak={streak().current}
+          reviewsDue={dueReviewCount()}
         />
         {!open && last && (
           <p className="mt-2 text-xs text-slate-500">

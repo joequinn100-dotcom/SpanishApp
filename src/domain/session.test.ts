@@ -4,8 +4,11 @@ import {
   planSession,
   warmupGuaranteeHeld,
   sessionProgress,
+  reviewOutcome,
   WARMUP_MIN,
+  REVIEW_ITEMS,
   type ContentRef,
+  type SessionPlan,
 } from './session';
 
 const NOW = '2026-08-06T12:00:00.000Z';
@@ -222,5 +225,137 @@ describe('sessionProgress', () => {
 
   it('treats an empty plan as complete', () => {
     expect(sessionProgress({ items: [], focusTopicId: null, warmupErrors: [] }, 0).done).toBe(true);
+  });
+});
+
+describe('spaced reviews (SPEC §4)', () => {
+  const errors = [
+    { code: 'noun.greek_ma', state: err(5) },
+    { code: 'verb.preterito_persona', state: err(5) },
+    { code: 'prep.despues_de', state: err(4) },
+  ];
+
+  const dueFor = (topicId: string, dueAt: string, n = 8) => ({
+    topicId,
+    dueAt,
+    content: Array.from({ length: n }, () => content(topicId, null, 3)),
+  });
+
+  it('places the review after the warm-up and before new material', () => {
+    // A review must be unaided, so it cannot follow the topic block that just
+    // re-taught the same material.
+    const plan = planSession({
+      errors,
+      contentByError: fixture(errors),
+      topicContent: [content('focus', null), content('focus', null)],
+      focusTopicId: 'focus',
+      due: [dueFor('b1.verb.preterito', '2026-08-01T00:00:00.000Z')],
+      now: NOW,
+    });
+    const sources = plan.items.map((i) => i.source);
+    expect(sources.lastIndexOf('warmup')).toBeLessThan(sources.indexOf('review'));
+    expect(sources.lastIndexOf('review')).toBeLessThan(sources.indexOf('topic'));
+  });
+
+  it('serves the oldest debt and only one topic per session', () => {
+    const plan = planSession({
+      errors: [],
+      contentByError: new Map(),
+      topicContent: [],
+      focusTopicId: null,
+      due: [
+        dueFor('newer', '2026-08-05T00:00:00.000Z'),
+        dueFor('older', '2026-07-20T00:00:00.000Z'),
+      ],
+      now: NOW,
+    });
+    expect(plan.reviewTopics).toEqual(['older']);
+    expect(new Set(plan.items.map((i) => i.topicId))).toEqual(new Set(['older']));
+  });
+
+  it('plans exactly REVIEW_ITEMS when enough content exists', () => {
+    const plan = planSession({
+      errors: [],
+      contentByError: new Map(),
+      topicContent: [],
+      focusTopicId: null,
+      due: [dueFor('t', '2026-08-01T00:00:00.000Z', 20)],
+      now: NOW,
+    });
+    expect(plan.items.filter((i) => i.source === 'review')).toHaveLength(REVIEW_ITEMS);
+  });
+
+  it('offers no review at all when the topic has too little content', () => {
+    // A two-item review cannot be "clean" in any meaningful sense, so offering
+    // it as a formality would cheapen the gate.
+    const plan = planSession({
+      errors: [],
+      contentByError: new Map(),
+      topicContent: [],
+      focusTopicId: null,
+      due: [dueFor('t', '2026-08-01T00:00:00.000Z', 2)],
+      now: NOW,
+    });
+    expect(plan.items).toEqual([]);
+    expect(plan.reviewTopics).toEqual([]);
+  });
+
+  it('never reuses a drill the warm-up already took', () => {
+    const shared = content('b1.verb.preterito', 'noun.greek_ma');
+    const byError = new Map([['noun.greek_ma', [shared]]]);
+    const plan = planSession({
+      errors: [{ code: 'noun.greek_ma', state: err(5) }],
+      contentByError: byError,
+      topicContent: [],
+      focusTopicId: null,
+      due: [{ topicId: 'b1.verb.preterito', dueAt: '2026-08-01T00:00:00.000Z', content: [shared, content('b1.verb.preterito', null), content('b1.verb.preterito', null), content('b1.verb.preterito', null)] }],
+      now: NOW,
+    });
+    const ids = plan.items.map((i) => i.contentId);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe('reviewOutcome', () => {
+  const plan: SessionPlan = {
+    items: [
+      { contentId: 1, source: 'review', topicId: 't', errorCode: null },
+      { contentId: 2, source: 'review', topicId: 't', errorCode: null },
+      { contentId: 3, source: 'topic', topicId: 't', errorCode: null },
+    ],
+    focusTopicId: 't',
+    warmupErrors: [],
+    reviewTopics: ['t'],
+  };
+
+  it('is null while the block is unfinished — "not yet" is not "failed"', () => {
+    expect(reviewOutcome([{ source: 'review', topicId: 't', correct: true }], plan, 't')).toBeNull();
+  });
+
+  it('passes only when every item is right — §4 says clean, not 80%', () => {
+    const all = [
+      { source: 'review', topicId: 't', correct: true },
+      { source: 'review', topicId: 't', correct: true },
+    ];
+    expect(reviewOutcome(all, plan, 't')).toBe(true);
+
+    const one = [
+      { source: 'review', topicId: 't', correct: true },
+      { source: 'review', topicId: 't', correct: false },
+    ];
+    expect(reviewOutcome(one, plan, 't')).toBe(false);
+  });
+
+  it('ignores answers from the topic block', () => {
+    const mixed = [
+      { source: 'review', topicId: 't', correct: true },
+      { source: 'review', topicId: 't', correct: true },
+      { source: 'topic', topicId: 't', correct: false },
+    ];
+    expect(reviewOutcome(mixed, plan, 't')).toBe(true);
+  });
+
+  it('is null for a topic the session never reviewed', () => {
+    expect(reviewOutcome([], plan, 'other')).toBeNull();
   });
 });

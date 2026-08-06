@@ -21,7 +21,7 @@ export interface RunnerItem {
   sessionId: number;
   index: number;
   total: number;
-  source: 'warmup' | 'topic';
+  source: 'warmup' | 'topic' | 'review';
   kind: string;
   difficulty: number;
   topicName: string;
@@ -103,10 +103,16 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
           className={`rounded-full px-2 py-0.5 uppercase tracking-wider ${
             item.source === 'warmup'
               ? 'bg-amber-500/15 text-amber-300'
-              : 'bg-teal-500/15 text-teal-300'
+              : item.source === 'review'
+                ? 'bg-violet-500/15 text-violet-300'
+                : 'bg-teal-500/15 text-teal-300'
           }`}
         >
-          {item.source === 'warmup' ? 'Warm-up' : 'New material'}
+          {item.source === 'warmup'
+            ? 'Warm-up'
+            : item.source === 'review'
+              ? 'Spaced review'
+              : 'New material'}
         </span>
         <span className={`inline-flex items-center gap-1.5 ${strandStyle(item.strandId).fg}`}>
           <StrandIcon strand={item.strandId} className="h-3.5 w-3.5" />
@@ -148,7 +154,7 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
           >
             {pending ? 'Checking…' : 'Check'}
           </button>
-          {item.hint && !hint && (
+          {item.hint && !hint && item.source !== 'review' && (
             <button
               onClick={() => setHint(true)}
               className="text-sm text-slate-500 underline underline-offset-4 transition hover:text-slate-300"

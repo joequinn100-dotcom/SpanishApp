@@ -286,3 +286,138 @@ describe('handoff (SPEC §7)', () => {
     }
   });
 });
+
+describe('spaced reviews — the consolidating → mastered gate', () => {
+  /** Put a topic into consolidation with a review already due. */
+  function consolidate(topicId: string, opts: { spontaneous?: number; reviewsPassed?: number } = {}) {
+    db.prepare(
+      `UPDATE topic_state
+          SET status = 'consolidating', accuracy = 0.9, attempts = 14, correct = 13,
+              spontaneous = ?, reviews_passed = ?, consolidating_since = ?, next_review_at = ?
+        WHERE topic_id = ?`,
+    ).run(
+      opts.spontaneous ?? 0,
+      opts.reviewsPassed ?? 0,
+      '2026-07-01T00:00:00.000Z',
+      '2026-07-04T00:00:00.000Z',
+      topicId,
+    );
+  }
+
+  /** Answer every review item in the open session, right or wrong. */
+  async function answerReviewBlock(sessionId: number, correct: boolean) {
+    const { currentItem, submitAnswer, sessionById, planOf } = await practice();
+    const plan = planOf(sessionById(sessionId)!);
+    for (let i = 0; i < plan.items.length; i++) {
+      const item = currentItem(sessionById(sessionId)!)!;
+      const isReview = plan.items[item.index].source === 'review';
+      submitAnswer(sessionId, isReview && !correct ? 'respuesta equivocada' : item.payload.answer);
+    }
+  }
+
+  it('finds a topic whose review has come due', async () => {
+    const { dueReviews, dueReviewCount } = await practice();
+    expect(dueReviews()).toEqual([]);
+    consolidate('b1.verb.imperfecto');
+    expect(dueReviews().map((d) => d.topicId)).toEqual(['b1.verb.imperfecto']);
+    expect(dueReviewCount()).toBe(1);
+  });
+
+  it('does not serve a review before it is due', async () => {
+    const { dueReviews } = await practice();
+    consolidate('b1.verb.imperfecto');
+    db.prepare("UPDATE topic_state SET next_review_at = '2099-01-01T00:00:00.000Z' WHERE topic_id = ?")
+      .run('b1.verb.imperfecto');
+    expect(dueReviews()).toEqual([]);
+  });
+
+  it('plans the review into the session', async () => {
+    const { startSession, planOf } = await practice();
+    consolidate('b1.verb.imperfecto');
+    const plan = planOf(startSession('b1.mood.subj_presente'));
+    expect(plan.reviewTopics).toEqual(['b1.verb.imperfecto']);
+    expect(plan.items.some((i) => i.source === 'review')).toBe(true);
+  });
+
+  it('a clean review advances the count without mastering, when spontaneous evidence is missing', async () => {
+    // §4's gate is two clean reviews AND at least one spontaneous correct use.
+    // Passing reviews alone must not be enough — that is the whole point of the
+    // rule, and the easiest place to get it wrong.
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', { spontaneous: 0 });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, true);
+
+    const st = db
+      .prepare('SELECT status, reviews_passed FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as { status: string; reviews_passed: number };
+    expect(st.reviews_passed).toBe(1);
+    expect(st.status).toBe('consolidating');
+  });
+
+  it('masters the topic on the second clean review once spontaneous evidence exists', async () => {
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', { spontaneous: 1, reviewsPassed: 1 });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, true);
+
+    const st = db
+      .prepare('SELECT status, reviews_passed, mastered_at FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as { status: string; reviews_passed: number; mastered_at: string };
+    expect(st.status).toBe('mastered');
+    expect(st.reviews_passed).toBe(2);
+    expect(st.mastered_at).toBeTruthy();
+  });
+
+  it('an unclean review restarts the sequence rather than pausing it', async () => {
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', { spontaneous: 1, reviewsPassed: 1 });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, false);
+
+    const st = db
+      .prepare('SELECT status, reviews_passed, next_review_at FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as {
+      status: string;
+      reviews_passed: number;
+      next_review_at: string;
+    };
+    expect(st.reviews_passed).toBe(0);
+    expect(st.status).toBe('consolidating');
+    expect(st.next_review_at).toBeTruthy();
+  });
+
+  it('schedules the next review 3 days out after the first, 10 after the second', async () => {
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', { spontaneous: 0 });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, true);
+
+    const st = db
+      .prepare('SELECT next_review_at FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as { next_review_at: string };
+    const days = (new Date(st.next_review_at).getTime() - Date.now()) / 86_400_000;
+    expect(days).toBeGreaterThan(9);
+    expect(days).toBeLessThan(11);
+  });
+
+  it('does not judge the review until every item in the block is answered', async () => {
+    const { startSession, currentItem, sessionById, submitAnswer, planOf } = await practice();
+    consolidate('b1.verb.imperfecto', { spontaneous: 1, reviewsPassed: 1 });
+    const s = startSession(null);
+    const plan = planOf(sessionById(s.id)!);
+    const firstReview = plan.items.findIndex((i) => i.source === 'review');
+
+    // Answer everything up to and including the first review item only.
+    for (let i = 0; i <= firstReview; i++) {
+      const item = currentItem(sessionById(s.id)!)!;
+      submitAnswer(s.id, item.payload.answer);
+    }
+
+    const st = db
+      .prepare('SELECT status, reviews_passed FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as { status: string; reviews_passed: number };
+    expect(st.status).toBe('consolidating');
+    expect(st.reviews_passed).toBe(1);
+  });
+});

@@ -18,6 +18,7 @@ export function SessionCta({
   focusTopicId,
   focusTopicName,
   streak,
+  reviewsDue,
 }: {
   openSessionId: number | null;
   answered: number;
@@ -25,6 +26,8 @@ export function SessionCta({
   focusTopicId: string | null;
   focusTopicName: string | null;
   streak: number;
+  /** Consolidating topics whose spaced review has come due (SPEC §4). */
+  reviewsDue: number;
 }) {
   const [pending, start] = useTransition();
 
@@ -53,9 +56,16 @@ export function SessionCta({
         <p className="text-xs uppercase tracking-[0.14em] text-teal-400">Today</p>
         <p className="mt-1 text-sm text-slate-300">
           Warm-up on your live errors
+          {reviewsDue > 0 ? <>, a spaced review</> : null}
           {focusTopicName ? <>, then {focusTopicName}</> : null}.
           {streak > 0 && <span className="ml-2 text-slate-500">Streak {streak}.</span>}
         </p>
+        {reviewsDue > 0 && (
+          <p className="mt-1 text-xs text-violet-300">
+            {reviewsDue} {reviewsDue === 1 ? 'topic is' : 'topics are'} due for review — clearing
+            one unaided is half of what mastery needs.
+          </p>
+        )}
       </div>
       <button
         onClick={() => start(() => beginSession(focusTopicId))}

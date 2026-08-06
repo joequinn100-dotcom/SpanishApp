@@ -24,8 +24,12 @@ export interface ContentRef {
 
 export interface PlannedItem {
   contentId: number;
-  /** Warm-up items carry the error they probe; topic items carry the topic. */
-  source: 'warmup' | 'topic';
+  /**
+   * `warmup` — error work, chosen by §4's weighting.
+   * `topic`  — the new material the session is about.
+   * `review` — a spaced review of a consolidating topic, due today.
+   */
+  source: 'warmup' | 'topic' | 'review';
   topicId: string;
   errorCode: string | null;
 }
@@ -36,6 +40,16 @@ export interface SessionPlan {
   focusTopicId: string | null;
   /** Error codes the warm-up covers, in the order §4's weighting chose them. */
   warmupErrors: string[];
+  /** Topics whose spaced review this session is serving. */
+  reviewTopics?: string[];
+}
+
+/** A consolidating topic whose next spaced review has come due. */
+export interface DueReview {
+  topicId: string;
+  /** ISO date the review became due. Older first — the oldest debt is paid first. */
+  dueAt: string;
+  content: ContentRef[];
 }
 
 export interface PlanInput {
@@ -47,8 +61,11 @@ export interface PlanInput {
   topicContent: ContentRef[];
   focusTopicId: string | null;
   now: string;
+  /** Consolidating topics due for a spaced review (SPEC §4). */
+  due?: DueReview[];
   warmupCount?: number;
   topicCount?: number;
+  reviewCount?: number;
   /** Deterministic in tests, rotating in production. Picks one of n. */
   pick?: (n: number, seq: number) => number;
 }
@@ -57,6 +74,16 @@ export interface PlanInput {
 export const WARMUP_MIN = 6;
 export const WARMUP_MAX = 10;
 export const TOPIC_ITEMS = 10;
+
+/**
+ * Items in one spaced review.
+ *
+ * §4 requires the review be *clean*, so the count is a real decision: too few
+ * and a lucky guess promotes a topic to mastered; too many and the gate becomes
+ * unreachable because one slip in twelve restarts the sequence. Six is enough
+ * that guessing through is implausible and few enough that a good day clears it.
+ */
+export const REVIEW_ITEMS = 6;
 
 /** Deterministic default: walk the list rather than repeating item 0 forever. */
 const rotate = (n: number, seq: number) => (n === 0 ? 0 : seq % n);
@@ -76,8 +103,10 @@ export function planSession(input: PlanInput): SessionPlan {
     topicContent,
     focusTopicId,
     now,
+    due = [],
     warmupCount = WARMUP_MAX,
     topicCount = TOPIC_ITEMS,
+    reviewCount = REVIEW_ITEMS,
     pick = rotate,
   } = input;
 
@@ -94,6 +123,7 @@ export function planSession(input: PlanInput): SessionPlan {
 
   const items: PlannedItem[] = [];
   const warmupErrors: string[] = [];
+  const reviewTopics: string[] = [];
   const used = new Set<number>();
 
   // Round-robin over the ranked errors: one item each per pass, highest weight
@@ -125,6 +155,35 @@ export function planSession(input: PlanInput): SessionPlan {
     if (placed === 0) break;
   }
 
+  // Review block, between the warm-up and the new material.
+  //
+  // Position is the argument: a review must be *unaided*, so it cannot follow
+  // the topic block that just re-taught the same material — the answer would
+  // still be on screen. Putting it before new material also means a session cut
+  // short still pays the review debt, which is the half of §4's mastery gate
+  // that time can otherwise run out on.
+  //
+  // Oldest debt first, and only one topic per session: two reviews in one
+  // sitting is not "spaced".
+  const oldest = [...due].sort((a, b) => a.dueAt.localeCompare(b.dueAt))[0];
+  if (oldest) {
+    const pool = oldest.content.filter((c) => !used.has(c.id));
+    // A review with too few items cannot be clean in any meaningful sense, so
+    // it is not offered at all rather than offered as a formality.
+    if (pool.length >= Math.min(3, reviewCount)) {
+      reviewTopics.push(oldest.topicId);
+      for (const c of pool.slice(0, reviewCount)) {
+        used.add(c.id);
+        items.push({
+          contentId: c.id,
+          source: 'review',
+          topicId: oldest.topicId,
+          errorCode: c.targetsError,
+        });
+      }
+    }
+  }
+
   // Topic block: easiest first, so the explanation lands before the hard case.
   const topicItems = topicContent
     .filter((c) => !used.has(c.id))
@@ -141,7 +200,7 @@ export function planSession(input: PlanInput): SessionPlan {
     });
   }
 
-  return { items, focusTopicId, warmupErrors };
+  return { items, focusTopicId, warmupErrors, reviewTopics };
 }
 
 /**
@@ -169,6 +228,32 @@ export function warmupGuaranteeHeld(
   );
   const hits = topThree.filter((c) => covered.has(c)).length;
   return hits >= Math.min(2, topThree.length);
+}
+
+/**
+ * Did the spaced review pass?
+ *
+ * §4 says "2 *clean* spaced reviews". Clean means no wrong answers — not "80%",
+ * which is the studying gate and a lower bar on purpose. A blank counts as
+ * unclean: skipping an item you cannot answer is not evidence you can.
+ *
+ * An accent slip is graded correct upstream (see grading.ts) and so passes
+ * here too. That is deliberate: the review is asking whether the grammar is
+ * installed, and a missing written accent does not show that it is not.
+ *
+ * Returns null when the review is not finished yet, so the caller knows the
+ * difference between "not yet" and "failed".
+ */
+export function reviewOutcome(
+  answers: { source: string; topicId: string; correct: boolean }[],
+  plan: SessionPlan,
+  topicId: string,
+): boolean | null {
+  const planned = plan.items.filter((i) => i.source === 'review' && i.topicId === topicId).length;
+  if (planned === 0) return null;
+  const given = answers.filter((a) => a.source === 'review' && a.topicId === topicId);
+  if (given.length < planned) return null;
+  return given.every((a) => a.correct);
 }
 
 /* ------------------------------------------------------------------ *
