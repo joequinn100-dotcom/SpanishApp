@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { segment, speakers, learnerTurns, flatten, guessLearner } from './transcript';
+import { segment, speakers, learnerTurns, flatten } from './transcript';
 import { analyze, wordCount } from './detectors';
 
 /**
@@ -80,26 +80,20 @@ describe('learnerTurns', () => {
   });
 });
 
-describe('speakers and guessLearner', () => {
+describe('speakers', () => {
   it('ranks speakers by how much they said', () => {
     const list = speakers(segment(CLASS));
     expect(list.map((s) => s.name).sort()).toEqual(['Joe', 'Lorena']);
   });
 
-  it('guesses the quieter of two speakers is the learner', () => {
-    const list = [
-      { name: 'Lorena', chars: 900 },
-      { name: 'Joe', chars: 300 },
-    ];
-    expect(guessLearner(list)).toBe('Joe');
+  it('reports turn and character counts so the learner can be picked by eye', () => {
+    const joe = speakers(segment(CLASS)).find((s) => s.name === 'Joe')!;
+    expect(joe.turns).toBe(4);
+    expect(joe.chars).toBeGreaterThan(0);
   });
 
-  it('guesses the only speaker when there is one', () => {
-    expect(guessLearner([{ name: 'Joe', chars: 100 }])).toBe('Joe');
-  });
-
-  it('guesses nothing from nothing', () => {
-    expect(guessLearner([])).toBeNull();
+  it('finds nothing in unlabelled text', () => {
+    expect(speakers(segment('Un párrafo sobre la obra, sin etiquetas.'))).toEqual([]);
   });
 });
 

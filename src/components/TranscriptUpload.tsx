@@ -36,7 +36,11 @@ export function TranscriptUpload() {
     start(async () => {
       const p = await previewTranscript(raw);
       setSpeakers(p.speakers);
-      setLearner(p.guessedLearner);
+      // Deliberately no default. Turn counts are shown so the choice is easy,
+      // but nothing is preselected: a wrong guess nobody notices would analyse
+      // your teacher's Spanish as yours, which is the one outcome §6 exists to
+      // prevent.
+      setLearner(null);
       setChecked(true);
     });
   }

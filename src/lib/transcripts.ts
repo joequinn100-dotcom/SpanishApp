@@ -2,7 +2,7 @@ import 'server-only';
 import { tx } from '@/db';
 import { db } from './queries';
 import { analyze, wordCount, type Finding } from '@/domain/detectors';
-import { segment, speakers, learnerTurns, flatten, guessLearner } from '@/domain/transcript';
+import { segment, speakers, learnerTurns, flatten } from '@/domain/transcript';
 import { errorTransition, topicTransition, newErrorState, newTopicState } from '@/domain/mastery';
 import type { ErrorStatus, TopicStatus } from '@/domain/mastery';
 
@@ -51,13 +51,17 @@ export interface FindingRow {
 
 export interface Preview {
   speakers: { name: string; turns: number; chars: number }[];
-  guessedLearner: string | null;
 }
 
+/**
+ * Who is in this transcript, with how much each said.
+ *
+ * No guess at which one is the learner. The obvious heuristic — the teacher
+ * talks more — does not hold for a conversation class, and a plausible-looking
+ * default that goes unchecked is worse than no default at all.
+ */
 export function preview(raw: string): Preview {
-  const turns = segment(raw);
-  const list = speakers(turns);
-  return { speakers: list, guessedLearner: guessLearner(list) };
+  return { speakers: speakers(segment(raw)) };
 }
 
 /* ------------------------------------------------------------------ *

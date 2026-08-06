@@ -143,18 +143,3 @@ export function flatten(turns: Turn[]): { text: string; map: { at: number; raw: 
   }
   return { text: parts.join('\n'), map };
 }
-
-/**
- * Guess which speaker is the learner.
- *
- * A guess, offered as a default in the UI and never applied silently — §6's
- * whole posture is that the human confirms. The heuristic is that a language
- * class is mostly the teacher talking, so the learner is usually *not* the
- * highest-volume speaker; with exactly two speakers, the quieter one is the
- * better bet.
- */
-export function guessLearner(list: { name: string; chars: number }[]): string | null {
-  if (list.length === 0) return null;
-  if (list.length === 1) return list[0].name;
-  return list[list.length - 1].name;
-}
