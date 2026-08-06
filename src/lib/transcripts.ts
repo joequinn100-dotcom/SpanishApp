@@ -4,6 +4,7 @@ import { db } from './queries';
 import { analyze, wordCount, type Finding } from '@/domain/detectors';
 import { segment, speakers, learnerTurns, flatten } from '@/domain/transcript';
 import { errorTransition, topicTransition, newErrorState, newTopicState } from '@/domain/mastery';
+import { markVocabSpontaneous, vocabUsedIn } from './vocab';
 import type { ErrorStatus, TopicStatus } from '@/domain/mastery';
 
 /**
@@ -73,6 +74,8 @@ export interface IngestResult {
   learnerWords: number;
   errors: number;
   positives: number;
+  /** Words that reached `spontaneous` because they appeared in your own speech. */
+  vocabPromoted: number;
 }
 
 /**
@@ -111,6 +114,7 @@ export function ingest(input: {
           learner: input.learner,
           learner_words: wordCount(text),
           turns: turns.length,
+          vocab_used: vocabUsedIn(text),
         }),
         now,
       );
@@ -152,7 +156,12 @@ export function ingest(input: {
       else positives++;
     }
 
-    return { transcriptId: id, learnerWords: wordCount(text), errors, positives };
+    // Vocabulary used unprompted in the learner's own turns. This is the only
+    // route to the top stage: SM-2 can prove you recall a word on demand, and
+    // §4's standard is that recall is not use.
+    const vocabPromoted = markVocabSpontaneous(vocabUsedIn(text));
+
+    return { transcriptId: id, learnerWords: wordCount(text), errors, positives, vocabPromoted };
   });
 }
 

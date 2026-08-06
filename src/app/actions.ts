@@ -8,6 +8,8 @@ import { recomputeAvailability } from '@/seed';
 import { startSession, submitAnswer, openSession } from '@/lib/practice';
 import { finishSession } from '@/lib/handoff';
 import { closeReview, decide, ingest, preview, type Decision } from '@/lib/transcripts';
+import { reviewCard } from '@/lib/vocab';
+import type { Recall } from '@/domain/srs';
 import type { TopicStatus } from '@/domain/mastery';
 
 /**
@@ -164,4 +166,15 @@ export async function decideFinding(findingId: number, decision: Decision) {
 export async function finishReview(transcriptId: number) {
   closeReview(transcriptId);
   revalidatePath('/', 'layout');
+}
+
+/* ------------------------------------------------------------------ *
+ * Vocabulary (SRS)
+ * ------------------------------------------------------------------ */
+
+/** Grade one vocabulary card and reschedule it. */
+export async function reviewVocabCard(vocabId: number, recall: Recall) {
+  const result = reviewCard(vocabId, recall, openSession()?.id ?? null);
+  revalidatePath('/', 'layout');
+  return result;
 }

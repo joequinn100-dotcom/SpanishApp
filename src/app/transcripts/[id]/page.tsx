@@ -47,7 +47,13 @@ export default async function TranscriptPage({ params }: { params: Promise<{ id:
     };
   });
 
-  const meta = t.analysis_json ? (JSON.parse(t.analysis_json) as { learner_words?: number; analyzer?: string }) : {};
+  const meta = t.analysis_json
+    ? (JSON.parse(t.analysis_json) as {
+        learner_words?: number;
+        analyzer?: string;
+        vocab_used?: string[];
+      })
+    : {};
   const errors = findings.filter((f) => f.kind === 'error');
   const positives = findings.filter((f) => f.kind === 'positive');
   const accepted = rows.filter((f) => f.decision === 'accepted');
@@ -71,6 +77,28 @@ export default async function TranscriptPage({ params }: { params: Promise<{ id:
           <span className="text-slate-600"> · rule-based analysis, not the §5 gauntlet</span>
         )}
       </p>
+
+      {meta.vocab_used && meta.vocab_used.length > 0 && (
+        <section className="mt-6 rounded-xl border border-emerald-800/40 bg-emerald-500/[0.03] p-5">
+          <h2 className="text-xs uppercase tracking-[0.14em] text-emerald-400">
+            Vocabulary you reached for
+          </h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Used unprompted in your own turns, so these moved to the top stage. A flashcard cannot
+            do that — it only ever proves you can recall a word when asked.
+          </p>
+          <p className="mt-3 flex flex-wrap gap-2">
+            {meta.vocab_used.map((v) => (
+              <span
+                key={v}
+                className="rounded-md border border-emerald-800/60 bg-emerald-500/10 px-2 py-0.5 font-serif text-sm text-emerald-300"
+              >
+                {v}
+              </span>
+            ))}
+          </p>
+        </section>
+      )}
 
       <div className="mt-6">
         <FindingReview transcriptId={t.id} findings={findings} />
