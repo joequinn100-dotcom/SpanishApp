@@ -45,7 +45,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'hablé (meaning he spoke)',
     right: 'habló',
     rule:
-      'In the preterite the person is carried entirely by the ending, and the two singular endings are minimal pairs separated only by the stressed vowel: -é/-í for yo, -ó/-ió for él, ella and usted. yo hablé, revisé, coordiné against él habló, revisó, coordinó; yo escribí, cumplí against él escribió, cumplió.\n\nThis is severity 5 rather than a cosmetic slip because it does not merely sound wrong — it reassigns the action. "Yo aprobé el presupuesto" and "él aprobó el presupuesto" are both perfectly grammatical sentences that name different people as responsible. In a claim meeting, a status report or an acta, that is a change of fact rather than a change of form.\n\nBecause the written accent falls on the final syllable in both, spelling gives no help; the only cue is the vowel. Under speaking pressure the fix is procedural rather than grammatical: fix the subject before starting the verb, then choose the vowel — yo takes é or í, él takes ó or ió.',
+      'In the preterite the person is carried entirely by the ending, and the two singular endings are minimal pairs separated only by the stressed vowel: -é/-í for yo, -ó/-ió for él, ella and usted. yo hablé, revisé, coordiné against él habló, revisó, coordinó; yo escribí, cumplí against él escribió, cumplió.\n\nThis is expensive rather than cosmetic because it does not merely sound wrong — it reassigns the action. "Yo aprobé el presupuesto" and "él aprobó el presupuesto" are both perfectly grammatical sentences that name different people as responsible. In a claim meeting, a status report or an acta, that is a change of fact rather than a change of form.\n\nBecause the written accent falls on the final syllable in both, spelling gives no help; the only cue is the vowel. Under speaking pressure the fix is procedural rather than grammatical: fix the subject before starting the verb, then choose the vowel — yo takes é or í, él takes ó or ió.',
     topicId: 'b1.verb.preterito',
     severity: 5,
     status: 'active',
@@ -82,7 +82,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'después la reunión',
     right: 'después de la reunión',
     rule:
-      '"Después" on its own is an adverb meaning "afterwards", and in that use it takes no complement: revisamos los planos y después firmamos.\n\nThe moment anything follows it — a noun, a pronoun, an infinitive or a clause — the preposition DE becomes obligatory: después de la reunión, después de eso, después de revisar los planos, después de que el cliente apruebe el adicional. Note the contraction with the masculine article: después del comité, después del pago.\n\nThere are two complement patterns and choosing between them depends on the subject. Same subject on both verbs takes de + infinitive: después de firmar, salimos. A change of subject takes de que + clause, and when it points at the future that clause is subjunctive: después de que el cliente firme, empezamos.\n\nThe identical pattern governs antes: antes de la reunión, antes de firmar, antes de que llegue el material. At 10-plus occurrences a week this is the highest-frequency single error in the log, which makes it the cheapest one to fix by volume.',
+      '"Después" on its own is an adverb meaning "afterwards", and in that use it takes no complement: revisamos los planos y después firmamos.\n\nThe moment anything follows it — a noun, a pronoun, an infinitive or a clause — the preposition DE becomes obligatory: después de la reunión, después de eso, después de revisar los planos, después de que el cliente apruebe el adicional. Note the contraction with the masculine article: después del comité, después del pago.\n\nThere are two complement patterns and choosing between them depends on the subject. Same subject on both verbs takes de + infinitive: después de firmar, salimos. A change of subject takes de que + clause, and when it points at the future that clause is subjunctive: después de que el cliente firme, empezamos.\n\nThe identical pattern governs antes: antes de la reunión, antes de firmar, antes de que llegue el material. This is the one that turns up most often in your own writing, which also makes it the cheapest to fix: it is a single rule with no exceptions.',
     topicId: 'b1.prep.verbos_regimen',
     severity: 3,
     status: 'active',
@@ -128,8 +128,8 @@ export const ERRORS: SeedError[] = [
   {
     code: 'verb.futuro_vs_condicional',
     labelEn: 'Conditional used where the future is meant',
-    wrong: 'preferiríamos el hormigón (meaning: we will prefer)',
-    right: 'preferiremos el hormigón',
+    wrong: 'preferiríamos el concreto (meaning: we will prefer)',
+    right: 'preferiremos el concreto',
     rule:
       'The future and the conditional share a stem and differ only in their endings, which puts them one or two letters apart: preferiremos (we will prefer) against preferiríamos (we would prefer). Future endings are -é, -ás, -á, -emos, -án. Conditional endings are the imperfect set: -ía, -ías, -ía, -íamos, -ían.\n\nThe meanings are not close. The future commits: preferiremos states a decision. The conditional withdraws: preferiríamos floats an option without accepting it. In a negotiation that is the difference between a position and a hint, and a listener will act on the one you said rather than the one you meant.\n\nBoth take the same twelve contracted stems — tendr-, pondr-, saldr-, vendr-, har-, dir-, podr-, sabr-, querr-, habr-, valdr-, cabr- — so learning them once serves both tenses. The third member of this family, the imperfect subjunctive in -áramos/-iéramos, completes the collision and is best drilled against these two rather than separately.',
     topicId: 'b2.verb.colision_r',
@@ -143,7 +143,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'si preferirá otro proveedor…',
     right: 'si prefiriera otro proveedor…',
     rule:
-      'The imperfect subjunctive is formed mechanically from the third person plural of the preterite: take prefirieron, drop -ron, add -ra (prefiriera) or -se (prefiriese). Both sets are correct; -ra dominates in Latin America. Because it derives from the preterite, every preterite irregularity carries through — tuvieron gives tuviera, fueron gives fuera, hicieron gives hiciera, pudieron gives pudiera — which makes this tense a direct test of whether the preterite is genuinely secure.\n\nIt is required in three places this learner needs daily. After a hypothetical si: si tuviéramos dos semanas más. After a past-tense trigger, by sequence of tenses: el cliente pidió que entregáramos el cronograma. And after como si, always: responde como si el contrato no existiera.\n\nSeverity 5 because its absence is not a slip but a missing structure: without it the hypothetical conditional cannot be built at all, and hypothetical framing is the core move of professional negotiation. A speaker who lacks it is forced to state as fact things they mean to float as possibilities.',
+      'The imperfect subjunctive is formed mechanically from the third person plural of the preterite: take prefirieron, drop -ron, add -ra (prefiriera) or -se (prefiriese). Both sets are correct; -ra dominates in Latin America. Because it derives from the preterite, every preterite irregularity carries through — tuvieron gives tuviera, fueron gives fuera, hicieron gives hiciera, pudieron gives pudiera — which makes this tense a direct test of whether the preterite is genuinely secure.\n\nIt is required in three places this learner needs daily. After a hypothetical si: si tuviéramos dos semanas más. After a past-tense trigger, by sequence of tenses: el cliente pidió que entregáramos el cronograma. And after como si, always: responde como si el contrato no existiera.\n\nIts absence is not a slip but a missing structure: without it the hypothetical conditional cannot be built at all, and hypothetical framing is the core move of professional negotiation. A speaker who lacks it is forced to state as fact things they mean to float as possibilities.',
     topicId: 'b2.mood.subj_imperfecto',
     severity: 5,
     status: 'active',
@@ -215,7 +215,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'he hablando',
     right: 'he hablado',
     rule:
-      'Two non-finite forms with different jobs that are one letter apart in the -ar conjugation. The participle ends in -ado or -ido and follows haber to build the perfect tenses: he hablado, hemos entregado, había llegado. The gerund ends in -ando or -iendo and follows estar to build the progressive: estoy hablando, estamos entregando.\n\n"He hablando" crosses the two: the auxiliary of one construction with the non-finite form of the other. It is not a possible Spanish sentence, which is why it registers as a jarring error rather than an accent.\n\nSeverity 4 because it hits the perfect tenses, which carry a large share of professional reporting, and because it compounds with the participle-versus-finite-verb error already in the log — both are failures to keep the three non-finite forms apart. Irregular participles are worth drilling alongside: hecho, dicho, puesto, escrito, visto, vuelto, abierto, resuelto, roto.',
+      'Two non-finite forms with different jobs that are one letter apart in the -ar conjugation. The participle ends in -ado or -ido and follows haber to build the perfect tenses: he hablado, hemos entregado, había llegado. The gerund ends in -ando or -iendo and follows estar to build the progressive: estoy hablando, estamos entregando.\n\n"He hablando" crosses the two: the auxiliary of one construction with the non-finite form of the other. It is not a possible Spanish sentence, which is why it registers as a jarring error rather than an accent.\n\nIt matters because it hits the perfect tenses, which carry a large share of professional reporting, and because it compounds with the participle-versus-finite-verb error already in the log — both are failures to keep the three non-finite forms apart. Irregular participles are worth drilling alongside: hecho, dicho, puesto, escrito, visto, vuelto, abierto, resuelto, roto.',
     topicId: 'b1.verb.presente_perfecto',
     severity: 4,
     status: 'active',
@@ -254,7 +254,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'quiero entreguen el informe',
     right: 'quiero que entreguen el informe',
     rule:
-      'A subjunctive clause after a verb of wish, influence, doubt or emotion is introduced by que, and the que is not optional: quiero que entreguen, espero que llegue, dudo que apruebe. Dropping it produces a sequence of two finite verbs with nothing joining them.\n\nThe exception is a same-subject sentence, which takes an infinitive and no clause at all: quiero entregar el informe myself. So the choice is: same subject → infinitive, no que; different subject → que + subjunctive. Resolved.',
+      'A subjunctive clause after a verb of wish, influence, doubt or emotion is introduced by que, and the que is not optional: quiero que entreguen, espero que llegue, dudo que apruebe. Dropping it produces a sequence of two finite verbs with nothing joining them.\n\nThe exception is a same-subject sentence, which takes an infinitive and no clause at all: quiero entregar el informe yo mismo. So the choice is: same subject → infinitive, no que; different subject → que + subjunctive.',
     topicId: 'b1.mood.subj_presente',
     severity: 3,
     status: 'resolved',
@@ -266,7 +266,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'llegamos en punto (meaning: on time)',
     right: 'llegamos a tiempo',
     rule:
-      '"A tiempo" means on time — before or by the deadline, with no claim about precision: llegamos a tiempo para el vaciado. "En punto" means exactly on the hour, sharp: la reunión es a las nueve en punto. English "on time" covers both senses, so the distinction has to be made deliberately.\n\nA third member of the set is worth holding alongside them. "Puntual" describes a person or a habit rather than an event — es muy puntual — and "a la hora" is the everyday spoken alternative to en punto. In a schedule discussion the difference matters: entregar a tiempo is meeting the deadline, entregar en punto would mean delivering at a named hour exactly, which is rarely what a contract requires.\n\nResolved.',
+      '"A tiempo" means on time — before or by the deadline, with no claim about precision: llegamos a tiempo para el vaciado. "En punto" means exactly on the hour, sharp: la reunión es a las nueve en punto. English "on time" covers both senses, so the distinction has to be made deliberately.\n\nA third member of the set is worth holding alongside them. "Puntual" describes a person or a habit rather than an event — es muy puntual — and "a la hora" is the everyday spoken alternative to en punto. In a schedule discussion the difference matters: entregar a tiempo is meeting the deadline, entregar en punto would mean delivering at a named hour exactly, which is rarely what a contract requires.',
     topicId: null,
     severity: 2,
     status: 'resolved',
@@ -278,7 +278,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'puedes explicar el procedimiento',
     right: 'me puedes explicar el procedimiento',
     rule:
-      'Spanish states the recipient with a pronoun where English can leave it to context. ¿Me puedes explicar el procedimiento?, ¿nos confirmas la fecha?, ¿te paso el archivo? Without the pronoun the sentence stays grammatical but loses its addressee: ¿puedes explicar el procedimiento? asks whether explaining is possible in general rather than asking you to explain it to me.\n\nThe pronoun is also what makes a request sound like a request rather than an interrogation of someone\u2019s capabilities. In a professional exchange that difference is audible.\n\nPlacement follows the ordinary clitic rules: before the conjugated verb (me puedes explicar) or attached to the infinitive (puedes explicarme), both correct and interchangeable here. Resolved.',
+      'Spanish states the recipient with a pronoun where English can leave it to context. ¿Me puedes explicar el procedimiento?, ¿nos confirmas la fecha?, ¿te paso el archivo? Without the pronoun the sentence stays grammatical but loses its addressee: ¿puedes explicar el procedimiento? asks whether explaining is possible in general rather than asking you to explain it to me.\n\nThe pronoun is also what makes a request sound like a request rather than an interrogation of someone\u2019s capabilities. In a professional exchange that difference is audible.\n\nPlacement follows the ordinary clitic rules: before the conjugated verb (me puedes explicar) or attached to the infinitive (puedes explicarme), both correct and interchangeable here.',
     topicId: 'b1.pron.od_oi',
     severity: 3,
     status: 'resolved',
@@ -290,7 +290,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'no fírmelo · me diga',
     right: 'no lo firme · dígame',
     rule:
-      'Placement flips with polarity. Affirmative commands take the pronoun attached to the end, and a written accent appears to keep the original stress: dígame, fírmelo, entrégueselo. Negative commands take it before the verb, detached: no me diga, no lo firme, no se lo entregue.\n\nThis is the one context where placement is fixed rather than optional — unlike infinitives and gerunds, where both positions are legal. Resolved.',
+      'Placement flips with polarity. Affirmative commands take the pronoun attached to the end, and a written accent appears to keep the original stress: dígame, fírmelo, entrégueselo. Negative commands take it before the verb, detached: no me diga, no lo firme, no se lo entregue.\n\nThis is the one context where placement is fixed rather than optional — unlike infinitives and gerunds, where both positions are legal.',
     topicId: 'a2.verb.imperativo',
     severity: 3,
     status: 'resolved',
@@ -302,7 +302,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'hace el informe · siéntase',
     right: 'haz el informe · siéntese',
     rule:
-      'Eight irregular affirmative tú commands have to be memorised: di, haz, ve, pon, sal, sé, ten, ven. Usted commands and every negative command borrow the present subjunctive, which is why haga, ponga and tenga look nothing like the tú forms.\n\nReflexive commands add the pronoun and, in the nosotros form, drop the final -s before nos: sentémonos, not sentemosnos. Resolved.',
+      'Eight irregular affirmative tú commands have to be memorised: di, haz, ve, pon, sal, sé, ten, ven. Usted commands and every negative command borrow the present subjunctive, which is why haga, ponga and tenga look nothing like the tú forms.\n\nReflexive commands add the pronoun and, in the nosotros form, drop the final -s before nos: sentémonos, not sentemosnos.',
     topicId: 'a2.verb.imperativo',
     severity: 3,
     status: 'resolved',
@@ -326,7 +326,7 @@ export const ERRORS: SeedError[] = [
     wrong: 'más que tres semanas',
     right: 'más de tres semanas',
     rule:
-      'Before a number Spanish uses más de or menos de, never más que: más de tres semanas, menos de veinte partidas, más de un millón de soles. "Más que" is for comparing two things to each other — este frente avanza más que el otro, cuesta más que lo presupuestado.\n\nThe test is what follows the comparative. A quantity takes de; a second term of comparison takes que. English uses "than" for both, which is the entire source of the error.\n\nThe exception matters commercially. In a negative sentence, no… más que means "only", not "more than": no tenemos más que dos semanas means we have only two weeks. To say we do not have more than two weeks you need no tenemos más de dos semanas. One letter reverses the claim, and both sentences are things a person says in a contract negotiation. Resolved.',
+      'Before a number Spanish uses más de or menos de, never más que: más de tres semanas, menos de veinte partidas, más de un millón de soles. "Más que" is for comparing two things to each other — este frente avanza más que el otro, cuesta más que lo presupuestado.\n\nThe test is what follows the comparative. A quantity takes de; a second term of comparison takes que. English uses "than" for both, which is the entire source of the error.\n\nThe exception matters commercially. In a negative sentence, no… más que means "only", not "more than": no tenemos más que dos semanas means we have only two weeks. To say we do not have more than two weeks you need no tenemos más de dos semanas. One letter reverses the claim, and both sentences are things a person says in a contract negotiation.',
     topicId: 'a2.noun.comparativos',
     severity: 2,
     status: 'resolved',

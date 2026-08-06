@@ -36,11 +36,10 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: null,
     payload: {
-      prompt: 'Give the two verb forms in order, separated by a comma. Both are imperfect.',
+      prompt: 'Give the two verb forms in order, separated by a comma.',
       context: 'Setting the scene before an incident.',
       sentence: 'Cuando llegué a obra, ___ (llover) y la cuadrilla ___ (estar) parada.',
       answer: 'llovía, estaba',
-      accept: ['llovía estaba'],
       distractors: [
         {
           answer: 'llovió, estuvo',
@@ -204,7 +203,6 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       answer: 'Recomiendo que revisemos los supuestos antes de enviar el presupuesto.',
       accept: [
         'recomiendo que revisemos las premisas antes de enviar el presupuesto',
-        'recomiendo que revisemos los supuestos antes de enviar la estimación',
         'recomiendo que revisemos las premisas antes de enviar la estimación',
         'recomiendo que revisemos los supuestos antes de enviar la estimación',
       ],
@@ -274,7 +272,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: null,
     payload: {
-      prompt: 'Replace the underlined object with a pronoun: «el informe».',
+      prompt: 'Rewrite the sentence, replacing «el informe» with a pronoun.',
       context: 'Answering a question about a document you already sent.',
       sentence: 'Enviamos el informe ayer.',
       answer: 'Lo enviamos ayer.',
@@ -300,7 +298,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 3,
     targetsError: null,
     payload: {
-      prompt: 'Complete with the correct pronoun.',
+      prompt: 'Complete with the correct pronouns.',
       context: 'Confirming an action to a colleague. The contractor asked for the updated drawings yesterday.',
       sentence: '¿Los planos actualizados? Ya ___ mandé esta mañana.',
       answer: 'se los',
@@ -313,7 +311,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         {
           answer: 'los',
           feedback:
-            'That sends the drawings but says nothing about who received them, and the contractor is nowhere in the sentence. Both objects have to be pronominalised: «se los».',
+            'That is grammatical, but it drops the recipient, and the prompt asks for both objects as pronouns. With the contractor as indirect object you need «se los».',
         },
       ],
       explanation:
@@ -361,7 +359,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'With «ir a + infinitive» the pronoun has two legal positions and one illegal one. Attached to the infinitive as a single written word: «voy a enviarle». Or before the entire phrase: «le voy a enviar». It can never sit loose between them, and it is never written as a separate word after the infinitive.\n\nBoth legal versions are equally correct and equally common. Attaching is marginally more formal in writing; fronting is marginally more common in speech.\n\nWhen attaching pushes the stress three syllables from the end, a written accent appears: «enviándole», «entregándoselo». That does not happen with a plain infinitive plus one pronoun, so «enviarle» takes none.\n\nNote «le» alongside «al cliente» — the doubled indirect object again, obligatory rather than redundant.',
+        'With «ir a + infinitive» the pronoun has two legal positions and one illegal one. Attached to the infinitive as a single written word: «voy a enviarle». Or before the entire phrase: «le voy a enviar». It can never sit loose between them, and it is never written as a separate word after the infinitive.\n\nBoth legal versions are equally correct and equally common. Attaching is marginally more formal in writing; fronting is marginally more common in speech.\n\nWhen attaching pushes the stress three or more syllables from the end, a written accent appears: «enviándole» (three), «entregándoselo» (four). That does not happen with a plain infinitive plus one pronoun, so «enviarle» takes none.\n\nNote «le» alongside «al cliente» — the doubled indirect object again, obligatory rather than redundant.',
     },
   },
 
@@ -454,7 +452,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       context: 'Explaining a consequence in a status report.',
       sentence: 'El proveedor no confirmó la fecha; ___, reprogramamos el vaciado para el jueves.',
       answer: 'por lo tanto',
-      accept: ['por tanto', 'en consecuencia', 'por consiguiente', 'de modo que'],
+      accept: ['por tanto', 'en consecuencia', 'por consiguiente'],
       distractors: [
         {
           answer: 'sin embargo',
@@ -463,7 +461,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'The relationship is cause and effect, so the connector must be consequential: por lo tanto, por consiguiente, en consecuencia, de modo que.\n\nRegister separates them. «Por lo tanto» is the neutral, all-purpose choice and works in speech and writing alike. «Por consiguiente» and «en consecuencia» are more formal and belong in written reports. «Así que» is the informal counterpart and is fine in a call but out of place in a letter to a client.\n\nPunctuation matters here and is a common source of lost marks. These connectors take a semicolon or a full stop before them and a comma after: «no confirmó la fecha; por lo tanto, reprogramamos». A bare comma before «por lo tanto» is a comma splice in Spanish just as in English.\n\n«Reprogramar» is the standard verb for rescheduling an activity — «reprogramamos el vaciado», «la reunión se reprogramó».',
+        'The relationship is cause and effect, so the connector must be consequential: por lo tanto, por consiguiente, en consecuencia.\n\nRegister separates them. «Por lo tanto» is the neutral, all-purpose choice and works in speech and writing alike. «Por consiguiente» and «en consecuencia» are more formal and belong in written reports.\n\n«Así que» and «de modo que» express the same relation but are conjunctions rather than adverbials, so they join the clauses directly — «no confirmó la fecha, así que reprogramamos», with a comma before and nothing after. They do not fit the «; ___,» frame in this sentence, and they are fine in a call but out of place in a letter to a client.\n\nPunctuation matters here and is a common source of lost marks. These connectors take a semicolon or a full stop before them and a comma after: «no confirmó la fecha; por lo tanto, reprogramamos». A bare comma before «por lo tanto» is a comma splice in Spanish just as in English.\n\n«Reprogramar» is the standard verb for rescheduling an activity — «reprogramamos el vaciado», «la reunión se reprogramó».',
     },
   },
   {
@@ -508,6 +506,9 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         'en síntesis, el cronograma se mantiene, aunque hay que revisar el costo',
         'en conclusión, el cronograma se mantiene, aunque hay que revisar el costo',
         'en resumen, el cronograma se mantiene, aunque el costo debe ser revisado',
+        'en resumen, el cronograma se mantiene, aunque se debe revisar el costo',
+        'en síntesis, el cronograma se mantiene, aunque se debe revisar el costo',
+        'en conclusión, el cronograma se mantiene, aunque se debe revisar el costo',
       ],
       distractors: [
         {
@@ -538,8 +539,8 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         {
           answer: 'podríamos',
           feedback:
-            'That is the conditional. The imperfect subjunctive comes from the preterite stem: pudieron → pudiéramos.',
-          errorCode: 'verb.futuro_vs_condicional',
+            'That is the conditional, and «si» never takes it. The imperfect subjunctive comes from the preterite stem: pudieron → pudiéramos.',
+          errorCode: 'mood.subj_imperfecto_missing',
         },
         {
           answer: 'pudieramos',
@@ -557,7 +558,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 3,
     targetsError: null,
     payload: {
-      prompt: 'Complete with the imperfect subjunctive.',
+      prompt: 'Complete with the correct form.',
       context: 'Reporting a requirement the client set last month.',
       sentence: 'Era necesario que el contratista ___ (presentar) el plan de seguridad antes de movilizar.',
       answer: 'presentara',
@@ -586,6 +587,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       accept: [
         'me gustaría que revisara los supuestos antes de que se reúna el comité',
         'quisiera que revise los supuestos antes de que se reúna el comité',
+        'me gustaría que revise los supuestos antes de que se reúna el comité',
       ],
       distractors: [
         {

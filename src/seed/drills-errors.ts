@@ -28,6 +28,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
       context: 'Opening line of a progress note to the client.',
       sentence: 'El contratista programó ___ demostración del sistema contra incendios para el jueves.',
       answer: 'una',
+      accept: ['la', 'esa', 'esta', 'otra'],
       distractors: [
         {
           answer: 'un',
@@ -108,7 +109,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'A short, closed set of nouns ending in -ma is masculine: el tema, el problema, el sistema, el programa, el esquema, el diagrama, el cronograma, el clima, el idioma, el síntoma, el dilema, el teorema.\n\nThey came into Spanish from Greek neuter nouns in -ma, which Latin absorbed as masculine. The -a is therefore not the feminine ending at all — it is the last letter of a borrowed Greek suffix that happens to look like one.\n\nThe set being closed is what makes it learnable: you memorise a list rather than a rule. And the test is etymological, not phonetic, so plenty of other -ma nouns are ordinary feminines — la cama, la firma, la forma, la norma, la víctima, la plataforma. Half of the work here is knowing which -ma words are *not* in the group.',
+        'A short, closed set of nouns ending in -ma is masculine: el tema, el problema, el sistema, el programa, el esquema, el diagrama, el cronograma, el clima, el idioma, el síntoma, el dilema, el teorema.\n\nThey came into Spanish from Greek neuter nouns in -ma, which Latin borrowed as neuters and which Spanish inherited as masculine when the neuter gender was absorbed into the masculine. The -a is therefore not the feminine ending at all — it is the last letter of a borrowed Greek suffix that happens to look like one.\n\nThe set being closed is what makes it learnable: you memorise a list rather than a rule. And the test is etymological, not phonetic, so plenty of other -ma nouns are ordinary feminines — la cama, la firma, la forma, la norma, la víctima, la plataforma. Half of the work here is knowing which -ma words are *not* in the group.',
     },
   },
   {
@@ -179,11 +180,6 @@ export const ERROR_DRILLS: SeedDrill[] = [
             'That is the yo form — it says *I* approved the change. The subject is «el supervisor», so the ending is -ó.',
           errorCode: 'verb.preterito_persona',
         },
-        {
-          answer: 'aprobo',
-          feedback:
-            'The ending is right but the accent is missing, and here it is not decoration: «aprobo» without the accent is not a preterite form at all.',
-        },
       ],
       explanation:
         'In the preterite, person is carried entirely by the ending, and the two singular endings differ only in the stressed vowel: -é (yo) against -ó (él, ella, usted) for -ar verbs, and -í (yo) against -ió (él, ella, usted) for -er and -ir verbs.\n\nyo aprobé, revisé, coordiné, firmé — él aprobó, revisó, coordinó, firmó.\nyo escribí, cumplí, recibí — él escribió, cumplió, recibió.\n\nThis is the most expensive error in your log because it does not merely sound wrong, it reassigns responsibility. «Yo aprobé el cambio» and «el supervisor aprobó el cambio» are both perfectly grammatical, and they name different people. In an acta, a claim file or a status report, that is a change of fact.\n\nThe written accent is load-bearing in both persons and gives no disambiguating help, since both forms carry one. Under speaking pressure the fix is procedural rather than grammatical: settle the subject before you start the verb, then pick the vowel — yo takes é or í, él takes ó or ió.',
@@ -192,10 +188,10 @@ export const ERROR_DRILLS: SeedDrill[] = [
   {
     topicId: 'b1.verb.preterito',
     kind: 'drill_error_spot',
-    difficulty: 4,
+    difficulty: 3,
     targetsError: 'verb.preterito_persona',
     payload: {
-      prompt: 'The verb names the wrong person. Rewrite the sentence.',
+      prompt: 'The verbs name the wrong person. Rewrite the sentence.',
       context: 'You are reporting what the client did, not what you did.',
       sentence: 'El cliente revisé los planos y devolví los comentarios el viernes.',
       answer: 'El cliente revisó los planos y devolvió los comentarios el viernes.',
@@ -224,6 +220,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
       accept: [
         'yo envié los planos el lunes y ella los aprobó el miércoles',
         'mandé los planos el lunes y ella los aprobó el miércoles',
+        'yo mandé los planos el lunes y ella los aprobó el miércoles',
       ],
       distractors: [
         {
@@ -286,7 +283,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Llegaran» is imperfect subjunctive; the sentence reports something that happened, so it needs the indicative: «llegaron». The written fix is a single vowel, but do not read that as the two forms being one tense in two moods — «llegaran» is the imperfect subjunctive, and what a factual past report needs is the preterite indicative. The indicative counterpart of the imperfect subjunctive is the imperfect or the pluperfect, not the preterite.\n\nThe subordinate clause matters too. «Porque» stating a real reason always takes the indicative: «porque el proveedor cambió el alcance». The subjunctive appears with «porque» only under negation, where the reason is being denied: «no lo hicimos porque nos lo pidieran, sino porque era necesario».\n\nThis is the shape of the error to watch for in your own writing: the leak usually lands on the main verb of a perfectly factual report, and the surrounding clause is untouched. If the sentence answers "what happened?", every verb in it is indicative unless a listed trigger says otherwise.',
+        '«Llegaran» is imperfect subjunctive; the sentence reports something that happened, so it needs the indicative: «llegaron». The written fix is a single vowel, but do not read that as one tense wearing two moods: «llegaran» is the imperfect subjunctive and «llegaron» is the preterite indicative, and they are separate forms rather than a matched pair. The imperfect subjunctive has no single indicative counterpart — «me alegró que llegaran a tiempo» reports «llegaron», while «si llegaran mañana» points at something unreal.\n\nThe subordinate clause matters too. «Porque» stating a real reason always takes the indicative: «porque el proveedor cambió el alcance». The subjunctive appears with «porque» chiefly under negation, where the reason is being denied: «no lo hicimos porque nos lo pidieran, sino porque era necesario». It also turns up in the less common final use, where «porque» means «para que»: «hicimos lo posible porque no se enterara».\n\nThis is the shape of the error to watch for in your own writing: the leak usually lands on the main verb of a perfectly factual report, and the surrounding clause is untouched. If the sentence answers "what happened?", every verb in it is indicative unless a listed trigger says otherwise.',
     },
   },
   {
@@ -302,6 +299,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
       accept: [
         'el cliente quiso que reforzásemos la cimentación y aprobó el costo adicional',
         'el cliente quería que reforzáramos la cimentación y aprobó el costo adicional',
+        'el cliente quería que reforzásemos la cimentación y aprobó el costo adicional',
       ],
       distractors: [
         {
@@ -379,6 +377,8 @@ export const ERROR_DRILLS: SeedDrill[] = [
       answer: 'El presupuesto está aprobado pero el contrato todavía no está firmado.',
       accept: [
         'el presupuesto está aprobado pero el contrato aún no está firmado',
+        'el presupuesto está aprobado pero el contrato no está firmado todavía',
+        'el presupuesto está aprobado pero el contrato no está firmado aún',
       ],
       distractors: [
         {
@@ -404,7 +404,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
       context: 'Sequencing two site activities. The inspection is at 08:00 and the pour follows it.',
       sentence: 'Vamos a vaciar la losa ___ la inspección, no antes.',
       answer: 'después de',
-      accept: ['tras'],
+      accept: ['tras', 'luego de'],
       distractors: [
         {
           answer: 'después',
@@ -462,7 +462,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'An infinitive is a complement like any other, so «de» is required: después de firmar.\n\nThis is also a reminder of the wider rule that any preposition in Spanish takes the infinitive, never a conjugated verb and never a gerund: antes de firmar, sin firmar, para firmar, al firmar. English uses -ing after prepositions ("after signing"), which is why the gerund «firmando» feels right and is wrong.\n\n«Al + infinitive» is worth knowing as a compact alternative for simultaneity: «al firmar la adenda, arrancamos» means "on signing the addendum, we start".\n\nOn vocabulary: «la adenda» is the standard term in Peruvian and broader Latin American contracting for a contract addendum. «La adenda» is the adapted form the DLE records and the one you will see in Peruvian contracts. The raw Latinism «addenda» survives in some boilerplate; use «la adenda».',
+        'An infinitive is a complement like any other, so «de» is required: después de firmar.\n\nThis is also a reminder of the wider rule that prepositions in Spanish take the infinitive rather than a conjugated verb or a gerund: antes de firmar, sin firmar, para firmar, al firmar. (The rule is near-absolute; «según acordamos» is the exception worth knowing.) English uses -ing after prepositions ("after signing"), which is why the gerund «firmando» feels right and is wrong.\n\n«Al + infinitive» is worth knowing as a compact alternative for simultaneity: «al firmar la adenda, arrancamos» means "on signing the addendum, we start".\n\nOn vocabulary: «la adenda» is the adapted form the DLE records, and the standard term in Peruvian and broader Latin American contracting for a contract addendum. The raw Latinism «addenda» survives in some boilerplate; use «la adenda».',
     },
   },
 
@@ -531,7 +531,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Darse cuenta de» is a fixed expression with two obligatory parts: the reflexive pronoun and the preposition «de». «Nos dimos cuenta de que…». Without the pronoun, «dar cuenta de» means to account for or report on something, which is a different claim entirely.\n\nDropping the «de» before «que» — «nos dimos cuenta que» — is extremely common in speech throughout Latin America and is generally tolerated in writing, but keeping it is the safer choice in a professional or exam register.\n\nThe subordinate clause takes the pluperfect: «había cambiado». The change happened before the realising, and Spanish marks that ordering with «haber» in the imperfect plus the participle, just as English does with "had changed". Note that the participle after haber never agrees — «había cambiado la especificación», not «cambiada».',
+        '«Darse cuenta de» is a fixed expression with two obligatory parts: the reflexive pronoun and the preposition «de». «Nos dimos cuenta de que…». Without the pronoun, «dar cuenta de» means to account for or report on something, which is a different claim entirely.\n\nDropping the «de» before «que» — «nos dimos cuenta que» — is extremely common in speech throughout Latin America, but the RAE classes it as queísmo and censures it. Keep the «de» in anything written.\n\nThe subordinate clause takes the pluperfect: «había cambiado». The change happened before the realising, and Spanish marks that ordering with «haber» in the imperfect plus the participle, just as English does with "had changed". Note that the participle after haber never agrees — «había cambiado la especificación», not «cambiada».',
     },
   },
 
@@ -539,7 +539,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
   {
     topicId: 'a1.noun.articulos',
     kind: 'drill_error_spot',
-    difficulty: 1,
+    difficulty: 2,
     targetsError: 'lex.una_otra_vez',
     payload: {
       prompt: 'Correct the sentence.',
@@ -548,8 +548,9 @@ export const ERROR_DRILLS: SeedDrill[] = [
       answer: '¿Podemos revisar el alcance en otra reunión?',
       distractors: [
         {
-          answer: '¿Podemos revisar el alcance en una otra reunión más?',
-          feedback: 'The problem is the article itself. «Otro/otra» never takes «un/una» in front of it.',
+          answer: '¿Podemos revisar el alcance en una reunión más?',
+          feedback:
+            'That is correct Spanish, but it is not a correction of this sentence — it swaps the phrase for a different one. The fault is the article: «otro/otra» never takes «un/una» in front of it, so the fix is to delete «una».',
           errorCode: 'lex.una_otra_vez',
         },
       ],
@@ -570,6 +571,8 @@ export const ERROR_DRILLS: SeedDrill[] = [
       accept: [
         'el proveedor incumplió el plazo una vez más',
         'el proveedor volvió a incumplir el plazo',
+        'el proveedor perdió el plazo otra vez',
+        'el proveedor volvió a perder el plazo',
       ],
       distractors: [
         {
@@ -579,7 +582,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Otra vez» is the standard phrase for "again" and takes no article. «Una vez más» is the alternative and *does* take one, because there the article belongs to «vez» and «más» is doing the work of "another".\n\nThat pair is worth memorising together, since it shows the logic: otra vez / una vez más. Both are natural; «una vez más» is slightly more formal and carries a hint of patience running out, which may or may not be what you want in a client email.\n\nThe most idiomatic option of the three is «volver a + infinitive» — «volvió a incumplir el plazo». Spanish prefers this construction to an adverb where English says "again", and reaching for it is one of the clearest markers of a B2 speaker rather than a B1 one.\n\n«Incumplir el plazo» is the contractual collocation and carries breach. «Perder el plazo» is also perfectly good Spanish, but it only reports lateness with no contractual weight — in a claim context «incumplir» is the word you want.',
+        '«Otra vez» is the standard phrase for "again" and takes no article. «Una vez más» is the alternative and *does* take one, because there the article belongs to «vez» and «más» is doing the work of "another".\n\nThat pair is worth memorising together, since it shows the logic: otra vez / una vez más. Both are natural; «una vez más» is slightly more formal and carries a hint of patience running out, which may or may not be what you want in a client email.\n\nThe most idiomatic option of the three is «volver a + infinitive» — «volvió a incumplir el plazo». Spanish prefers this construction to an adverb where English says "again", and reaching for it is one of the clearest markers of a B2 speaker rather than a B1 one.\n\nOn the verb: «incumplir el plazo» is the contractual collocation and carries breach, which is why it is the key here. «Perder el plazo» is also perfectly good Spanish and is accepted, but it only reports lateness with no contractual weight — in a claim or a letter that may be read as evidence, «incumplir» is the word you want.',
     },
   },
 
@@ -597,6 +600,9 @@ export const ERROR_DRILLS: SeedDrill[] = [
       accept: [
         'hace tres semanas presentamos la valorización',
         'entregamos la valorización hace tres semanas',
+        'hace tres semanas entregamos la valorización',
+        'hace tres semanas que presentamos la valorización',
+        'presentamos la valorización tres semanas atrás',
       ],
       distractors: [
         {
@@ -684,18 +690,18 @@ export const ERROR_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'One verb is in the wrong tense. Rewrite the sentence.',
       context: 'Confirming scope in writing after a meeting.',
-      sentence: 'Confirmamos que incluiríamos la partida de instalaciones en el alcance.',
-      answer: 'Confirmamos que incluiremos la partida de instalaciones en el alcance.',
+      sentence: 'Les confirmo que incluiríamos la partida de instalaciones en el alcance.',
+      answer: 'Les confirmo que incluiremos la partida de instalaciones en el alcance.',
       distractors: [
         {
-          answer: 'Confirmamos que incluyéramos la partida de instalaciones en el alcance.',
+          answer: 'Les confirmo que incluyéramos la partida de instalaciones en el alcance.',
           feedback:
             '«Confirmar que» asserts a fact, so nothing here licenses a subjunctive. The sentence is a forward commitment, which is what the future is for: incluiremos.',
           errorCode: 'verb.futuro_vs_condicional',
         },
       ],
       explanation:
-        '«Confirmamos que…» sets up an assertion, and an assertion in the conditional contradicts itself: you cannot confirm a hypothesis. «Incluiremos» is the form the sentence needs.\n\nThe professional cost here is larger than the grammatical one. A conditional inside a confirmation reads to a Spanish-speaking client as deliberate hedging — as though you are leaving yourself an exit. That is a worse impression than a grammatical slip, because it looks like intent.\n\nWhere the conditional does belong in this register is in softening a *request* or a *proposal*: «propondríamos incluir la partida» is a genuine, useful hedge before a decision is made. Once the decision is made, the hedge has to come off.\n\nNote «la partida» in the construction sense — a budget line item or work package. «El alcance» is scope. Both are core vocabulary in your context and neither is a false friend, but «partida» has enough other meanings that the collocation is worth fixing as a unit.',
+        '«Les confirmo que…» sets up an assertion, and a present-tense assertion in the conditional contradicts itself: you cannot confirm a hypothesis. «Incluiremos» is the form the sentence needs.\n\nNote that with a *past* reporting verb the conditional would be right: «confirmamos ayer que incluiríamos la partida» is future-in-the-past, and perfectly good. The clash here is specifically between a present assertion and a conditional — which is also why the sentence uses «les confirmo» rather than «confirmamos», since for an -ar verb the nosotros form is identical in the present and the preterite and would leave the reading open.\n\nThe professional cost here is larger than the grammatical one. A conditional inside a confirmation reads to a Spanish-speaking client as deliberate hedging — as though you are leaving yourself an exit. That is a worse impression than a grammatical slip, because it looks like intent.\n\nWhere the conditional does belong in this register is in softening a *request* or a *proposal*: «propondríamos incluir la partida» is a genuine, useful hedge before a decision is made. Once the decision is made, the hedge has to come off.\n\nNote «la partida» in the construction sense — a budget line item or work package. «El alcance» is scope. Both are core vocabulary in your context and neither is a false friend, but «partida» has enough other meanings that the collocation is worth fixing as a unit.',
     },
   },
   {
@@ -894,18 +900,17 @@ export const ERROR_DRILLS: SeedDrill[] = [
       sentence: 'The foremen are missing two people on the night shift.',
       answer: 'A los capataces les faltan dos personas en el turno de noche.',
       accept: [
-        'a los capataces les faltan dos personas en el turno noche',
         'les faltan dos personas a los capataces en el turno de noche',
       ],
       distractors: [
         {
-          answer: 'Los capataces faltan dos personas en el turno noche.',
+          answer: 'Los capataces faltan dos personas en el turno de noche.',
           feedback:
             'Faltar works like gustar and doler: the missing people are the subject, and the foremen are an indirect object. «A los capataces les faltan…»',
         },
       ],
       explanation:
-        'Faltar belongs to the same family as gustar and doler, and it is the one that matters most at work: «me falta información», «nos faltan dos días», «al expediente le falta la firma».\n\nThe structure is: a + person (optional but common), the indirect object pronoun (obligatory), the verb agreeing with the thing, then the thing. «A los capataces les faltan dos personas» — the verb is plural because «dos personas» is plural, not because «los capataces» is.\n\nEnglish inverts this completely, making the person the subject of "are missing", which is why the error is so persistent. The whole family works the same way and is worth learning as one pattern rather than verb by verb: gustar, doler, faltar, quedar, sobrar, interesar, importar, convenir, parecer.\n\n«El turno de noche» is the neutral form and the one that belongs in writing. The preposition-less «el turno noche» is heard on site, but bare noun-plus-noun shift names are characteristically River Plate and are a marked choice here — do not default to them.',
+        'Faltar belongs to the same family as gustar and doler, and it is the one that matters most at work: «me falta información», «nos faltan dos días», «al expediente le falta la firma».\n\nThe structure is: a + person (optional but common), the indirect object pronoun (obligatory), the verb agreeing with the thing, then the thing. «A los capataces les faltan dos personas» — the verb is plural because «dos personas» is plural, not because «los capataces» is.\n\nEnglish inverts this completely, making the person the subject of "are missing", which is why the error is so persistent. The whole family works the same way and is worth learning as one pattern rather than verb by verb: gustar, doler, faltar, quedar, sobrar, interesar, importar, convenir, parecer.\n\n«El turno de noche» is the neutral form and the one that belongs in writing. The preposition-less «el turno noche» is common in spoken site usage across Peru — it is an ellipsis of «de», not an error — but it is colloquial, so keep the «de» in reports, minutes and anything that reaches the client.',
     },
   },
 
@@ -1014,11 +1019,17 @@ export const ERROR_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: 'pron.personal_a',
     payload: {
-      prompt: 'Complete the sentence with «a», «al», or «—» for nothing.',
+      prompt: 'Complete the sentence. Write «a», «al», or «nada» if nothing is needed.',
       context: 'Describing a staffing decision.',
       sentence: 'Contratamos ___ los dos ingenieros que nos recomendó el cliente.',
       answer: 'a',
       distractors: [
+        {
+          answer: 'nada',
+          feedback:
+            'A specific human direct object takes the personal «a». These are two identified engineers — the client named them — so the «a» is required.',
+          errorCode: 'pron.personal_a',
+        },
         {
           answer: '—',
           feedback:
@@ -1107,7 +1118,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        '«Haber» takes the participle: «no ha respondido». The gerund cannot follow it.\n\nA near neighbour worth keeping separate, because it is correct Spanish and simply not what this sentence means: «no está respondiendo». That describes an ongoing behaviour, where «no ha respondido» reports a completed absence of response up to now. In a client email the difference is the difference between a factual chase and an accusation.\n\nThe distractor tests something else — after «haber» the participle is invariable. «Ha respondido» whoever the subject is and whatever the object; «ha respondida» does not exist. Agreement appears only when the participle follows estar or ser.\n\n«Responder a» takes the preposition: «responder a una consulta», «responder a un correo». Dropping it is a separate error and a common one, since English "answer" is transitive.\n\n«Nuestras dos últimas consultas» — note the order. Spanish normally puts the number before «último/a», the reverse of English "last two": las dos últimas consultas, los tres últimos informes. «Las últimas dos consultas» is heard and is not an error, but the numeral-first order is the standard one and the safer default in writing.',
+        '«Haber» takes the participle: «no ha respondido». The gerund cannot follow it.\n\nA near neighbour worth keeping separate, because it is correct Spanish and simply not what this sentence means: «no está respondiendo». That describes an ongoing behaviour, where «no ha respondido» reports a completed absence of response up to now. In a client email the difference is the difference between a factual chase and an accusation.\n\nThe distractor tests something else — after «haber» the participle is invariable. «Ha respondido» whoever the subject is and whatever the object; «ha respondida» does not exist. Agreement appears only when the participle follows estar or ser.\n\nOn «responder»: both constructions are correct when what is being answered is a question, a letter or a query — «responder una consulta» and «responder a una consulta» alike (DPD, *responder* §2c). The version with «a» is the safer default in formal writing, but the bare transitive is not an error.\n\n«Nuestras dos últimas consultas» — note the order. Spanish normally puts the number before «último/a», the reverse of English "last two": las dos últimas consultas, los tres últimos informes. «Las últimas dos consultas» is heard and is not an error, but the numeral-first order is the standard one and the safer default in writing.',
     },
   },
 
@@ -1118,11 +1129,17 @@ export const ERROR_DRILLS: SeedDrill[] = [
     difficulty: 3,
     targetsError: 'pron.io_redundant',
     payload: {
-      prompt: 'Complete with «Le», «Lo», or «—» for nothing.',
+      prompt: 'Complete the sentence. Write «Le», «Lo», or «nada» if nothing is needed.',
       context: 'Confirming what you sent and to whom.',
       sentence: 'Al cliente ___ enviamos el informe el martes por la tarde.',
       answer: 'Le',
       distractors: [
+        {
+          answer: 'nada',
+          feedback:
+            'A fronted indirect object is the case where the clitic stops being optional. «Al cliente le enviamos el informe» — without «le» the sentence is ungrammatical.',
+          errorCode: 'pron.io_redundant',
+        },
         {
           answer: '—',
           feedback:
@@ -1186,7 +1203,7 @@ export const ERROR_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Buscar means "to look for", with the "for" already inside the verb. It takes a direct object and no preposition: «buscamos un proveedor», «busco el plano», «estamos buscando alternativas».\n\nThis is a whole class of English particles that get carried onto Spanish verbs where they do not belong. «Esperar» means "wait for" — «esperamos la respuesta», not «esperamos por la respuesta». «Pedir» means "ask for" — «pedimos una prórroga». «Pagar» means "pay for" — «pagamos el material». «Mirar» means "look at" — «mira el plano».\n\nThe mirror-image error also exists and is worth guarding against at the same time: some Spanish verbs demand a preposition where English has none. «Entrar en/a la sala», «depender de», «confiar en», «asistir a una reunión», «responder a una consulta».\n\nSo neither language can be used as a guide for the other. Verb government has to be learned verb by verb, which is why this topic exists as its own item in the curriculum.',
+        'Buscar means "to look for", with the "for" already inside the verb. It takes a direct object and no preposition of its own: «buscamos un proveedor», «busco el plano», «estamos buscando alternativas». The personal «a» before a specific person is a different thing and still applies: «buscamos a la supervisora de turno».\n\nThis is a whole class of English particles that get carried onto Spanish verbs where they do not belong. «Esperar» means "wait for" — «esperamos la respuesta», not «esperamos por la respuesta». «Pedir» means "ask for" — «pedimos una prórroga». «Pagar» means "pay for" — «pagamos el material». «Mirar» means "look at" — «mira el plano».\n\nThe mirror-image error also exists and is worth guarding against at the same time: some Spanish verbs demand a preposition where English has none. «Entrar en/a la sala», «depender de», «confiar en», «asistir a una reunión», «responder a una consulta».\n\nSo neither language can be used as a guide for the other. Verb government has to be learned verb by verb, which is why this topic exists as its own item in the curriculum.',
     },
   },
   {

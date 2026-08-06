@@ -8,9 +8,9 @@ import { ERRORS } from './errors';
 import { ERROR_DRILLS } from './drills-errors';
 import { TOPIC_DRILLS } from './drills-topics';
 import { VOCAB } from './vocab';
-import { GAUNTLET } from './gauntlet';
+import { BATCH, PER_KEY, gauntletFor } from './gauntlet';
 import { LEVELS, STRANDS, type SeedTopic, type SeedDrill } from './types';
-export { VOCAB, GAUNTLET };
+export { VOCAB, BATCH, PER_KEY, gauntletFor };
 
 export const TOPICS: SeedTopic[] = [...A_TOPICS, ...B_TOPICS, ...C_TOPICS];
 export const DRILLS: SeedDrill[] = [...ERROR_DRILLS, ...TOPIC_DRILLS];
@@ -140,14 +140,17 @@ export function seed(db: DB): {
         gauntlet_log = excluded.gauntlet_log,
         verified_at = excluded.verified_at
     `);
-    const unverified = JSON.stringify({
-      rounds: [],
-      note: 'Authored, not gauntlet-verified. Checked by the seed test suite only.',
-    });
     for (const [i, d] of DRILLS.entries()) {
       const key = drillKey(d, i);
       // A drill carries a score only if the §5 panel actually gave it one.
-      const g = GAUNTLET[key];
+      // Today every authored drill is covered by the batch verdict, but a drill
+      // added without one must still seed as unverified rather than inherit a
+      // score it was never given.
+      const g = gauntletFor(key);
+      const unverified = JSON.stringify({
+        rounds: [],
+        note: 'Authored, not gauntlet-verified. Checked by the seed test suite only.',
+      });
       drill.run({
         topicId: d.topicId,
         kind: d.kind,

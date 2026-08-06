@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DRILLS, ERRORS, TOPICS, seed, drillKey } from './index';
+import { DRILLS, ERRORS, TOPICS, seed, drillKey, gauntletFor } from './index';
 import { DRILL_KINDS, grade, normalize } from '@/domain/grading';
 import { migrate, openDatabase } from '@/db';
 import type { DB } from '@/db';
@@ -256,13 +256,55 @@ describe('seeding drills into SQLite', () => {
     expect(after).toEqual(ids);
   });
 
-  it('records that no gauntlet ran, rather than faking a score', () => {
+  it('stores the score the panel actually gave, and the audit trail behind it', () => {
+    // The point of this test is that nothing invents a score. Every drill either
+    // carries a verdict a real §5 panel recorded, or carries 0 and says why.
     const db = freshDb();
     seed(db);
-    const row = db
-      .prepare('SELECT gauntlet_score, gauntlet_log FROM content LIMIT 1')
-      .get() as { gauntlet_score: number; gauntlet_log: string };
-    expect(row.gauntlet_score).toBe(0);
-    expect(JSON.parse(row.gauntlet_log).rounds).toEqual([]);
+    const rows = db
+      .prepare('SELECT seed_key, gauntlet_score, gauntlet_log, verified_at FROM content')
+      .all() as {
+      seed_key: string;
+      gauntlet_score: number;
+      gauntlet_log: string;
+      verified_at: string;
+    }[];
+    expect(rows).toHaveLength(DRILLS.length);
+
+    for (const row of rows) {
+      const expected = gauntletFor(row.seed_key);
+      if (!expected) {
+        expect(row.gauntlet_score).toBe(0);
+        expect(JSON.parse(row.gauntlet_log).rounds).toEqual([]);
+        continue;
+      }
+      expect(row.gauntlet_score).toBe(expected.score);
+      expect(row.verified_at).toBe(expected.verifiedAt);
+
+      const log = JSON.parse(row.gauntlet_log) as typeof expected;
+      expect(log.verdict).toBe('accepted');
+      // §5 accepts only when all three verifiers pass and the mean reaches 8.0.
+      expect(log.linguistic.pass && log.register.pass && log.pedagogy.pass).toBe(true);
+      const mean = (log.linguistic.score + log.register.score + log.pedagogy.score) / 3;
+      expect(mean).toBeGreaterThanOrEqual(8);
+      expect(log.score).toBeCloseTo(mean, 5);
+      // The trail is the reason the score is believable — an accept with no
+      // recorded revisions would mean the panel found nothing across 74 items.
+      expect(log.revisions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('never quarantines content into the seeded set', () => {
+    // SPEC §5: quarantined content is withheld from the learner, so it must not
+    // reach `content` at all. If a future batch is quarantined this test is the
+    // thing that stops it being seeded anyway.
+    const db = freshDb();
+    seed(db);
+    const logs = db.prepare('SELECT gauntlet_log FROM content').all() as {
+      gauntlet_log: string;
+    }[];
+    for (const { gauntlet_log } of logs) {
+      expect(JSON.parse(gauntlet_log).verdict).not.toBe('quarantined');
+    }
   });
 });
