@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * Fluencia is a working tool, not a consumer app: it commits to one dark
+ * identity rather than following the viewer's theme. Teal accent on cool slate,
+ * carried over from v1, with a serif face reserved for Spanish and for the
+ * grammar prose — the two things the user actually reads at length.
+ *
+ * Everything below lives in @layer base so Tailwind utilities still win. The
+ * scaffold shipped these as unlayered rules, which silently overrode every
+ * utility applied to <body>.
+ */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "Source Serif 4", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    color-scheme: dark;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-slate-950);
+    color: var(--color-slate-200);
+    font-family: var(--font-sans);
+  }
+
+  /* Spanish and grammar prose read better with a serif; everything structural
+     stays sans. */
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-teal-500) 30%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-teal-500);
+    outline-offset: 2px;
+  }
+
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details > summary::before {
+    content: "▸ ";
+    color: var(--color-slate-600);
+  }
+  details[open] > summary::before {
+    content: "▾ ";
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
