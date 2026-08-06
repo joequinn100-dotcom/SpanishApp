@@ -26,7 +26,6 @@ export default function TimelinePage() {
   const p = t.projection;
   // Nodes cluster hard at a healthy pace, so nudge them apart to stay legible.
   const nodeAt = spread(t.nodes.map((n) => n.position), 0.055);
-  const pct = Math.round((t.target.mastered / t.target.total) * 100);
 
   return (
     <div className="space-y-8">

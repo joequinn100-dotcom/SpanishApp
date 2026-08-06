@@ -4,7 +4,7 @@ import { dependentsOf, errorsForTopic, prerequisitesOf, topicBySlug } from '@/li
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
 import { TopicPlacement } from '@/components/PlacementControls';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
-import { diagramFor } from '@/components/diagrams';
+import { Diagram } from '@/components/diagrams';
 import { PracticeTopicButton } from '@/components/PracticeTopicButton';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,6 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   const errors = errorsForTopic(topic.id);
   const blocking = prereqs.filter((p) => p.strength === 'hard' && p.status !== 'mastered');
   const style = strandStyle(topic.strand_id);
-  const Diagram = diagramFor(topic.id, topic.strand_id);
 
   return (
     <article className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -96,11 +95,9 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
 
         {/* The picture goes above the fold, before the prerequisites and the
             error list — it is the part that makes the shape of the rule stick. */}
-        {Diagram && (
-          <div className="mt-6 max-w-[68ch]">
-            <Diagram />
-          </div>
-        )}
+        <div className="mt-6 max-w-[68ch]">
+          <Diagram topicId={topic.id} strand={topic.strand_id} />
+        </div>
 
         {blocking.length > 0 && (
           <p className="mt-6 rounded-lg border-l-2 border-amber-600 bg-slate-900/60 px-4 py-3 text-sm text-slate-400">

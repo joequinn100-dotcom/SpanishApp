@@ -258,7 +258,7 @@ export function PrepBridge() {
  * Registry
  * ------------------------------------------------------------------ */
 
-type Diagram = () => ReactNode;
+type DiagramFn = () => ReactNode;
 
 /**
  * Which diagram belongs to which topic.
@@ -267,7 +267,7 @@ type Diagram = () => ReactNode;
  * still gets the one that covers its family rather than nothing. Explicit rather
  * than clever: a wrong diagram is worse than no diagram.
  */
-const BY_TOPIC: Record<string, Diagram> = {
+const BY_TOPIC: Record<string, DiagramFn> = {
   'b1.verb.preterito': TenseTimeline,
   'b1.verb.imperfecto': TenseTimeline,
   'b1.verb.pret_vs_imp': TenseTimeline,
@@ -307,7 +307,7 @@ const BY_TOPIC: Record<string, Diagram> = {
   'a2.prep.por_para_intro': PrepBridge,
 };
 
-const BY_STRAND: Record<string, Diagram> = {
+const BY_STRAND: Record<string, DiagramFn> = {
   verb: TenseTimeline,
   mood: MoodSwitch,
   noun: AgreementChain,
@@ -315,12 +315,12 @@ const BY_STRAND: Record<string, Diagram> = {
   prep: PrepBridge,
 };
 
-export function diagramFor(topicId: string, strand: string): Diagram | null {
+export function diagramFor(topicId: string, strand: string): DiagramFn | null {
   return BY_TOPIC[topicId] ?? BY_STRAND[strand] ?? null;
 }
 
 /** The error codes whose feedback is worth illustrating, and with what. */
-const BY_ERROR: Record<string, Diagram> = {
+const BY_ERROR: Record<string, DiagramFn> = {
   'noun.greek_ma': AgreementChain,
   'noun.gender_agreement': AgreementChain,
   'mood.subj_leak_past': MoodSwitch,
@@ -336,6 +336,31 @@ const BY_ERROR: Record<string, Diagram> = {
   'pron.se_vs_se_accent': CliticSlots,
 };
 
-export function diagramForError(code: string): Diagram | null {
+export function diagramForError(code: string): DiagramFn | null {
   return BY_ERROR[code] ?? null;
+}
+
+/**
+ * The diagram for a topic, or for the error an item probes.
+ *
+ * A component rather than a lookup returning one, because building a component
+ * during render defeats React's identity tracking: the returned function is a
+ * new value every render, so the subtree remounts and any state or animation
+ * inside it is thrown away. Selecting *inside* a stable component keeps the
+ * identity fixed and the choice dynamic.
+ */
+export function Diagram({
+  topicId,
+  strand,
+  errorCode,
+}: {
+  topicId: string;
+  strand: string;
+  errorCode?: string | null;
+}) {
+  const render =
+    (errorCode ? BY_ERROR[errorCode] : undefined) ?? BY_TOPIC[topicId] ?? BY_STRAND[strand];
+  // Called, not rendered as <render />: invoking it returns the element tree
+  // directly, so no component is created during this render.
+  return render ? render() : null;
 }

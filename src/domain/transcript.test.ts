@@ -237,3 +237,20 @@ describe('wordCount', () => {
     expect(wordCount('')).toBe(0);
   });
 });
+
+describe('analyze — repeated errors in one sentence', () => {
+  it('repairs every instance, not just the first', () => {
+    // One finding, two mistakes. A correction that fixed only «una problema»
+    // would be presented as the right answer while still carrying «la
+    // programa» — worse than no correction at all.
+    const f = analyze('Tenemos una problema con la programa de entregas.')[0];
+    expect(f.errorCode).toBe('noun.greek_ma');
+    expect(f.correction).toContain('un problema');
+    expect(f.correction).toContain('el programa');
+  });
+
+  it('still reports one finding per sentence per rule', () => {
+    const found = analyze('Tenemos una problema con la programa de entregas.');
+    expect(found.filter((x) => x.errorCode === 'noun.greek_ma')).toHaveLength(1);
+  });
+});

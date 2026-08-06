@@ -71,8 +71,9 @@ export default async function TranscriptPage({ params }: { params: Promise<{ id:
 
       <h1 className="text-2xl font-semibold">{t.title || `Class of ${t.class_date}`}</h1>
       <p className="mt-1 text-sm text-slate-400">
-        {meta.learner_words ?? 0} words of your own Spanish · {errors.length} possible errors ·{' '}
-        {positives.length} things that went well
+        {meta.learner_words ?? 0} words of your own Spanish · {errors.length}{' '}
+        {errors.length === 1 ? 'possible error' : 'possible errors'} ·{' '}
+        {positives.length} {positives.length === 1 ? 'thing that went well' : 'things that went well'}
         {meta.analyzer === 'rules' && (
           <span className="text-slate-600"> · rule-based analysis, not the §5 gauntlet</span>
         )}

@@ -16,7 +16,6 @@ const MIGRATIONS_DIR = join(process.cwd(), 'migrations');
 export type DB = Database.Database;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __fluencia_db: DB | undefined;
 }
 

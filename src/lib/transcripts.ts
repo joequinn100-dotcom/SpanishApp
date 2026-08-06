@@ -1,7 +1,7 @@
 import 'server-only';
 import { tx } from '@/db';
 import { db } from './queries';
-import { analyze, wordCount, type Finding } from '@/domain/detectors';
+import { analyze, wordCount } from '@/domain/detectors';
 import { segment, speakers, learnerTurns, flatten } from '@/domain/transcript';
 import { errorTransition, topicTransition, newErrorState, newTopicState } from '@/domain/mastery';
 import { markVocabSpontaneous, vocabUsedIn } from './vocab';

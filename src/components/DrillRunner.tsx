@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { answer } from '@/app/actions';
-import { diagramForError, diagramFor } from '@/components/diagrams';
+import { Diagram } from '@/components/diagrams';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import type { Grade } from '@/domain/grading';
 
@@ -57,20 +57,20 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
   const [result, setResult] = useState<Result | null>(null);
   const [pending, start] = useTransition();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const startedAt = useRef<number>(Date.now());
+  const startedAt = useRef<number | null>(null);
 
-  // A new item means a new question: clear everything the previous one left.
+  // State is reset by remounting — the parent keys this component on the item
+  // index — rather than by an effect that clears it after the new item has
+  // already rendered. Same outcome, one render instead of two, and no window
+  // where the previous answer is on screen under the new question.
   useEffect(() => {
-    setValue('');
-    setHint(false);
-    setResult(null);
     startedAt.current = Date.now();
     inputRef.current?.focus();
-  }, [item.index, item.sessionId]);
+  }, []);
 
   function submit() {
     if (pending || result) return;
-    const latency = Date.now() - startedAt.current;
+    const latency = startedAt.current === null ? 0 : Date.now() - startedAt.current;
     start(async () => {
       setResult(await answer(item.sessionId, value, latency));
     });
@@ -85,14 +85,12 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
     // Enter submits; Shift+Enter is a newline, which translation items need.
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      result ? next() : submit();
+      if (result) next();
+      else submit();
     }
   }
 
   const v = result ? VERDICT[result.verdict] : null;
-  const Diagram =
-    (item.errorCode ? diagramForError(item.errorCode) : null) ??
-    diagramFor(item.topicId, item.strandId);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -197,9 +195,13 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
           {/* The diagram is shown when the answer was wrong. Getting it right
               means the shape is already there; getting it wrong is exactly when
               a picture of the rule beats another paragraph about it. */}
-          {!result.correct && Diagram && (
+          {!result.correct && (
             <div className="mt-4">
-              <Diagram />
+              <Diagram
+                topicId={item.topicId}
+                strand={item.strandId}
+                errorCode={item.errorCode}
+              />
             </div>
           )}
 

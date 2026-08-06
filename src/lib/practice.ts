@@ -16,7 +16,6 @@ import {
   reviewOutcome,
   sessionProgress,
   warmupGuaranteeHeld,
-  REVIEW_ITEMS,
   type ContentRef,
   type DueReview,
   type SessionPlan,

@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template is documentation, not a secret, and is the only place
+# that records which models Revision 2 uses.
+!.env.local.example
 
 # vercel
 .vercel

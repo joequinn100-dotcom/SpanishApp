@@ -291,9 +291,20 @@ export function analyze(text: string): Finding[] {
       if (seen.has(key)) continue;
       seen.add(key);
 
-      const fixed = rule.fix(m);
-      const correction =
-        fixed === null ? '' : quote.replace(m[0], matchCase(m[0], fixed));
+      // One finding per sentence per rule — but the correction has to repair
+      // *every* instance in that sentence. «Tenemos una problema con la
+      // programa» is one finding and two mistakes, and a correction that fixed
+      // only the first would be shown to the learner as the right answer while
+      // still being wrong.
+      let correction = '';
+      if (rule.fix(m) !== null) {
+        const local = new RegExp(rule.pattern.source, rule.pattern.flags);
+        correction = quote.replace(local, (...args) => {
+          const groups = args.slice(0, -2) as unknown as RegExpExecArray;
+          const fixedHere = rule.fix(groups);
+          return fixedHere === null ? groups[0] : matchCase(groups[0], fixedHere);
+        });
+      }
 
       findings.push({
         kind: 'error',

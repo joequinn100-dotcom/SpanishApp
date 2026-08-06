@@ -24,7 +24,13 @@ export function CommandPalette({ index }: { index: SearchDoc[] }) {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setOpen((o) => !o);
+        setOpen((o) => {
+          if (!o) {
+            setQuery('');
+            setActive(0);
+          }
+          return !o;
+        });
       }
       if (e.key === 'Escape') setOpen(false);
     };
@@ -32,15 +38,20 @@ export function CommandPalette({ index }: { index: SearchDoc[] }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  // Focus on open. State is reset by the opener rather than by an effect
+  // reacting to `open`: setting state from an effect makes React render twice
+  // and the compiler flags it, and "clear the box when you open it" is a
+  // property of the action, not of the state changing.
   useEffect(() => {
-    if (open) {
-      setQuery('');
-      setActive(0);
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
+    if (open) requestAnimationFrame(() => inputRef.current?.focus());
   }, [open]);
 
-  useEffect(() => setActive(0), [query]);
+  /** Open with a clean box. */
+  function show() {
+    setQuery('');
+    setActive(0);
+    setOpen(true);
+  }
 
   function go(hit: SearchHit | undefined) {
     if (!hit) return;
@@ -51,7 +62,7 @@ export function CommandPalette({ index }: { index: SearchDoc[] }) {
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => show()}
         className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/60 px-2.5 py-1.5 text-sm text-slate-400 transition hover:border-teal-600 hover:text-slate-200 sm:px-3"
         aria-label="Search topics and errors"
       >
@@ -81,7 +92,10 @@ export function CommandPalette({ index }: { index: SearchDoc[] }) {
         <input
           ref={inputRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setActive(0);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') {
               e.preventDefault();

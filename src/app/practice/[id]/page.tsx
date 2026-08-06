@@ -32,7 +32,10 @@ export default async function PracticePage({ params }: { params: Promise<{ id: s
         <EndSessionButton sessionId={session.id} />
       </div>
 
+      {/* Keyed on the item so a new question remounts with clean state — see
+          the note in DrillRunner. */}
       <DrillRunner
+        key={`${session.id}:${item.index}`}
         item={{
           sessionId: session.id,
           index: item.index,
