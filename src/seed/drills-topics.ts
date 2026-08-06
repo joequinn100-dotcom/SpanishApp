@@ -36,20 +36,20 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 2,
     targetsError: null,
     payload: {
-      prompt: 'Complete with the imperfect.',
+      prompt: 'Give the two verb forms in order, separated by a comma. Both are imperfect.',
       context: 'Setting the scene before an incident.',
       sentence: 'Cuando llegué a obra, ___ (llover) y la cuadrilla ___ (estar) parada.',
-      answer: 'llovía y la cuadrilla estaba',
-      accept: ['llovía, y la cuadrilla estaba'],
+      answer: 'llovía, estaba',
+      accept: ['llovía estaba'],
       distractors: [
         {
-          answer: 'llovió y la cuadrilla estuvo',
+          answer: 'llovió, estuvo',
           feedback:
             'The preterite turns the background into two events. Rain and an idle crew are the situation you walked into, so both are imperfect.',
         },
       ],
       explanation:
-        'This is the imperfect doing its most characteristic job: painting the background against which a single event happens. «Llegué» is the event — one moment, preterite. «Llovía» and «estaba parada» are the scene that was already in place — imperfect.\n\nThe test is whether the verb answers "what happened?" or "what was going on?". Weather, time of day, ongoing states, physical descriptions and emotions are almost always imperfect, because they are conditions rather than occurrences.\n\n«Estar parado» is standard site usage for work being stopped or idle: «la cuadrilla está parada», «la obra estuvo parada dos días». Note it takes estar rather than ser, because it is a temporary condition.',
+        'This is the imperfect doing its most characteristic job: painting the background against which a single event happens. «Llegué» is the event — one moment, preterite. «Llovía» and «estaba parada» are the scene that was already in place — imperfect.\n\nThe test is whether the verb answers "what happened?" or "what was going on?". Weather, time of day, ongoing states, physical descriptions and emotions are almost always imperfect, because they are conditions rather than occurrences.\n\n«La obra está parada» / «la obra estuvo parada dos días» is standard site usage for work stopped. Be careful applying it to people, though: in Peru «parado» is also the everyday word for *standing up*, so «la cuadrilla estaba parada» can be read either way. Where the stoppage is the point, «la cuadrilla estaba sin trabajar» or «detenida» is unambiguous. Note it takes estar rather than ser, because it is a temporary condition.',
     },
   },
   {
@@ -107,7 +107,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         {
           answer: 'Mientras revisábamos el expediente, el cliente llamaba para pedir el avance.',
           feedback:
-            'Now both are imperfect. The call is a single interrupting event, so it stays in the preterite.',
+            'That reads as repeated calling rather than one interruption — grammatical, but not what the sentence says. The call is a single event, so it stays in the preterite, and the prompt asked you to change one verb, not two.',
         },
       ],
       explanation:
@@ -167,7 +167,6 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       context: 'Two statements about the same fact.',
       sentence: 'Sé que el plazo ___ (ser) ajustado, pero dudo que ___ (haber) otra opción.',
       answer: 'es, haya',
-      accept: ['es haya'],
       distractors: [
         {
           answer: 'sea, hay',
@@ -190,7 +189,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       sentence: 'El cliente aprueba el adicional esta semana.',
       answer: 'Le pedimos al cliente que apruebe el adicional esta semana.',
       explanation:
-        '«Pedir que» is a verb of influence, so its clause goes into the subjunctive: aprueba → apruebe.\n\nNotice the doubled indirect object: «le pedimos al cliente». Spanish names the recipient twice, as a pronoun and as a full phrase, and the pronoun is not optional.\n\nNote also that the stem change survives into the subjunctive. «Aprobar» is o→ue, so «aprueba» in the indicative gives «apruebe» here — and the same holds for «poder» → «pueda», «cerrar» → «cierre», «devolver» → «devuelva», because the present subjunctive is built from the yo form, which already carries the change. The change appears in the same four persons as in the indicative (apruebe, apruebes, apruebe, aprueben) and disappears in nosotros: «aprobemos», never «apruebemos».\n\n«El adicional» is standard Peruvian contracting vocabulary for a variation or change order — «un adicional de obra». It is a noun here, not an adjective.',
+        '«Pedir que» is a verb of influence, so its clause goes into the subjunctive: aprueba → apruebe.\n\nNotice the doubled indirect object: «le pedimos al cliente». Spanish names the recipient twice, as a pronoun and as a full phrase. With «pedir» the pronoun is all but obligatory — leaving it out sounds incomplete — though as a general matter a postverbal indirect object doubles by strong preference rather than by strict rule.\n\nNote also that the stem change survives into the subjunctive. «Aprobar» is o→ue, so «aprueba» in the indicative gives «apruebe» here — and the same holds for «poder» → «pueda», «cerrar» → «cierre», «devolver» → «devuelva», because the present subjunctive is built from the yo form, which already carries the change. The change appears in the same four persons as in the indicative (apruebe, apruebes, apruebe, aprueben) and disappears in nosotros: «aprobemos», never «apruebemos».\n\n«El adicional» is standard Peruvian contracting vocabulary for a variation or change order — «un adicional de obra». It is a noun here, not an adjective.',
     },
   },
   {
@@ -205,6 +204,8 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       answer: 'Recomiendo que revisemos los supuestos antes de enviar el presupuesto.',
       accept: [
         'recomiendo que revisemos las premisas antes de enviar el presupuesto',
+        'recomiendo que revisemos los supuestos antes de enviar la estimación',
+        'recomiendo que revisemos las premisas antes de enviar la estimación',
         'recomiendo que revisemos los supuestos antes de enviar la estimación',
       ],
       distractors: [
@@ -237,7 +238,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'Both clauses are wrong, in opposite directions, which is the useful shape for this drill.\n\n«Creer que» in the affirmative is an assertion — you are claiming the schedule is realistic — so it takes the indicative: «creo que es realista». Negate it and the assertion disappears: «no creo que sea realista» takes the subjunctive.\n\n«No estar seguro de que» works the other way round. The negation puts it into doubt, so the subjunctive follows: «no estoy seguro de que se cumpla». Affirmative «estoy seguro de que se cumple» would take the indicative.\n\nOn the wording: «cumplir el plazo» is the standard collocation for meeting a deadline, and «el plazo se cumple» is how you say it impersonally, with the deadline as subject. «Cumplir con el plazo» is equally current. Avoid «alcanzar el plazo», which is a calque of English "reach the deadline" and does not mean meeting it.\n\nThe rule underneath both is the same one: assert with the indicative, withhold assertion with the subjunctive. Negation flips which one applies, so the tell is not the verb but whether the sentence commits to the claim.',
+        'Only the first clause is wrong. The second — «no estoy seguro de que se cumpla» — is already right, and the distractor breaks it in the opposite direction. Seeing the two failures side by side is the point of the item.\n\n«Creer que» in the affirmative is an assertion — you are claiming the schedule is realistic — so it takes the indicative: «creo que es realista». Negate it and the assertion disappears: «no creo que sea realista» takes the subjunctive.\n\n«No estar seguro de que» works the other way round. The negation puts it into doubt, so the subjunctive follows: «no estoy seguro de que se cumpla». Affirmative «estoy seguro de que se cumple» would take the indicative.\n\nOn the wording: «cumplir el plazo» is the standard collocation for meeting a deadline, and «el plazo se cumple» is how you say it impersonally, with the deadline as subject. «Cumplir con el plazo» is equally current. Avoid «alcanzar el plazo», which is a calque of English "reach the deadline" and does not mean meeting it.\n\nThe rule underneath both is the same one: assert with the indicative, withhold assertion with the subjunctive. Negation flips which one applies, so the tell is not the verb but whether the sentence commits to the claim.',
     },
   },
   {
@@ -300,8 +301,8 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     targetsError: null,
     payload: {
       prompt: 'Complete with the correct pronoun.',
-      context: 'Confirming an action to a colleague.',
-      sentence: '¿Los planos actualizados? Ya ___ mandé al contratista esta mañana.',
+      context: 'Confirming an action to a colleague. The contractor asked for the updated drawings yesterday.',
+      sentence: '¿Los planos actualizados? Ya ___ mandé esta mañana.',
       answer: 'se los',
       distractors: [
         {
@@ -312,11 +313,11 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         {
           answer: 'los',
           feedback:
-            'That drops the recipient. Both objects are present here — the drawings and the contractor — so you need both pronouns: «se los».',
+            'That sends the drawings but says nothing about who received them, and the contractor is nowhere in the sentence. Both objects have to be pronominalised: «se los».',
         },
       ],
       explanation:
-        'When both objects become pronouns, the indirect one comes first and the direct one second: «me lo», «te la», «nos los». But «le» and «les» cannot stand before an l-pronoun, so they change to «se»: «se lo», «se la», «se los», «se las».\n\nThe «se» here is not the reflexive pronoun wearing a disguise, and it is not a euphony rule either, whatever you may have been told. Historically the form was «ge lo» (from Latin ILLI ILLUM); «ge» later fell together with «se» in pronunciation and the spelling followed. So the two «se»s are separate words that ended up identical by accident. That is why the rule cannot be derived from anything and simply has to be memorised.\n\nThe cost is ambiguity: «se los mandé» could mean you sent them to him, to her, to you (usted) or to them. Spanish resolves it by adding the phrase back: «se los mandé al contratista», «se los mandé a ellos». That is not redundancy, it is how the language repairs the information the «se» destroyed.\n\nNote that this «se» has nothing to do with the reflexive «se». Same spelling, unrelated job.',
+        'When both objects become pronouns, the indirect one comes first and the direct one second: «me lo», «te la», «nos los». But «le» and «les» cannot stand before an l-pronoun, so they change to «se»: «se lo», «se la», «se los», «se las».\n\nThe «se» here is not the reflexive pronoun wearing a disguise, and it is not a euphony rule either, whatever you may have been told. Historically the form was «ge lo» (from Latin ILLI ILLUM); «ge» later fell together with «se» in pronunciation and the spelling followed. So the two «se»s are separate words that ended up identical by accident. That is why the rule cannot be derived from anything and simply has to be memorised.\n\nThe cost is ambiguity: «se los mandé» could mean you sent them to him, to her, to you (usted) or to them. Spanish resolves it by adding the phrase back: «se los mandé al contratista», «se los mandé a ellos». That is not redundancy, it is how the language repairs the information the «se» destroyed.',
     },
   },
   {
@@ -329,7 +330,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       context: 'Confirming a handover. «It» is el expediente; «them» is the supervision team.',
       sentence: 'I gave it to them yesterday, at the site meeting.',
       answer: 'Se lo di ayer, en la reunión de obra.',
-      accept: ['se lo entregué ayer, en la reunión de obra', 'se lo di ayer en la reunión de obra'],
+      accept: ['se lo entregué ayer, en la reunión de obra', 'ayer se lo di, en la reunión de obra'],
       distractors: [
         {
           answer: 'Lo les di ayer, en la reunión de obra.',
@@ -379,7 +380,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         {
           answer: 'cual',
           feedback:
-            '«Cual» never stands alone. It needs an article — «el cual» — and in a short defining clause like this, plain «que» is what Spanish uses.',
+            'As a relative with a noun antecedent, «cual» always needs an article — «el cual», «la cual». (It stands bare only in «lo cual» and in fixed comparatives like «cual si fuera».) In a short defining clause like this one, plain «que» is what Spanish uses.',
         },
         {
           answer: 'quien',
@@ -451,9 +452,9 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     payload: {
       prompt: 'Complete with the connector the logic requires.',
       context: 'Explaining a consequence in a status report.',
-      sentence: 'El proveedor no confirmó la fecha; ___ , reprogramamos el vaciado para el jueves.',
+      sentence: 'El proveedor no confirmó la fecha; ___, reprogramamos el vaciado para el jueves.',
       answer: 'por lo tanto',
-      accept: ['por tanto', 'en consecuencia', 'por consiguiente'],
+      accept: ['por tanto', 'en consecuencia', 'por consiguiente', 'de modo que'],
       distractors: [
         {
           answer: 'sin embargo',
@@ -471,7 +472,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 3,
     targetsError: null,
     payload: {
-      prompt: 'Join the two sentences with a concessive connector, keeping both facts.',
+      prompt: 'Join the two sentences with an adversative connector, keeping both facts.',
       context: 'Reporting mixed progress.',
       sentence: 'Avanzamos con la estructura. Los acabados siguen retrasados.',
       answer: 'Avanzamos con la estructura; sin embargo, los acabados siguen retrasados.',
@@ -503,6 +504,9 @@ export const TOPIC_DRILLS: SeedDrill[] = [
       accept: [
         'en resumen, el cronograma se mantiene, aunque hay que revisar el costo',
         'en síntesis, el cronograma se mantiene, aunque el costo debe revisarse',
+        'en conclusión, el cronograma se mantiene, aunque el costo debe revisarse',
+        'en síntesis, el cronograma se mantiene, aunque hay que revisar el costo',
+        'en conclusión, el cronograma se mantiene, aunque hay que revisar el costo',
         'en resumen, el cronograma se mantiene, aunque el costo debe ser revisado',
       ],
       distractors: [
@@ -544,7 +548,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
         },
       ],
       explanation:
-        'The derivation is mechanical and has no exceptions anywhere in the language. Take the third-person plural preterite, drop -ron, and add -ra, -ras, -ra, -´ramos, -ran.\n\npudieron → pudiera, pudiéramos\ntuvieron → tuviera, tuviéramos\nfueron → fuera, fuéramos\ndijeron → dijera, dijéramos\ncondujeron → condujera, condujéramos\n\nEvery irregular preterite you already know becomes an irregular imperfect subjunctive for free. That is why this tense is cheaper to learn than it looks — the hard work was done when you learned the preterite.\n\nThe nosotros form always carries a written accent, because dropping -ron and adding -ramos puts the stress three syllables from the end. Forgetting it is not cosmetic: «pudieramos» would be stressed on the wrong syllable.\n\nThe -se forms (pudiésemos) are equally correct and sound literary. In Latin America the -ra forms dominate overwhelmingly.',
+        'The derivation is mechanical and has no exceptions anywhere in the language. Take the third-person plural preterite, drop -ron, and add -ra, -ras, -ra, -ramos, -ran — with a written accent on the stem vowel in the nosotros form: -áramos, -iéramos.\n\npudieron → pudiera, pudiéramos\ntuvieron → tuviera, tuviéramos\nfueron → fuera, fuéramos\ndijeron → dijera, dijéramos\ncondujeron → condujera, condujéramos\n\nEvery irregular preterite you already know becomes an irregular imperfect subjunctive for free. That is why this tense is cheaper to learn than it looks — the hard work was done when you learned the preterite.\n\nThe nosotros form always carries a written accent, because dropping -ron and adding -ramos puts the stress three syllables from the end. Forgetting it is not cosmetic: «pudieramos» would be stressed on the wrong syllable.\n\nThe -se forms (pudiésemos) are equally correct and sound literary. In Latin America the -ra forms dominate overwhelmingly.',
     },
   },
   {
@@ -575,7 +579,7 @@ export const TOPIC_DRILLS: SeedDrill[] = [
     difficulty: 5,
     targetsError: null,
     payload: {
-      prompt: 'Translate into Spanish.',
+      prompt: 'Translate into Spanish. Address the client as usted.',
       context: 'Softening a request to a senior client contact.',
       sentence: 'I would like you to review the assumptions before the committee meets.',
       answer: 'Quisiera que revisara los supuestos antes de que se reúna el comité.',
