@@ -7,6 +7,7 @@ import { db } from '@/lib/queries';
 import { recomputeAvailability } from '@/seed';
 import { startSession, submitAnswer, openSession } from '@/lib/practice';
 import { finishSession } from '@/lib/handoff';
+import { closeReview, decide, ingest, preview, type Decision } from '@/lib/transcripts';
 import type { TopicStatus } from '@/domain/mastery';
 
 /**
@@ -125,4 +126,42 @@ export async function endOpenSession() {
   const s = openSession();
   if (!s) return;
   await endSession(s.id);
+}
+
+/* ------------------------------------------------------------------ *
+ * Transcripts (Phase 3, SPEC §6)
+ * ------------------------------------------------------------------ */
+
+/** Who is speaking, so the learner's turns can be told from the teacher's. */
+export async function previewTranscript(raw: string) {
+  return preview(raw);
+}
+
+/**
+ * Store a transcript and its proposed findings.
+ *
+ * Nothing reaches the error log here. CLAUDE.md: "Never auto-apply a transcript
+ * finding. Findings are proposed; the user confirms."
+ */
+export async function uploadTranscript(input: {
+  raw: string;
+  learner: string | null;
+  source: 'lorena' | 'self_recording' | 'other';
+  classDate: string;
+  title?: string;
+}) {
+  const result = ingest(input);
+  revalidatePath('/', 'layout');
+  redirect(`/transcripts/${result.transcriptId}`);
+}
+
+/** Accept / One-off / Reject one finding. The only path that writes state. */
+export async function decideFinding(findingId: number, decision: Decision) {
+  decide(findingId, decision);
+  revalidatePath('/', 'layout');
+}
+
+export async function finishReview(transcriptId: number) {
+  closeReview(transcriptId);
+  revalidatePath('/', 'layout');
 }

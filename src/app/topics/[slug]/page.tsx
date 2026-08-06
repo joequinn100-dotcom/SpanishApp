@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation';
 import { dependentsOf, errorsForTopic, prerequisitesOf, topicBySlug } from '@/lib/queries';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
 import { TopicPlacement } from '@/components/PlacementControls';
+import { StrandIcon, strandStyle } from '@/components/StrandIcon';
+import { diagramFor } from '@/components/diagrams';
+import { PracticeTopicButton } from '@/components/PracticeTopicButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,15 +51,26 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   const dependents = dependentsOf(topic.id);
   const errors = errorsForTopic(topic.id);
   const blocking = prereqs.filter((p) => p.strength === 'hard' && p.status !== 'mastered');
+  const style = strandStyle(topic.strand_id);
+  const Diagram = diagramFor(topic.id, topic.strand_id);
 
   return (
     <article className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div>
-        <p className="text-xs uppercase tracking-[0.14em] text-teal-400">
-          {topic.level_id} · {topic.strand_en}
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold">{topic.name_en}</h1>
-        <p className="font-serif text-lg text-slate-400">{topic.name_es}</p>
+        <div className="flex items-center gap-3">
+          <span
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl border ${style.ring} ${style.bg} ${style.fg}`}
+          >
+            <StrandIcon strand={topic.strand_id} className="h-6 w-6" />
+          </span>
+          <div>
+            <p className={`text-xs uppercase tracking-[0.14em] ${style.fg}`}>
+              {topic.level_id} · {topic.strand_en}
+            </p>
+            <h1 className="text-2xl font-semibold">{topic.name_en}</h1>
+          </div>
+        </div>
+        <p className="mt-1 font-serif text-lg text-slate-400">{topic.name_es}</p>
 
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
           <StatusPill status={topic.status} />
@@ -79,6 +93,14 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
         <p className="mt-6 max-w-[68ch] font-serif text-[1.05rem] leading-[1.75] text-slate-300">
           {topic.summary}
         </p>
+
+        {/* The picture goes above the fold, before the prerequisites and the
+            error list — it is the part that makes the shape of the rule stick. */}
+        {Diagram && (
+          <div className="mt-6 max-w-[68ch]">
+            <Diagram />
+          </div>
+        )}
 
         {blocking.length > 0 && (
           <p className="mt-6 rounded-lg border-l-2 border-amber-600 bg-slate-900/60 px-4 py-3 text-sm text-slate-400">
@@ -118,6 +140,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
       </div>
 
       <aside className="space-y-6">
+        <PracticeTopicButton topicId={topic.id} />
+
         <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">
             Placement

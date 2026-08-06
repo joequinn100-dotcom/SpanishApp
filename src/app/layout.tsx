@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CommandPalette } from '@/components/CommandPalette';
 import { searchIndex } from '@/lib/queries';
+import { pendingCount } from '@/lib/transcripts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -11,6 +12,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const index = searchIndex();
+  // Findings waiting on a decision. Surfaced in the nav because an unreviewed
+  // transcript is evidence the error log has not seen yet.
+  const pending = pendingCount();
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen bg-slate-950 text-slate-200 antialiased">
@@ -23,6 +27,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/" className="transition hover:text-slate-100">Progress</Link>
               <Link href="/curriculum" className="transition hover:text-slate-100">Curriculum</Link>
               <Link href="/errors" className="transition hover:text-slate-100">Error log</Link>
+              <Link href="/transcripts" className="inline-flex items-center gap-1.5 transition hover:text-slate-100">
+                Transcripts
+                {pending > 0 && (
+                  <span className="rounded-full bg-amber-500/20 px-1.5 text-[10px] text-amber-300">
+                    {pending}
+                  </span>
+                )}
+              </Link>
             </nav>
             <div className="flex-1" />
             <CommandPalette index={index} />

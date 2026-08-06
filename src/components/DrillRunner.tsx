@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { answer } from '@/app/actions';
+import { diagramForError, diagramFor } from '@/components/diagrams';
+import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import type { Grade } from '@/domain/grading';
 
 /**
@@ -24,6 +26,9 @@ export interface RunnerItem {
   difficulty: number;
   topicName: string;
   topicSlug: string;
+  topicId: string;
+  strandId: string;
+  errorCode: string | null;
   errorLabel: string | null;
   prompt: string;
   context?: string;
@@ -85,6 +90,9 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
   }
 
   const v = result ? VERDICT[result.verdict] : null;
+  const Diagram =
+    (item.errorCode ? diagramForError(item.errorCode) : null) ??
+    diagramFor(item.topicId, item.strandId);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -100,7 +108,10 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
         >
           {item.source === 'warmup' ? 'Warm-up' : 'New material'}
         </span>
-        <span className="text-slate-500">{item.topicName}</span>
+        <span className={`inline-flex items-center gap-1.5 ${strandStyle(item.strandId).fg}`}>
+          <StrandIcon strand={item.strandId} className="h-3.5 w-3.5" />
+          {item.topicName}
+        </span>
         {item.errorLabel && (
           <span className="text-slate-600">· targeting: {item.errorLabel}</span>
         )}
@@ -176,6 +187,15 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
               {para}
             </p>
           ))}
+
+          {/* The diagram is shown when the answer was wrong. Getting it right
+              means the shape is already there; getting it wrong is exactly when
+              a picture of the rule beats another paragraph about it. */}
+          {!result.correct && Diagram && (
+            <div className="mt-4">
+              <Diagram />
+            </div>
+          )}
 
           {result.notes.map((n, i) => (
             <p key={i} className="mt-3 text-sm text-amber-300">

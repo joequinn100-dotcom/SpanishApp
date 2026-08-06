@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { allTopics, curriculumStats } from '@/lib/queries';
 import { StatusPill } from '@/components/StatusPill';
+import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { LevelPlacement } from '@/components/PlacementControls';
 
 export const dynamic = 'force-dynamic';
@@ -67,6 +68,13 @@ export default function Home() {
                   href={`/topics/${t.slug}`}
                   className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 transition hover:border-teal-700/60 hover:bg-slate-900"
                 >
+                  <span
+                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${
+                      strandStyle(t.strand_id).ring
+                    } ${strandStyle(t.strand_id).bg} ${strandStyle(t.strand_id).fg}`}
+                  >
+                    <StrandIcon strand={t.strand_id} className="h-4 w-4" />
+                  </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm text-slate-100">{t.name_en}</span>
                     <span className="block truncate text-xs text-slate-500">

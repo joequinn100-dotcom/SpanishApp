@@ -91,6 +91,7 @@ export interface NextTopic {
   name_es: string;
   level_id: string;
   strand_en: string;
+  strand_id: string;
   status: string;
   unlocks: number;
   summary: string;
@@ -109,7 +110,7 @@ export function nextUp(limit = 5): NextTopic[] {
   return db()
     .prepare(
       `SELECT t.id, t.slug, t.name_en, t.name_es, t.level_id, t.summary,
-              st.name_en AS strand_en, s.status,
+              st.name_en AS strand_en, t.strand_id, s.status,
               (SELECT count(*) FROM topic_prereq p WHERE p.prereq_id = t.id) AS unlocks
          FROM topic t
          JOIN topic_state s ON s.topic_id = t.id

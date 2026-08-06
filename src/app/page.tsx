@@ -3,6 +3,7 @@ import { nextUp, progress, topErrors } from '@/lib/progress';
 import { firstTopicWithContent, openSession, planOf, streak } from '@/lib/practice';
 import { latestHandoff } from '@/lib/handoff';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
+import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { SessionCta } from '@/components/SessionCta';
 
 export const dynamic = 'force-dynamic';
@@ -161,6 +162,9 @@ export default function Home() {
                     className="block rounded-lg border border-slate-800 bg-slate-900/40 p-3 transition hover:border-teal-700/60 hover:bg-slate-900"
                   >
                     <div className="flex items-center gap-2">
+                      <span className={strandStyle(t.strand_id).fg}>
+                        <StrandIcon strand={t.strand_id} className="h-4 w-4" />
+                      </span>
                       <span className="text-[10px] text-slate-500">{t.level_id}</span>
                       <span className="min-w-0 flex-1 truncate text-sm text-slate-100">
                         {t.name_en}

@@ -201,6 +201,7 @@ export interface CurrentItem {
   topicId: string;
   topicName: string;
   topicSlug: string;
+  strandId: string;
   errorCode: string | null;
   errorLabel: string | null;
   payload: DrillPayload;
@@ -214,7 +215,7 @@ export function currentItem(s: SessionRow): CurrentItem | null {
   const row = db()
     .prepare(
       `SELECT c.id, c.kind, c.difficulty, c.payload, c.topic_id,
-              t.name_en AS topic_name, t.slug AS topic_slug
+              t.name_en AS topic_name, t.slug AS topic_slug, t.strand_id
          FROM content c JOIN topic t ON t.id = c.topic_id
         WHERE c.id = ?`,
     )
@@ -227,6 +228,7 @@ export function currentItem(s: SessionRow): CurrentItem | null {
         topic_id: string;
         topic_name: string;
         topic_slug: string;
+        strand_id: string;
       }
     | undefined;
 
@@ -250,6 +252,7 @@ export function currentItem(s: SessionRow): CurrentItem | null {
     topicId: row.topic_id,
     topicName: row.topic_name,
     topicSlug: row.topic_slug,
+    strandId: row.strand_id,
     errorCode: p.current.errorCode,
     errorLabel: label?.label_en ?? null,
     payload: JSON.parse(row.payload) as DrillPayload,
