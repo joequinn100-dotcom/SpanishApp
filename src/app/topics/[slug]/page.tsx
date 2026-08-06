@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { dependentsOf, errorsForTopic, prerequisitesOf, topicBySlug } from '@/lib/queries';
 import { SeverityDots, StatusPill } from '@/components/StatusPill';
+import { TopicPlacement } from '@/components/PlacementControls';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,6 +118,13 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
       </div>
 
       <aside className="space-y-6">
+        <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">
+            Placement
+          </h2>
+          <TopicPlacement topicId={topic.id} status={topic.status} />
+        </div>
+
         <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">
             Progress

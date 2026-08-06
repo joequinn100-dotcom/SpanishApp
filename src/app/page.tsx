@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { allTopics, curriculumStats } from '@/lib/queries';
 import { StatusPill } from '@/components/StatusPill';
+import { LevelPlacement } from '@/components/PlacementControls';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,8 +55,10 @@ export default function Home() {
 
       {[...byLevel.entries()].map(([level, list]) => (
         <section key={level} className="mb-8">
-          <h2 className="mb-3 border-b border-slate-800 pb-1.5 text-sm font-semibold uppercase tracking-widest text-slate-400">
-            {level} <span className="ml-1 font-normal text-slate-600">{LEVEL_BOOK[level]}</span>
+          <h2 className="mb-3 flex items-center gap-2 border-b border-slate-800 pb-1.5 text-sm font-semibold uppercase tracking-widest text-slate-400">
+            {level} <span className="font-normal text-slate-600">{LEVEL_BOOK[level]}</span>
+            <span className="flex-1" />
+            <LevelPlacement level={level} />
           </h2>
           <ul className="grid gap-1.5 md:grid-cols-2">
             {list.map((t) => (
