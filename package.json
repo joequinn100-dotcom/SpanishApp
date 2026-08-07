@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx --tsconfig tsconfig.scripts.json scripts/migrate.ts",
+    "pregenerate": "tsx --tsconfig tsconfig.scripts.json scripts/pregenerate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
@@ -31,6 +32,7 @@
     "eslint-config-next": "16.3.0",
     "playwright": "^1.62.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.10",
     "typescript": "^5",
     "vitest": "^4.1.10"
   }

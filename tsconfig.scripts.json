@@ -1,0 +1,19 @@
+{
+  // For the CLI entry points in ./scripts, run under tsx.
+  //
+  // They import the same `src/lib` modules the app does, and those start with
+  // `import 'server-only'` — a package whose default export throws, on purpose,
+  // to catch a server module being pulled into a client bundle. A cron job is
+  // neither a server render nor a client bundle, so it is aliased to the same
+  // empty stub vitest uses. The guard stays real everywhere it means something.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"],
+      "server-only": ["./src/test/server-only.ts"]
+    }
+  },
+  "include": ["scripts/**/*.ts", "src/**/*.ts"]
+}
