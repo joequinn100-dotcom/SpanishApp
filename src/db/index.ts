@@ -40,6 +40,22 @@ export function getDb(): DB {
   return globalThis.__fluencia_db;
 }
 
+/**
+ * Drop the cached connection.
+ *
+ * Required before anything replaces the database file underneath us. On Linux
+ * the unlink of an open file succeeds and the handle keeps working — against
+ * the deleted inode. Every write after that lands nowhere anybody can read,
+ * which is the worst possible failure for a restore: it reports success and
+ * then silently discards the session that follows.
+ */
+export function closeDatabase(): void {
+  if (globalThis.__fluencia_db) {
+    globalThis.__fluencia_db.close();
+    globalThis.__fluencia_db = undefined;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Migrations
  * ------------------------------------------------------------------ */
