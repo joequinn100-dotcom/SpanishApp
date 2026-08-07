@@ -7,6 +7,7 @@ import { db } from '@/lib/queries';
 import { recomputeAvailability } from '@/seed';
 import { startSession, submitAnswer, openSession } from '@/lib/practice';
 import { finishSession } from '@/lib/handoff';
+import { abandonChallenge, startBoss, startSprint } from '@/lib/challenge';
 import { closeReview, decide, ingest, preview, type Decision } from '@/lib/transcripts';
 import { reviewCard } from '@/lib/vocab';
 import type { Recall } from '@/domain/srs';
@@ -128,6 +129,43 @@ export async function endOpenSession() {
   const s = openSession();
   if (!s) return;
   await endSession(s.id);
+}
+
+/* ------------------------------------------------------------------ *
+ * The §8 challenges (Phase 4)
+ * ------------------------------------------------------------------ */
+
+/**
+ * Open a boss fight for a topic.
+ *
+ * Not idempotent the way `beginSession` is, and it must not be: §8 gives the
+ * boss fight no retries, so a second click while one is open has to be refused
+ * rather than quietly resuming. `startBoss` throws `ChallengeUnavailable` and
+ * the caller shows the reason.
+ */
+export async function beginBossFight(topicId: string) {
+  const id = startBoss(topicId);
+  revalidatePath('/', 'layout');
+  redirect(`/challenge/${id}`);
+}
+
+/** §8 item 3, "The Gauntlet Run" — `sprint` in the code. */
+export async function beginGauntletRun() {
+  const id = startSprint();
+  revalidatePath('/', 'layout');
+  redirect(`/challenge/${id}`);
+}
+
+/**
+ * Walk away from a run.
+ *
+ * For a boss fight this is a loss, and the action says so where it is used —
+ * §8 gives it no retries, so a free exit would make the gate optional.
+ */
+export async function abandonRun(sessionId: number) {
+  abandonChallenge(sessionId);
+  revalidatePath('/', 'layout');
+  redirect(`/challenge/${sessionId}`);
 }
 
 /* ------------------------------------------------------------------ *

@@ -7,6 +7,8 @@ import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { SessionCta } from '@/components/SessionCta';
 import { HomeSearch } from '@/components/HomeSearch';
 import { DailyQuest } from '@/components/DailyQuest';
+import { GauntletRunCard } from '@/components/GauntletRunCard';
+import { finishedSprints, sprintAvailability, sprintPersonalBest } from '@/lib/challenge';
 import { gameState } from '@/lib/game';
 import { allTopics, searchIndex } from '@/lib/queries';
 
@@ -48,6 +50,7 @@ export default function Home() {
   // match in the browser — which is what makes it feel instant (SPEC §8).
   const index = searchIndex();
   const game = gameState();
+  const sprint = sprintAvailability();
   const strands = Object.fromEntries(allTopics().map((t) => [t.id, t.strand_id]));
 
   return (
@@ -64,6 +67,17 @@ export default function Home() {
           streak={streak().current}
           reviewsDue={dueReviewCount()}
         />
+        {/* §8 item 3. Hidden while a session is open: the two are mutually
+            exclusive, and offering a run that would be refused is a worse
+            answer than not offering it. */}
+        {!open && (
+          <GauntletRunCard
+            ready={sprint.ready}
+            reason={sprint.reason}
+            best={sprintPersonalBest()}
+            runs={finishedSprints().filter((r) => r.outcome === 'cleared').length}
+          />
+        )}
         {!open && last && (
           <p className="mt-2 text-xs text-slate-500">
             Last session: {last.handoff.duration_min} min, {last.handoff.xp} XP.{' '}

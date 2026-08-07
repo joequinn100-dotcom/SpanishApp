@@ -6,6 +6,8 @@ import { TopicPlacement } from '@/components/PlacementControls';
 import { StrandIcon, strandStyle } from '@/components/StrandIcon';
 import { Diagram } from '@/components/diagrams';
 import { PracticeTopicButton } from '@/components/PracticeTopicButton';
+import { BossFightPanel } from '@/components/BossFightPanel';
+import { bossAvailability, bossHistory } from '@/lib/challenge';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +53,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   const dependents = dependentsOf(topic.id);
   const errors = errorsForTopic(topic.id);
   const blocking = prereqs.filter((p) => p.strength === 'hard' && p.status !== 'mastered');
+  const attempts = bossHistory(topic.id);
+  const bossCleared = attempts.some((a) => a.passed === true);
   const style = strandStyle(topic.strand_id);
 
   return (
@@ -138,6 +142,17 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
 
       <aside className="space-y-6">
         <PracticeTopicButton topicId={topic.id} />
+
+        {/* Only once the topic is in play. A boss fight offered against a
+            locked topic is noise on 90 pages out of 97. */}
+        {(topic.status === 'consolidating' || bossCleared) && (
+          <BossFightPanel
+            topicId={topic.id}
+            availability={bossAvailability(topic.id)}
+            attempts={attempts.length}
+            cleared={bossCleared}
+          />
+        )}
 
         <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">

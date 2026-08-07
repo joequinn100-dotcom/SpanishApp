@@ -38,6 +38,30 @@ export interface RunnerItem {
 
 type Result = Grade & { xp: number; notes: string[] };
 
+const SOURCE: Record<RunnerItem['source'], { label: string; chip: string }> = {
+  warmup: { label: 'Warm-up', chip: 'bg-amber-500/15 text-amber-300' },
+  review: { label: 'Spaced review', chip: 'bg-violet-500/15 text-violet-300' },
+  topic: { label: 'New material', chip: 'bg-teal-500/15 text-teal-300' },
+  boss: { label: 'Boss fight', chip: 'bg-rose-500/15 text-rose-300' },
+  sprint: { label: 'Gauntlet Run', chip: 'bg-sky-500/15 text-sky-300' },
+};
+
+/**
+ * Which sources may show a hint.
+ *
+ * A spaced review is unaided by §4, and both §8 challenges are unaided by
+ * construction — the boss fight says so outright, and a hint in a timed sprint
+ * is just a slower way to answer. Written as a table rather than a chain of
+ * `!==` so adding a source forces a decision about it.
+ */
+const AIDED: Record<RunnerItem['source'], boolean> = {
+  warmup: true,
+  topic: true,
+  review: false,
+  boss: false,
+  sprint: false,
+};
+
 const VERDICT: Record<string, { label: string; tone: string; ring: string }> = {
   correct: { label: 'Correct', tone: 'text-teal-300', ring: 'border-teal-500/40 bg-teal-500/5' },
   accent: {
@@ -97,20 +121,8 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
       <ProgressBar index={item.index} total={item.total} />
 
       <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
-        <span
-          className={`rounded-full px-2 py-0.5 uppercase tracking-wider ${
-            item.source === 'warmup'
-              ? 'bg-amber-500/15 text-amber-300'
-              : item.source === 'review'
-                ? 'bg-violet-500/15 text-violet-300'
-                : 'bg-teal-500/15 text-teal-300'
-          }`}
-        >
-          {item.source === 'warmup'
-            ? 'Warm-up'
-            : item.source === 'review'
-              ? 'Spaced review'
-              : 'New material'}
+        <span className={`rounded-full px-2 py-0.5 uppercase tracking-wider ${SOURCE[item.source].chip}`}>
+          {SOURCE[item.source].label}
         </span>
         <span className={`inline-flex items-center gap-1.5 ${strandStyle(item.strandId).fg}`}>
           <StrandIcon strand={item.strandId} className="h-3.5 w-3.5" />
@@ -152,7 +164,7 @@ export function DrillRunner({ item }: { item: RunnerItem }) {
           >
             {pending ? 'Checking…' : 'Check'}
           </button>
-          {item.hint && !hint && item.source !== 'review' && (
+          {item.hint && !hint && AIDED[item.source] && (
             <button
               onClick={() => setHint(true)}
               className="text-sm text-slate-500 underline underline-offset-4 transition hover:text-slate-300"

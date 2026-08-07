@@ -426,6 +426,84 @@ export function sprintPersonalBest(): SprintRecord | null {
   return personalBest(finishedSprints());
 }
 
+export interface ChallengeStatus {
+  sessionId: number;
+  kind: 'boss' | 'sprint';
+  items: number;
+  answered: number;
+  correct: number;
+  finished: boolean;
+  /** Boss only. */
+  topicId?: string;
+  topicName?: string;
+  topicSlug?: string;
+  passed?: boolean;
+  /** Sprint only. */
+  livesLeft?: number;
+  outcome?: 'cleared' | 'out_of_lives' | 'abandoned';
+  durationMs?: number;
+  /** The run to beat, excluding this one. Sprint only. */
+  previousBest?: SprintRecord | null;
+}
+
+/** Everything the challenge screen needs, in one read. */
+export function challengeStatus(sessionId: number): ChallengeStatus | null {
+  const s = db()
+    .prepare('SELECT id, kind, ended_at, plan_json FROM session WHERE id = ?')
+    .get(sessionId) as
+    | { id: number; kind: string; ended_at: string | null; plan_json: string | null }
+    | undefined;
+  if (!s || (s.kind !== 'boss' && s.kind !== 'sprint')) return null;
+
+  const plan = s.plan_json ? (JSON.parse(s.plan_json) as SessionPlan) : { items: [] };
+  const answers = answersOf(sessionId);
+  const base = {
+    sessionId,
+    kind: s.kind,
+    items: plan.items.length,
+    answered: answers.length,
+    correct: answers.filter(Boolean).length,
+    finished: s.ended_at !== null,
+  };
+
+  if (s.kind === 'boss') {
+    const row = db()
+      .prepare(
+        `SELECT b.topic_id AS topicId, t.name_en AS topicName, t.slug AS topicSlug, b.passed
+           FROM boss_attempt b JOIN topic t ON t.id = b.topic_id
+          WHERE b.session_id = ?`,
+      )
+      .get(sessionId) as
+      | { topicId: string; topicName: string; topicSlug: string; passed: number | null }
+      | undefined;
+    return {
+      ...base,
+      kind: 'boss',
+      topicId: row?.topicId,
+      topicName: row?.topicName,
+      topicSlug: row?.topicSlug,
+      passed: row?.passed === null || row?.passed === undefined ? undefined : row.passed === 1,
+    };
+  }
+
+  const row = db()
+    .prepare(
+      `SELECT lives_left AS livesLeft, outcome, duration_ms AS durationMs
+         FROM sprint_run WHERE session_id = ?`,
+    )
+    .get(sessionId) as
+    | { livesLeft: number; outcome: string | null; durationMs: number | null }
+    | undefined;
+  return {
+    ...base,
+    kind: 'sprint',
+    livesLeft: row?.livesLeft ?? SPRINT.LIVES,
+    outcome: (row?.outcome ?? undefined) as ChallengeStatus['outcome'],
+    durationMs: row?.durationMs ?? undefined,
+    previousBest: personalBest(finishedSprints().filter((r) => r.id !== sessionId)),
+  };
+}
+
 export interface BossHistoryRow {
   sessionId: number;
   topicId: string;
