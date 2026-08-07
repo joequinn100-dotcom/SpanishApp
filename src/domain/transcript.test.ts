@@ -325,3 +325,40 @@ describe('timestamped exports with no speaker labels', () => {
     expect(turns[0]!.text).toBe(line);
   });
 });
+
+describe('single-speaker class recordings', () => {
+  /**
+   * The learner's teacher speaks through his headset, so her voice never
+   * reaches the microphone the ASR transcribes. An unlabelled class export is
+   * therefore entirely his — this is a fact about the recording setup, not a
+   * guess, and it is what makes these files analysable without labelling.
+   */
+  const ONE_SIDED = [
+    '0:00:15 Hola Lorena, ¿cómo estás?',
+    '0:00:48',
+    'OK.',
+    '0:01:02 Sí, tenemos un feriado el lunes.',
+    '0:01:30 Lorena, no tengo audio.',
+  ].join('\n');
+
+  it('treats every turn as the learner when nobody is named', () => {
+    const turns = segment(ONE_SIDED);
+    expect(learnerTurns(turns, null)).toHaveLength(turns.length);
+  });
+
+  it('keeps the short acknowledgements, which answer speech not in the file', () => {
+    // These are the learner responding to the teacher. Dropping them as noise
+    // would be wrong: they are his production, and the gaps between them are
+    // the only trace the recording keeps of the other half of the conversation.
+    const texts = learnerTurns(segment(ONE_SIDED), null).map((t) => t.text);
+    expect(texts).toContain('OK.');
+  });
+
+  it('still refuses to guess when a file does name speakers', () => {
+    // A labelled export is a different situation, and picking the wrong name
+    // there would put someone else's Spanish in the error log.
+    const labelled = 'Lorena: ¿Cómo estás?\nJoe: Bien, gracias.';
+    expect(learnerTurns(segment(labelled), null)).toEqual([]);
+    expect(learnerTurns(segment(labelled), 'Joe')).toHaveLength(1);
+  });
+});

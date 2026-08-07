@@ -153,11 +153,30 @@ export function speakers(turns: Turn[]): { name: string; turns: number; chars: n
 /**
  * Keep only the learner's turns.
  *
- * When no speaker is named, everything is treated as the learner's — a pasted
- * chunk of your own writing is the common case and has no labels. When speakers
- * *are* named and none matches, the result is empty rather than everything:
- * silently falling back to "all of it" is how a teacher's Spanish ends up in
- * your error log.
+ * When no speaker is named, everything is treated as the learner's. That is not
+ * a fallback — it is the real shape of this learner's recordings, and the reason
+ * is worth writing down because it is invisible from the file alone: Lorena
+ * speaks through his headset, so her voice never reaches the microphone the ASR
+ * is transcribing. Every word in a class export is his.
+ *
+ * The evidence is in the transcripts themselves, for anyone who doubts it later:
+ * «Lorena, no tengo audio», third-person references («aprender con Lorena»),
+ * and fifty-four bare acknowledgement turns — OK, Sí, Ajá — answering speech
+ * that is not in the file.
+ *
+ * Two consequences follow, and the second is the subtle one.
+ *
+ * The turns need no attribution, so nothing has to be labelled before analysis.
+ *
+ * But a correction Lorena speaks and the learner repeats *does* land here as his
+ * own production, and it is indistinguishable from the real thing by text alone.
+ * SPEC §4 lets only spontaneous evidence resolve an error, so the positive
+ * detectors — not this function — carry the burden of not counting a repetition
+ * as proof of a gap closed.
+ *
+ * When speakers *are* named and none matches, the result is empty rather than
+ * everything: silently falling back to "all of it" is how another speaker's
+ * Spanish would end up in the error log.
  */
 export function learnerTurns(turns: Turn[], learner: string | null): Turn[] {
   const labelled = turns.some((t) => t.speaker);
