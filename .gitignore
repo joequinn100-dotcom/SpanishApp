@@ -45,6 +45,9 @@ next-env.d.ts
 
 # learning database — the product, but local and personal
 /data
+# database snapshots. Personal, and often larger than the database itself.
+# They are meant to leave this machine, not to enter the repository.
+/backups
 # session handoffs (SPEC.md §7) — local artefacts
 /handoffs
 # licensed source books, traceable to the purchaser. never commit.

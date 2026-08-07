@@ -15,7 +15,7 @@ evidence that you produced it correctly and unprompted.
 ```bash
 npm install
 npm run build && npm start        # http://localhost:3000
-npm test                          # 321 tests
+npm test                          # 518 tests
 ```
 
 The database creates and seeds itself at `./data/fluencia.db` on first request.
@@ -24,6 +24,49 @@ Delete that file to start over; migrations and seed re-run automatically.
 Everything is local. There is no account, no cloud, no sync — the database file
 *is* the account, which is why closing the laptop mid-session loses nothing and
 why the app only works on the machine holding that file.
+
+## Backing it up
+
+`data/` is gitignored, deliberately: it holds class transcripts and a learning
+record that has no business on GitHub. The consequence is that nothing else
+backs it up, and by exam day that file is months of attempts, error history and
+review schedules that cannot be reconstructed from anything.
+
+```bash
+npm run backup                       # → ./backups/fluencia-<timestamp>.db
+npm run backup -- --out ~/Library/Mobile\ Documents/com~apple~CloudDocs/fluencia.db
+npm run backup -- --list
+```
+
+Safe to run while the app is open. It uses `VACUUM INTO` rather than a file
+copy — the database runs in WAL mode, so `cp data/fluencia.db somewhere` leaves
+the most recent sessions behind in `fluencia.db-wal` and produces a file that
+opens without complaint and is quietly out of date. The output is one
+self-contained file with no sidecars, which is what makes it safe to AirDrop.
+Every backup is read back and integrity-checked before the command reports
+success.
+
+### Moving to a new machine
+
+```bash
+git clone <repo> && cd SpanishApp && npm install
+npm run restore -- ~/Downloads/fluencia-2026-08-07-13-49-26.db
+npm run dev
+```
+
+That is the whole migration. A backup taken months ago still works: the restore
+applies any migrations released since, so the schema catches up while the
+history is preserved. A backup from a *newer* build than the checkout is
+refused rather than half-understood — update the app first.
+
+Restoring over a database that already has progress is refused unless you pass
+`--force`, and even then the database being replaced is snapshotted to
+`data/replaced-<timestamp>.db` first, so restoring the wrong file is undoable:
+
+```bash
+npm run restore -- <backup> --dry-run     # what would change, writes nothing
+npm run restore -- <backup> --force       # keeps the replaced db beside it
+```
 
 ## What it does
 
