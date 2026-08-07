@@ -344,4 +344,15 @@ export const A_TOPICS: SeedTopic[] = [
     bookRef: 'Foundations U8',
     searchTerms: 'present perfect|pretérito perfecto|he hablado|ha llegado|haber participio',
   },
+  {
+    id: 'a1.verb.estar_ubicacion',
+    nameEn: 'Estar for location and physical state',
+    nameEs: 'Estar: ubicación y estado',
+    level: 'A1',
+    strand: 'verb',
+    summary:
+      'Estar is irregular in the present — estoy, estás, está, estamos, están — and the yo form is the one that breaks the pattern. Two of its jobs start here. Location is always estar, with no exceptions worth learning around: «el expediente está en la oficina», «la cuadrilla está en obra», «¿dónde está el plano?». Temporary physical or emotional state is also estar: «estoy cansado», «el cliente está molesto». The contrast with ser comes later, once adjectives are in play; at this stage the useful shortcut is that anything you could point at a place for, or that could be different tomorrow, takes estar.',
+    bookRef: 'Foundations U5',
+    searchTerms: 'estar|location|ubicación|dónde está|estoy|estamos|state|estado|cansado',
+  },
 ];

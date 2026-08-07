@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { migrate, openDatabase } from '@/db';
-import { seed, recomputeAvailability } from '@/seed';
+import { seed, recomputeAvailability, TOPICS } from '@/seed';
 import type { DB } from '@/db';
 
 /**
@@ -40,17 +40,23 @@ const nextUp = (db: DB, limit = 5) =>
 
 describe('progress aggregates', () => {
   it('starts at zero mastered out of the full curriculum', () => {
+    // Derived, not hard-coded: the curriculum grows whenever a book unit that
+    // had no topic gets one, and a literal here would fail that as a
+    // regression rather than reporting the real defect, which would be the
+    // denominator drifting away from what was seeded.
     const db = fresh();
     const a = agg(db);
     expect(a.mastered).toBe(0);
-    expect(a.total).toBe(92);
+    expect(a.total).toBe(TOPICS.length);
     db.close();
   });
 
   it('counts placed topics toward completion', () => {
     const db = fresh();
+    const a1 = TOPICS.filter((t) => t.id.startsWith('a1.')).length;
+    expect(a1).toBeGreaterThan(0);
     db.prepare("UPDATE topic_state SET status='mastered' WHERE topic_id LIKE 'a1.%'").run();
-    expect(agg(db).mastered).toBe(15);
+    expect(agg(db).mastered).toBe(a1);
     db.close();
   });
 

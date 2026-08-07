@@ -15,11 +15,23 @@ Run `npm test` before declaring any task complete.
 
 ## Source books
 
-The three Read2Speak books are the curriculum authority — they decide which
-topics exist, in what order, and which unit each belongs to. They are **not** a
-register authority: Foundations is Peninsular-flavoured (85 `vosotros` forms,
-Castilian /θ/ pronunciation respellings, `ordenador`/`vale`/`coger`). Never lift
-Spanish from them. `npm test` enforces this — see `src/seed/__tests__/register`.
+Three books, fifteen units each, forty-five in total: Foundations (A1–A2),
+Breakthrough (B1–B2), Mastery (C1–C2).
+
+They are the curriculum authority — they decide which topics exist, in what
+order, and which unit each belongs to. Every unit must have at least one topic
+citing it; `seed.test.ts` enforces that, with one documented exemption
+(Foundations U15 is a consolidation unit with no new grammar).
+
+They are **not** a register authority. Foundations is Peninsular-flavoured (85
+`vosotros` forms — it teaches `estáis` in a conjugation table — plus Castilian
+/θ/ respellings such as `ambulancia` → "ahm-boo-LAHN-thyah", and
+`ordenador`/`vale`/`coger`/`coche`). Never lift Spanish from them; rewrite every
+example into neutral Latin American Spanish and into construction/consulting
+context. `npm test` enforces this — see the register suite in
+`src/seed/seed.test.ts`.
 
 The PDFs are licensed to a single purchaser and carry embedded tracing
-identifiers. They are gitignored and must never be committed.
+identifiers — every page footer is the buyer's own email address. They are
+gitignored and must never be committed, and neither may text extracted from
+them, which carries the same footer. Extract to a scratchpad outside the repo.

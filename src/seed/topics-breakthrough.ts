@@ -566,4 +566,37 @@ export const B_TOPICS: SeedTopic[] = [
     bookRef: 'Breakthrough U13.2.4',
     searchTerms: 'diplomatic|diplomático|bad news|malas noticias|refusal|rechazo|register|tacto',
   },
+  {
+    id: 'b1.verb.ser_estar_adjetivos',
+    nameEn: 'Ser vs. estar with adjectives',
+    nameEs: 'Ser y estar con adjetivos',
+    level: 'B1',
+    strand: 'verb',
+    summary:
+      'With an adjective, ser states what something inherently is and estar states how it is right now. «El ingeniero es serio» describes his character; «el ingeniero está serio» says something changed today. The distinction is not optional politeness — it is the difference between a description and a report.\n\nA closed set of adjectives goes further and changes meaning outright: aburrido (boring / bored), listo (clever / ready), malo (bad / unwell), rico (wealthy / tasty), verde (green / unripe), orgulloso (proud of something / arrogant), despierto (sharp / awake). These are worth memorising as pairs, because choosing the wrong verb does not produce an awkward sentence, it produces a different claim about a person.\n\nIn a work register the stakes are concrete: «la obra es lenta» judges the project, «la obra está lenta» reports this month. One is a criticism you may not have meant to make.',
+    bookRef: 'Breakthrough U6.2.1',
+    searchTerms: 'ser estar|adjetivos|aburrido|listo|malo|rico|verde|orgulloso|character|state|carácter',
+  },
+  {
+    id: 'b1.prof.emergencias',
+    nameEn: 'Site emergencies and incident reporting',
+    nameEs: 'Emergencias y reporte de incidentes',
+    level: 'B1',
+    strand: 'prof',
+    summary:
+      'Two registers, and the pressure is on getting between them fast. In the moment, short usted imperatives to people you do not know: «¡Llame a una ambulancia!», «¡Avise al supervisor!», «¡Pare la máquina!», «¡No lo mueva!». Afterwards, a written report in the preterite with the sequence intact: what happened, when, who was involved, what was done.\n\nThe vocabulary is HSE vocabulary and it is worth holding as a set: el accidente, el incidente, el casi accidente, los primeros auxilios, el botiquín, la camilla, el arnés, el casco, la señalización, el área restringida, el permiso de trabajo. «Los bomberos» and «la ambulancia» are the services you actually name.\n\nA register note the source book does not give: in Peru this is site language, not travel language. Use «carro» or «camioneta» rather than the Peninsular «coche», and expect the incident report itself to be read by people who were not there — so the preterite has to carry the order of events on its own.',
+    bookRef: 'Breakthrough U9.2.1',
+    searchTerms: 'emergency|emergencia|accidente|incidente|ambulancia|bomberos|primeros auxilios|botiquín|HSE|seguridad|reporte',
+  },
+  {
+    id: 'b2.mood.consejo_gradado',
+    nameEn: 'Graded advice: from direct to gentle',
+    nameEs: 'El consejo graduado',
+    level: 'B2',
+    strand: 'mood',
+    summary:
+      'Spanish offers roughly a dozen ways to tell someone what to do, and they form a spectrum rather than a list of synonyms. Hardest first: the imperative («Revise el metrado»), then tener que, then deber, then the impersonal hay que, then es importante / es necesario que + subjunctive, then te recomiendo / le aconsejo que + subjunctive, then the conditional debería, then yo que usted + conditional, then podría, then ¿por qué no...?, and at the soft end quizás + subjunctive and ¿ha pensado en...?.\n\nThe grammar of each rung is B1. Choosing the right rung is B2, and it is the part that carries professional risk: an imperative to a client reads as an instruction from someone not entitled to give one, while three hedges stacked on a genuine safety issue reads as though the issue is negotiable.\n\nThe same spectrum runs in reverse for refusing. «No puedo» is flat; «me temo que no va a ser posible», «preferiría que lo viéramos con el cliente», «entiendo el punto, aunque tendría que revisarlo» hold the same position with the relationship intact.',
+    bookRef: 'Breakthrough U8.2.1',
+    searchTerms: 'advice|consejo|deberías|debería|yo que tú|yo que usted|podría|hay que|te recomiendo|hedging|softening|boundaries|límites|rechazar',
+  },
 ];

@@ -62,6 +62,44 @@ describe('topic integrity', () => {
     }
   });
 
+  it('leaves no Read2Speak unit without a topic, except the review unit', () => {
+    // The books are the curriculum authority (CLAUDE.md): they decide which
+    // topics exist and which unit each belongs to. Reading them turned up six
+    // units with no topic at all, which is a curriculum hole rather than a
+    // stylistic one — a whole unit of the syllabus the app could not schedule,
+    // teach or search. This locks the coverage in.
+    //
+    // Foundations U15 is the deliberate exception. "Spanish A2 in Real Life" is
+    // a consolidation unit — dialogues and scenarios recycling U1–U14 with no
+    // new grammar — so a topic for it would be invented rather than sourced.
+    const EXPECTED_UNITS = 15;
+    const EXEMPT = new Set(['Foundations U15']);
+
+    for (const book of ['Foundations', 'Breakthrough', 'Mastery'] as const) {
+      const covered = new Set<number>();
+      for (const t of TOPICS) {
+        const m = t.bookRef?.match(new RegExp(`^${book} U(\\d+)`));
+        if (m) covered.add(Number(m[1]));
+      }
+      for (let unit = 1; unit <= EXPECTED_UNITS; unit++) {
+        if (EXEMPT.has(`${book} U${unit}`)) continue;
+        expect(covered.has(unit), `${book} U${unit} has no topic`).toBe(true);
+      }
+    }
+  });
+
+  it('cites a unit no higher than the books actually contain', () => {
+    // Each of the three books has exactly 15 units. A U16 would be a fabricated
+    // citation that the shape check above would happily accept.
+    for (const t of TOPICS) {
+      const m = t.bookRef?.match(/^(?:Foundations|Breakthrough|Mastery) U(\d+)/);
+      if (!m) continue;
+      const unit = Number(m[1]);
+      expect(unit, `${t.id} cites ${t.bookRef}`).toBeGreaterThanOrEqual(1);
+      expect(unit, `${t.id} cites ${t.bookRef}`).toBeLessThanOrEqual(15);
+    }
+  });
+
   it('covers every topic named in the SPEC §3 prerequisite graph', () => {
     // These IDs are quoted verbatim in the spec; a rename silently breaks routing.
     const fromSpec = [

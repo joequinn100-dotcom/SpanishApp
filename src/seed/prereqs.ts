@@ -115,4 +115,27 @@ export const PREREQS: SeedPrereq[] = [
   hard('c2.lex.abstraccion', 'b2.syntax.nominalizacion'),
   hard('c2.lex.idiom_regional', 'c1.lex.precision'),
   hard('c2.prof.registro_legal', 'c2.lex.abstraccion'),
+
+  /* ---- Book units that had no topic until the workbooks were read ---- */
+  // Ser/estar with adjectives is the A1 contrast applied to description, so it
+  // waits on the basic contrast rather than on the estar-only topic.
+  hard('b1.verb.ser_estar_adjetivos', 'a1.verb.ser_estar'),
+  soft('b1.verb.ser_estar_adjetivos', 'a1.verb.estar_ubicacion'),
+
+  // The advice spectrum needs both halves of its range: the subjunctive rungs
+  // (es importante que, te recomiendo que) and the conditional ones (debería,
+  // podría, yo que usted).
+  hard('b2.mood.consejo_gradado', 'b1.mood.subj_presente'),
+  hard('b2.mood.consejo_gradado', 'a2.verb.condicional'),
+  soft('b2.mood.consejo_gradado', 'a2.verb.imperativo'),
+
+  // Emergencies are usted imperatives in the moment and a preterite narrative
+  // afterwards; only the first is a hard gate.
+  hard('b1.prof.emergencias', 'a2.verb.imperativo'),
+  soft('b1.prof.emergencias', 'b1.verb.preterito'),
+
+  // Mixed and si-less hypotheticals sit on top of the counterfactual spine.
+  hard('c1.mood.hipotesis_complejas', 'b2.mood.si_counterfactual'),
+  hard('c1.mood.hipotesis_complejas', 'b2.verb.condicional_compuesto'),
+  soft('c1.mood.hipotesis_complejas', 'b2.mood.subj_pluscuamperfecto'),
 ];

@@ -163,4 +163,15 @@ export const C_TOPICS: SeedTopic[] = [
     bookRef: 'Mastery U8.2.1',
     searchTerms: 'legal|jurídico|bureaucratic|burocrático|contrato|resolución|administrative',
   },
+  {
+    id: 'c1.mood.hipotesis_complejas',
+    nameEn: 'Complex and mixed hypotheticals',
+    nameEs: 'Hipótesis complejas',
+    level: 'C1',
+    strand: 'mood',
+    summary:
+      'Past B2, the three conditional "types" stop describing what people actually say. Time frames mix: «si hubiéramos firmado en marzo, ahora estaríamos avanzando» puts an unreal past against a present consequence, and the reverse pairing exists too. Whole constructions drop si altogether — de haber sabido, «¿y si probáramos otra cosa?», siempre que, a no ser que, en caso de que, con tal de que.\n\nRegret has its own machinery: ojalá + pluperfect subjunctive («ojalá lo hubiera sabido antes») says something different from a plain conditional perfect, because it is an attitude rather than a calculation.\n\nThis sits above the exam line and is scheduled after December, but it is the register that negotiation actually runs in — most of what a consultant needs to say about an alternative that was never taken lives here.',
+    bookRef: 'Mastery U6',
+    searchTerms: 'hypothetical|hipótesis|mixed conditional|de haber|y si|siempre que|a no ser que|ojalá hubiera|counterfactual|condicional mixto',
+  },
 ];
