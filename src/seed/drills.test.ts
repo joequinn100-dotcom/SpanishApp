@@ -262,7 +262,13 @@ describe('seeding drills into SQLite', () => {
     const db = freshDb();
     seed(db);
     const rows = db
-      .prepare('SELECT seed_key, gauntlet_score, gauntlet_log, verified_at FROM content')
+      .prepare(
+        // Authored rows only. Engine-generated conjugations are a third
+        // provenance with a different verification story, asserted separately
+        // below — a panel never saw them and their log says so.
+        `SELECT seed_key, gauntlet_score, gauntlet_log, verified_at
+           FROM content WHERE provenance = 'authored'`,
+      )
       .all() as {
       seed_key: string;
       gauntlet_score: number;
@@ -306,5 +312,63 @@ describe('seeding drills into SQLite', () => {
     for (const { gauntlet_log } of logs) {
       expect(JSON.parse(gauntlet_log).verdict).not.toBe('quarantined');
     }
+  });
+
+  it('marks engine-generated conjugations as such, and never as panel-verified', () => {
+    // Migration 010 added this provenance precisely so a generated row cannot
+    // be mistaken for one three verifiers agreed on. The log has to say what
+    // actually happened.
+    const db = freshDb();
+    seed(db);
+    const rows = db
+      .prepare("SELECT gauntlet_log, payload, topic_id FROM content WHERE provenance = 'engine'")
+      .all() as { gauntlet_log: string; payload: string; topic_id: string }[];
+
+    expect(rows.length).toBeGreaterThan(100);
+    for (const r of rows) {
+      const log = JSON.parse(r.gauntlet_log);
+      expect(log.provenance).toBe('engine');
+      expect(log.generator).toBe('src/domain/conjugation.ts');
+      expect(log.verification).toContain('test');
+      // Never claims a verdict it did not get.
+      expect(log.verdict).toBeUndefined();
+      expect(log.linguistic).toBeUndefined();
+      expect(log.rounds).toBeUndefined();
+    }
+  });
+
+  it('fills verb topics that had no content at all', () => {
+    const db = freshDb();
+    seed(db);
+    const filled = db
+      .prepare(
+        `SELECT count(DISTINCT topic_id) AS n FROM content WHERE provenance = 'engine'`,
+      )
+      .get() as { n: number };
+    expect(filled.n).toBeGreaterThanOrEqual(10);
+
+    // And every generated row points at a topic that really exists.
+    const orphans = db
+      .prepare(
+        `SELECT count(*) AS n FROM content c
+          WHERE c.provenance = 'engine'
+            AND NOT EXISTS (SELECT 1 FROM topic t WHERE t.id = c.topic_id)`,
+      )
+      .get() as { n: number };
+    expect(orphans.n).toBe(0);
+  });
+
+  it('re-seeds in place, so historical attempts keep pointing at live content', () => {
+    const db = freshDb();
+    seed(db);
+    const before = db
+      .prepare("SELECT id, seed_key FROM content WHERE provenance = 'engine' ORDER BY id LIMIT 1")
+      .get() as { id: number; seed_key: string };
+
+    seed(db);
+    const after = db
+      .prepare('SELECT id FROM content WHERE seed_key = ?')
+      .get(before.seed_key) as { id: number };
+    expect(after.id).toBe(before.id);
   });
 });
