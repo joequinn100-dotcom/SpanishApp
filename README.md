@@ -15,7 +15,7 @@ evidence that you produced it correctly and unprompted.
 ```bash
 npm install
 npm run build && npm start        # http://localhost:3000
-npm test                          # 518 tests
+npm test                          # 593 tests
 ```
 
 The database creates and seeds itself at `./data/fluencia.db` on first request.
@@ -24,6 +24,25 @@ Delete that file to start over; migrations and seed re-run automatically.
 Everything is local. There is no account, no cloud, no sync — the database file
 *is* the account, which is why closing the laptop mid-session loses nothing and
 why the app only works on the machine holding that file.
+
+## The field reference
+
+`docs/field-reference.html` is a single self-contained page — every tense
+conjugated across 24 verbs, the construction lexicon, the daily routine and the
+backup procedure. Open it from anywhere, including an iPad with the app nowhere
+in sight. Each conjugation table tints the span that changes across persons, so
+the paradigm's shape reads down the column: the stem holds still and the ending
+moves, and in the compound tenses it is the auxiliary that moves while the
+participle sits there refusing to agree with anything.
+
+The conjugations are dumped from the live engine rather than retyped, so the
+page cannot drift from what the drills mark you against. To rebuild it after
+changing the lexicon or the engine:
+
+```bash
+npx tsx --tsconfig tsconfig.scripts.json scripts/dump-reference.ts
+python3 scripts/build-reference.py
+```
 
 ## Backing it up
 

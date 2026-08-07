@@ -1,0 +1,649 @@
+<title>Fluencia — Field Reference</title>
+<style>
+  /* ============================================================
+     Tokens. Light is the bare :root; dark is redefined twice so
+     both the OS default and an explicit toggle resolve.
+     ============================================================ */
+  :root {
+    --ground: #edf0f1;      /* cool paper, biased toward the accent */
+    --surface: #ffffff;
+    --surface-2: #e4e9eb;
+    --ink: #16232c;         /* drafting ink */
+    --ink-2: #4a5c66;
+    --ink-3: #7d8d95;
+    --accent: #0e6e88;      /* desaturated drafting cyan */
+    --accent-soft: #0e6e881a;
+    --rust: #a85a2b;        /* rebar oxide */
+    --rust-soft: #a85a2b1a;
+    --rule: #c6d0d4;
+    --rule-soft: #d8e0e3;
+
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+    --shell: 74rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d1418;
+      --surface: #131e23;
+      --surface-2: #1a272d;
+      --ink: #dae4e8;
+      --ink-2: #9db0b8;
+      --ink-3: #6d828b;
+      --accent: #56b6d0;
+      --accent-soft: #56b6d022;
+      --rust: #d2874e;
+      --rust-soft: #d2874e22;
+      --rule: #27373e;
+      --rule-soft: #1e2c32;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0d1418;
+    --surface: #131e23;
+    --surface-2: #1a272d;
+    --ink: #dae4e8;
+    --ink-2: #9db0b8;
+    --ink-3: #6d828b;
+    --accent: #56b6d0;
+    --accent-soft: #56b6d022;
+    --rust: #d2874e;
+    --rust-soft: #d2874e22;
+    --rule: #27373e;
+    --rule-soft: #1e2c32;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .shell { max-width: var(--shell); margin: 0 auto; padding: 0 1.25rem; }
+
+  /* ============================================================
+     Title block — the header of an engineering drawing.
+     ============================================================ */
+  .titleblock {
+    border-bottom: 2px solid var(--ink);
+    background: var(--surface);
+  }
+  .tb-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) repeat(3, minmax(0, 1fr));
+    border-left: 1px solid var(--rule);
+  }
+  .tb-cell {
+    border-right: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+    padding: 0.85rem 1rem;
+    min-width: 0;
+  }
+  .tb-cell:first-child { padding: 1.4rem 1rem 1.1rem; }
+  .tb-key {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .tb-val { font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    text-wrap: balance;
+    font-weight: 700;
+  }
+  h1 .thin { color: var(--accent); font-weight: 400; }
+  .tagline {
+    margin: 0.5rem 0 0;
+    color: var(--ink-2);
+    max-width: 46ch;
+    font-size: 0.95rem;
+  }
+
+  /* ============================================================
+     Navigation
+     ============================================================ */
+  .rail {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+  }
+  .rail-in {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    max-width: var(--shell);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+  .rail-in::-webkit-scrollbar { display: none; }
+  .rail a, .theme-btn {
+    flex: none;
+    padding: 0.7rem 0.75rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    border-top: 0; border-left: 0; border-right: 0;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .rail a:hover, .theme-btn:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .rail a:focus-visible, .theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .theme-btn { margin-left: auto; }
+
+  /* ============================================================
+     Sections
+     ============================================================ */
+  section.major { padding: 3rem 0 1rem; }
+  .sec-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; border-bottom: 1px solid var(--rule); padding-bottom: 0.6rem; margin-bottom: 1.5rem; }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+  h2 { margin: 0; font-size: 1.45rem; letter-spacing: -0.01em; font-weight: 700; }
+  .sec-sub { color: var(--ink-3); font-size: 0.85rem; margin-left: auto; }
+
+  p.lede { max-width: 68ch; color: var(--ink-2); }
+
+  /* ---------------- routine ---------------- */
+  .steps { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  @media (min-width: 50rem) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { background: var(--surface); padding: 1.1rem 1.15rem; }
+  .step-k { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); letter-spacing: 0.06em; }
+  .step h4 { margin: 0.35rem 0 0.4rem; font-size: 1rem; }
+  .step p { margin: 0; font-size: 0.875rem; color: var(--ink-2); }
+
+  code, kbd {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.1em 0.4em;
+    border-radius: 2px;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--accent);
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin: 0;
+  }
+  pre code { background: none; padding: 0; }
+
+  /* ---------------- tense reference ---------------- */
+  .controls { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.1rem; align-items: center; }
+  .chip {
+    font-family: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 0.34rem 0.62rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .mood-i { border-left: 3px solid var(--accent); }
+  .mood-s { border-left: 3px solid var(--rust); }
+  .mood-m { border-left: 3px solid var(--ink-3); }
+
+  .search {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.36rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 2px;
+    min-width: 12rem;
+  }
+  .search:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .tense-card { border: 1px solid var(--rule); background: var(--surface); margin-bottom: 1.1rem; }
+  .tc-head { padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--rule-soft); }
+  .tc-title { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .tc-en { font-size: 1.05rem; font-weight: 700; }
+  .tc-es { font-family: var(--serif); font-style: italic; color: var(--ink-2); font-size: 0.95rem; }
+  .badge {
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0.15rem 0.4rem; border: 1px solid currentColor; border-radius: 2px;
+  }
+  .b-lvl { color: var(--ink-3); }
+  .b-cmp { color: var(--rust); }
+  .tc-use { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--ink-2); max-width: 78ch; }
+  .tc-use .es { font-family: var(--serif); color: var(--ink); }
+
+  .tbl-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+  th, td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--rule-soft); }
+  thead th {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.11em;
+    color: var(--ink-3); font-weight: 600; white-space: nowrap;
+    position: sticky; top: 0; background: var(--surface);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--accent-soft); }
+  .v-inf { font-family: var(--serif); font-size: 0.95rem; white-space: nowrap; }
+  .v-en { color: var(--ink-3); font-size: 0.75rem; display: block; }
+  td.form { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+  td.form .vary { color: var(--accent); font-weight: 600; }
+  .irr { color: var(--rust); font-size: 0.7rem; }
+  .legend { font-size: 0.75rem; color: var(--ink-3); padding: 0.6rem 1.1rem; border-top: 1px solid var(--rule-soft); }
+  .legend .sw { color: var(--accent); font-family: var(--mono); font-weight: 600; }
+
+  /* ---------------- lexicon ---------------- */
+  .band { margin-bottom: 2rem; }
+  .band-h { display: flex; align-items: baseline; gap: 0.6rem; margin: 0 0 0.3rem; font-size: 1.05rem; }
+  .count { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); }
+  .band-note { margin: 0 0 0.9rem; font-size: 0.85rem; color: var(--ink-2); max-width: 72ch; }
+  .lex-grid { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  @media (min-width: 44rem) { .lex-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 68rem) { .lex-grid { grid-template-columns: repeat(3, 1fr); } }
+  .lex { background: var(--surface); padding: 0.75rem 0.9rem; }
+  .lex-h { display: flex; align-items: baseline; gap: 0.5rem; }
+  .lex .es { font-family: var(--serif); font-size: 1rem; }
+  .lv { font-family: var(--mono); font-size: 0.62rem; color: var(--ink-3); margin-left: auto; }
+  .lex .en { font-size: 0.8rem; color: var(--ink-2); }
+  .sub { color: var(--rust); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .lex .ex { font-family: var(--serif); font-size: 0.85rem; color: var(--ink); margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px dotted var(--rule); }
+
+  /* ---------------- notes / callouts ---------------- */
+  .note {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--rust);
+    background: var(--surface);
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    max-width: 76ch;
+  }
+  .note b { color: var(--ink); }
+
+  .cols { display: grid; gap: 1.25rem; }
+  @media (min-width: 52rem) { .cols { grid-template-columns: 1fr 1fr; } }
+
+  footer {
+    margin-top: 3rem;
+    border-top: 2px solid var(--ink);
+    background: var(--surface);
+    padding: 1.5rem 0 2.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+  footer .shell > p { margin: 0.3rem 0; max-width: 70ch; }
+
+  ol.proc { padding-left: 1.1rem; max-width: 70ch; }
+  ol.proc li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--ink-2); }
+  ol.proc li b { color: var(--ink); }
+
+  .hide { display: none !important; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tense-card { transition: border-color 0.15s ease; }
+  }
+</style>
+
+<header class="titleblock">
+  <div class="shell">
+    <div class="tb-grid">
+      <div class="tb-cell">
+        <span class="tb-key">Reference</span>
+        <h1>Fluen<span class="thin">cia</span></h1>
+        <p class="tagline">
+          Field reference for the Spanish drilling app — every tense, the meeting
+          lexicon, and the procedure for moving it to a new machine.
+        </p>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Target</span>
+        <span class="tb-val">CEFR B2</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Exam</span>
+        <span class="tb-val">Dec 2026</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Register</span>
+        <span class="tb-val">LatAm neutral</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Tenses</span>
+        <span class="tb-val" id="n-tenses">15</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Verbs tabled</span>
+        <span class="tb-val" id="n-verbs">24</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Lexicon</span>
+        <span class="tb-val" id="n-vocab">109</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Domain</span>
+        <span class="tb-val">Obra / consultoría</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="rail">
+  <div class="rail-in">
+    <a href="#routine">Routine</a>
+    <a href="#tenses">Tenses</a>
+    <a href="#lexicon">Lexicon</a>
+    <a href="#backup">Backup</a>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch theme">Theme</button>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <!-- ============================================================ -->
+  <section class="major" id="routine">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>The routine</h2>
+      <span class="sec-sub">12 minutes on a bad day</span>
+    </div>
+
+    <p class="lede">
+      The app runs on your own machine and keeps everything in one SQLite file, so it
+      remembers exactly where you stopped — mid-question, mid-session, mid-week. Start it
+      with <code>npm run dev</code> and open <code>localhost:3000</code>.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-k">Every day</span>
+        <h4>One warm-up</h4>
+        <p>
+          Six to ten items drawn from the errors you are actually still making, weighted by
+          severity and how recently you made them. This alone keeps the streak.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-k">Most days</span>
+        <h4>A topic block</h4>
+        <p>
+          Ten items on whatever the prerequisite graph says is next. Recognition first,
+          unaided production last.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-k">When it fits</span>
+        <h4>A Gauntlet Run</h4>
+        <p>
+          Ten items, three lives, timed, drawn only from live errors. Scored against your own
+          previous runs.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:1.25rem">
+      <div class="note">
+        <b>After every class with Lorena.</b> Upload the transcript. The app segments your
+        turns, proposes findings, and waits — nothing reaches the error log until you accept
+        it. A correct form used unprompted is what unlocks a topic's boss fight, and it can
+        only come from a transcript, never from a drill.
+      </div>
+      <div class="note">
+        <b>What «mastered» costs.</b> Twelve attempts at 80%, then two clean spaced reviews at
+        +3 and +10 days, then one spontaneous correct use in a real conversation, and finally a
+        twelve-item unaided challenge with no hints and no retries. Fail that last one and the
+        topic goes back to studying. It is meant to be expensive.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="tenses">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>Tenses</h2>
+      <span class="sec-sub">generated from the app's own engine</span>
+    </div>
+
+    <p class="lede">
+      Every form below is produced by the same tested conjugation engine the drills use, so
+      what you read here is what the app will mark you against. In each table the
+      <span class="sw" style="color:var(--accent);font-weight:600">tinted</span> span is the
+      part that changes across persons — read it down a column and the pattern is the lesson.
+    </p>
+
+    <div class="controls">
+      <button class="chip mood-i" data-mood="indicativo" aria-pressed="true" type="button">Indicative</button>
+      <button class="chip mood-s" data-mood="subjuntivo" aria-pressed="true" type="button">Subjunctive</button>
+      <button class="chip mood-m" data-mood="imperativo" aria-pressed="true" type="button">Imperative</button>
+      <input class="search" id="vsearch" type="search" placeholder="filter verbs — tener, to approve…" aria-label="Filter verbs" />
+    </div>
+
+    <div id="tense-list"></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="lexicon">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>Lexicon</h2>
+      <span class="sec-sub">chosen for the job, not for a frequency list</span>
+    </div>
+    <p class="lede">
+      A word earns a place here if it appears in a Lima infrastructure consultant's week and
+      its absence would force a paraphrase. That excludes plenty of ordinary B2 vocabulary and
+      includes some a general course would call C1 — «adenda», «valorización», «penalidad» are
+      not advanced, they are Tuesday.
+    </p>
+    <section class="band"><h3 class="band-h">Connectors<span class="count">17</span></h3><p class="band-note">What an examiner listens for. The ones marked <b>+ subj</b> force a subjunctive after them, so each one carries a grammar lesson with it.</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">sin embargo</span><span class="lv">B1</span></div><div class="en">however</div><div class="ex">El diseño está aprobado; sin embargo, el presupuesto sigue en revisión.</div></div><div class="lex"><div class="lex-h"><span class="es">no obstante</span><span class="lv">B2</span></div><div class="en">nevertheless (formal)</div><div class="ex">No obstante lo acordado en el acta, el proveedor cambió la especificación.</div></div><div class="lex"><div class="lex-h"><span class="es">por lo tanto</span><span class="lv">B1</span></div><div class="en">therefore</div><div class="ex">El proveedor no confirmó la fecha; por lo tanto, reprogramamos el vaciado.</div></div><div class="lex"><div class="lex-h"><span class="es">en consecuencia</span><span class="lv">B2</span></div><div class="en">consequently (formal)</div><div class="ex">Se detectó una interferencia en la losa; en consecuencia, se detuvo el encofrado.</div></div><div class="lex"><div class="lex-h"><span class="es">siempre y cuando</span><span class="lv">B2</span></div><div class="en">provided that</div><div class="ex">Empezamos el lunes siempre y cuando el cliente confirme el presupuesto.</div></div><div class="lex"><div class="lex-h"><span class="es">a raíz de</span><span class="lv">B2</span></div><div class="en">as a result of, stemming from</div><div class="ex">A raíz de la observación de la supervisión, rehicimos el cálculo estructural.</div></div><div class="lex"><div class="lex-h"><span class="es">en la medida en que</span><span class="lv">B2</span></div><div class="en">insofar as, to the extent that</div><div class="ex">Podemos comprimir el plazo en la medida en que se libere el frente de trabajo.</div></div><div class="lex"><div class="lex-h"><span class="es">dado que</span><span class="lv">B2</span></div><div class="en">given that</div><div class="ex">Dado que el expediente está incompleto, la valorización queda observada.</div></div><div class="lex"><div class="lex-h"><span class="es">a su vez</span><span class="lv">B2</span></div><div class="en">in turn</div><div class="ex">El retraso afecta al montaje, y este a su vez a las pruebas de operación.</div></div><div class="lex"><div class="lex-h"><span class="es">de ahí que</span><span class="lv">B2</span></div><div class="en">hence (takes the subjunctive)</div><div class="ex">El terreno resultó más blando de lo previsto; de ahí que reforcemos la cimentación.</div></div><div class="lex"><div class="lex-h"><span class="es">ahora bien</span><span class="lv">B2</span></div><div class="en">that said</div><div class="ex">El avance físico va bien. Ahora bien, la curva de costos preocupa.</div></div><div class="lex"><div class="lex-h"><span class="es">en cuanto a</span><span class="lv">B1</span></div><div class="en">as regards</div><div class="ex">En cuanto a la seguridad, cerramos las tres observaciones de la semana pasada.</div></div><div class="lex"><div class="lex-h"><span class="es">a fin de que</span><span class="lv">B2</span></div><div class="en">so that <span class="sub">+ subj</span></div><div class="ex">Enviamos el expediente hoy a fin de que el cliente lo revise antes del comité.</div></div><div class="lex"><div class="lex-h"><span class="es">siempre que</span><span class="lv">B2</span></div><div class="en">as long as, provided <span class="sub">+ subj</span></div><div class="ex">Podemos adelantar la partida siempre que se libere el frente.</div></div><div class="lex"><div class="lex-h"><span class="es">por consiguiente</span><span class="lv">B2</span></div><div class="en">consequently (formal register)</div><div class="ex">No se levantaron las observaciones; por consiguiente, la valorización queda en suspenso.</div></div><div class="lex"><div class="lex-h"><span class="es">en todo caso</span><span class="lv">B1</span></div><div class="en">in any case, at any rate</div><div class="ex">En todo caso, dejaremos constancia en el acta antes de retirarnos.</div></div><div class="lex"><div class="lex-h"><span class="es">pese a que</span><span class="lv">B2</span></div><div class="en">despite the fact that</div><div class="ex">Pese a que el plazo se mantiene, el riesgo de penalidad sigue vigente.</div></div></div></section><section class="band"><h3 class="band-h">Meeting phrases<span class="count">21</span></h3><p class="band-note">Disagreeing without conceding is the register this job runs on.</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">levantar una observación</span><span class="lv">B2</span></div><div class="en">to raise — or to clear — a formal objection</div><div class="ex">Levantamos la observación con el ensayo de resistencia del concreto.</div></div><div class="lex"><div class="lex-h"><span class="es">dar por cerrado</span><span class="lv">B2</span></div><div class="en">to consider closed</div><div class="ex">Damos por cerrado el punto una vez que llegue el acta firmada.</div></div><div class="lex"><div class="lex-h"><span class="es">quedar pendiente</span><span class="lv">B1</span></div><div class="en">to remain outstanding</div><div class="ex">Queda pendiente la confirmación del proveedor de encofrados.</div></div><div class="lex"><div class="lex-h"><span class="es">estar a cargo de</span><span class="lv">B1</span></div><div class="en">to be in charge of</div><div class="ex">El ingeniero residente está a cargo de la coordinación con la municipalidad.</div></div><div class="lex"><div class="lex-h"><span class="es">hacer seguimiento</span><span class="lv">B1</span></div><div class="en">to follow up on</div><div class="ex">Voy a hacer seguimiento a la consulta que enviamos hace dos semanas.</div></div><div class="lex"><div class="lex-h"><span class="es">en principio</span><span class="lv">B2</span></div><div class="en">in principle, as things stand</div><div class="ex">En principio mantenemos la fecha, aunque depende de la procura.</div></div><div class="lex"><div class="lex-h"><span class="es">habría que</span><span class="lv">B2</span></div><div class="en">one would have to (impersonal, softened)</div><div class="ex">Habría que revisar el metrado antes de comprometer una cifra.</div></div><div class="lex"><div class="lex-h"><span class="es">cabe señalar</span><span class="lv">B2</span></div><div class="en">it is worth pointing out</div><div class="ex">Cabe señalar que la demora se originó en la entrega de información.</div></div><div class="lex"><div class="lex-h"><span class="es">salvo que</span><span class="lv">B2</span></div><div class="en">unless (takes the subjunctive)</div><div class="ex">Mantenemos el cronograma salvo que el cliente modifique el alcance.</div></div><div class="lex"><div class="lex-h"><span class="es">a la brevedad</span><span class="lv">B2</span></div><div class="en">as soon as possible (formal)</div><div class="ex">Agradeceré su respuesta a la brevedad para no afectar el plazo.</div></div><div class="lex"><div class="lex-h"><span class="es">por nuestra parte</span><span class="lv">B2</span></div><div class="en">for our part</div><div class="ex">Por nuestra parte, el expediente quedó entregado dentro del plazo.</div></div><div class="lex"><div class="lex-h"><span class="es">quisiera plantear un punto</span><span class="lv">B2</span></div><div class="en">I would like to raise a point</div><div class="ex">Antes de cerrar el acta, quisiera plantear un punto sobre el metrado.</div></div><div class="lex"><div class="lex-h"><span class="es">si me permite</span><span class="lv">B2</span></div><div class="en">if I may</div><div class="ex">Si me permite, hay un tema de interferencias que conviene revisar.</div></div><div class="lex"><div class="lex-h"><span class="es">en aras de</span><span class="lv">C1</span></div><div class="en">for the sake of</div><div class="ex">En aras de cumplir el plazo, proponemos trabajar los sábados.</div></div><div class="lex"><div class="lex-h"><span class="es">a efectos de</span><span class="lv">C1</span></div><div class="en">for the purposes of</div><div class="ex">A efectos de la valorización, el avance se corta el día veinticinco.</div></div><div class="lex"><div class="lex-h"><span class="es">valga la aclaración</span><span class="lv">C1</span></div><div class="en">let me be clear about this</div><div class="ex">Valga la aclaración: el adicional no cubre el cambio de especificación.</div></div><div class="lex"><div class="lex-h"><span class="es">corríjame si me equivoco</span><span class="lv">B2</span></div><div class="en">correct me if I am wrong</div><div class="ex">Corríjame si me equivoco, pero el plazo original vencía el quince.</div></div><div class="lex"><div class="lex-h"><span class="es">coincido con usted en que</span><span class="lv">B2</span></div><div class="en">I agree with you that</div><div class="ex">Coincido con usted en que el frente debió liberarse antes.</div></div><div class="lex"><div class="lex-h"><span class="es">no comparto ese criterio</span><span class="lv">C1</span></div><div class="en">I do not share that view (polite disagreement)</div><div class="ex">Con todo respeto, no comparto ese criterio sobre la responsabilidad del retraso.</div></div><div class="lex"><div class="lex-h"><span class="es">entiendo su posición, sin embargo</span><span class="lv">B2</span></div><div class="en">I understand your position, however</div><div class="ex">Entiendo su posición, sin embargo el contrato es claro en ese punto.</div></div><div class="lex"><div class="lex-h"><span class="es">lo dejamos para la siguiente sesión</span><span class="lv">B2</span></div><div class="en">let us park it for the next meeting</div><div class="ex">Si no hay consenso hoy, lo dejamos para la siguiente sesión.</div></div></div></section><section class="band"><h3 class="band-h">The words that make a claim precise<span class="count">34</span></h3><p class="band-note">The difference between «hubo un problema» and «se detectó una interferencia que obligó a reprogramar el vaciado».</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">la valorización</span><span class="lv">B2</span></div><div class="en">progress valuation / payment application</div><div class="ex">Presentamos la valorización del mes con el metrado verificado en campo.</div></div><div class="lex"><div class="lex-h"><span class="es">la adenda</span><span class="lv">B2</span></div><div class="en">contract addendum</div><div class="ex">La ampliación de plazo se formalizó mediante una adenda al contrato.</div></div><div class="lex"><div class="lex-h"><span class="es">el adicional</span><span class="lv">B2</span></div><div class="en">variation, change order</div><div class="ex">El adicional por mayores metrados todavía no cuenta con aprobación.</div></div><div class="lex"><div class="lex-h"><span class="es">la penalidad</span><span class="lv">B2</span></div><div class="en">liquidated damages, contractual penalty</div><div class="ex">El contrato prevé una penalidad diaria por cada día de atraso en la entrega.</div></div><div class="lex"><div class="lex-h"><span class="es">el expediente técnico</span><span class="lv">B2</span></div><div class="en">technical dossier, design package</div><div class="ex">El expediente técnico se entregó con los planos y la memoria de cálculo.</div></div><div class="lex"><div class="lex-h"><span class="es">el acta de conformidad</span><span class="lv">B2</span></div><div class="en">sign-off certificate</div><div class="ex">No podemos facturar sin el acta de conformidad firmada por la supervisión.</div></div><div class="lex"><div class="lex-h"><span class="es">la partida</span><span class="lv">B2</span></div><div class="en">line item, work package</div><div class="ex">La partida de instalaciones eléctricas quedó fuera del alcance original.</div></div><div class="lex"><div class="lex-h"><span class="es">el metrado</span><span class="lv">B2</span></div><div class="en">quantity take-off</div><div class="ex">Revisamos el metrado antes de facturar para evitar una observación.</div></div><div class="lex"><div class="lex-h"><span class="es">el alcance</span><span class="lv">B1</span></div><div class="en">scope</div><div class="ex">Cualquier cambio de alcance debe quedar registrado por escrito.</div></div><div class="lex"><div class="lex-h"><span class="es">la observación</span><span class="lv">B2</span></div><div class="en">formal objection, snag</div><div class="ex">La supervisión levantó dos observaciones sobre el acabado de la fachada.</div></div><div class="lex"><div class="lex-h"><span class="es">el plazo</span><span class="lv">B1</span></div><div class="en">deadline, term</div><div class="ex">El plazo contractual vence a fin de mes y el frente sigue abierto.</div></div><div class="lex"><div class="lex-h"><span class="es">la licitación</span><span class="lv">B2</span></div><div class="en">tender, bidding process</div><div class="ex">La licitación se declaró desierta porque ningún postor cumplió los requisitos.</div></div><div class="lex"><div class="lex-h"><span class="es">el postor</span><span class="lv">B2</span></div><div class="en">bidder</div><div class="ex">Solo dos postores presentaron propuesta técnica y económica.</div></div><div class="lex"><div class="lex-h"><span class="es">la contingencia</span><span class="lv">B2</span></div><div class="en">contingency (budget or risk)</div><div class="ex">Usamos la contingencia para cubrir el sobrecosto del acero.</div></div><div class="lex"><div class="lex-h"><span class="es">el sobrecosto</span><span class="lv">B2</span></div><div class="en">cost overrun</div><div class="ex">El sobrecosto se explica por la variación del precio del concreto.</div></div><div class="lex"><div class="lex-h"><span class="es">el vaciado</span><span class="lv">B1</span></div><div class="en">concrete pour</div><div class="ex">El vaciado de la losa se programó para el jueves a primera hora.</div></div><div class="lex"><div class="lex-h"><span class="es">el encofrado</span><span class="lv">B1</span></div><div class="en">formwork</div><div class="ex">La cuadrilla de encofrado necesita dos días más en el segundo nivel.</div></div><div class="lex"><div class="lex-h"><span class="es">la cimentación</span><span class="lv">B1</span></div><div class="en">foundations</div><div class="ex">Reforzamos la cimentación después del estudio de suelos.</div></div><div class="lex"><div class="lex-h"><span class="es">la cuadrilla</span><span class="lv">B1</span></div><div class="en">work crew</div><div class="ex">La cuadrilla quedó parada porque no llegó el concreto.</div></div><div class="lex"><div class="lex-h"><span class="es">el capataz</span><span class="lv">B1</span></div><div class="en">foreman</div><div class="ex">El capataz reportó una interferencia entre la tubería y la viga.</div></div><div class="lex"><div class="lex-h"><span class="es">la movilización</span><span class="lv">B2</span></div><div class="en">mobilisation to site</div><div class="ex">La movilización de equipos es una partida facturable del contrato.</div></div><div class="lex"><div class="lex-h"><span class="es">el frente de trabajo</span><span class="lv">B2</span></div><div class="en">work front, available work area</div><div class="ex">No podemos avanzar hasta que el cliente libere el frente de trabajo.</div></div><div class="lex"><div class="lex-h"><span class="es">la interferencia</span><span class="lv">B2</span></div><div class="en">clash (between services)</div><div class="ex">Detectamos una interferencia entre el ducto y la estructura metálica.</div></div><div class="lex"><div class="lex-h"><span class="es">el hito</span><span class="lv">B2</span></div><div class="en">milestone</div><div class="ex">El siguiente hito contractual es la entrega del casco estructural.</div></div><div class="lex"><div class="lex-h"><span class="es">la holgura</span><span class="lv">B2</span></div><div class="en">float, slack (in a schedule)</div><div class="ex">La ruta crítica ya no tiene holgura; cualquier retraso se traslada a la entrega.</div></div><div class="lex"><div class="lex-h"><span class="es">la ruta crítica</span><span class="lv">B2</span></div><div class="en">critical path</div><div class="ex">El montaje de estructura entró a la ruta crítica tras el retraso del acero.</div></div><div class="lex"><div class="lex-h"><span class="es">el entregable</span><span class="lv">B2</span></div><div class="en">deliverable</div><div class="ex">El entregable de esta etapa es el expediente técnico completo.</div></div><div class="lex"><div class="lex-h"><span class="es">el replanteo</span><span class="lv">B2</span></div><div class="en">setting out, staking out</div><div class="ex">El replanteo topográfico se ejecutó antes del vaciado de cimientos.</div></div><div class="lex"><div class="lex-h"><span class="es">la subsanación</span><span class="lv">C1</span></div><div class="en">remedying, correction of defects</div><div class="ex">La subsanación de observaciones tiene un plazo de diez días hábiles.</div></div><div class="lex"><div class="lex-h"><span class="es">el precedente</span><span class="lv">B2</span></div><div class="en">precedent</div><div class="ex">Aceptar ese cambio sin adenda sentaría un precedente incómodo.</div></div><div class="lex"><div class="lex-h"><span class="es">la salvedad</span><span class="lv">C1</span></div><div class="en">caveat, qualification</div><div class="ex">Firmamos el acta con la salvedad de que el metrado será revisado.</div></div><div class="lex"><div class="lex-h"><span class="es">el respaldo</span><span class="lv">B2</span></div><div class="en">backing, supporting documentation</div><div class="ex">El adicional requiere respaldo técnico y sustento de costos.</div></div><div class="lex"><div class="lex-h"><span class="es">el sustento</span><span class="lv">B2</span></div><div class="en">justification, supporting evidence</div><div class="ex">Presentamos el sustento del mayor metrado con planos as-built.</div></div><div class="lex"><div class="lex-h"><span class="es">el vencimiento</span><span class="lv">B1</span></div><div class="en">expiry, due date</div><div class="ex">El vencimiento de la carta fianza es el treinta de noviembre.</div></div></div></section><section class="band"><h3 class="band-h">Verbs that assign responsibility<span class="count">12</span></h3><p class="band-note">Verbs that place responsibility somewhere specific.</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">subsanar</span><span class="lv">B2</span></div><div class="en">to remedy, to put right (a defect or objection)</div><div class="ex">Tenemos cinco días hábiles para subsanar las observaciones.</div></div><div class="lex"><div class="lex-h"><span class="es">incumplir</span><span class="lv">B2</span></div><div class="en">to breach, to fail to meet</div><div class="ex">El proveedor incumplió el plazo de entrega por tercera vez.</div></div><div class="lex"><div class="lex-h"><span class="es">reprogramar</span><span class="lv">B1</span></div><div class="en">to reschedule</div><div class="ex">Reprogramamos la reunión de coordinación para el viernes.</div></div><div class="lex"><div class="lex-h"><span class="es">sustentar</span><span class="lv">B2</span></div><div class="en">to substantiate, to back up with evidence</div><div class="ex">Hay que sustentar el adicional con el metrado y las fotos de campo.</div></div><div class="lex"><div class="lex-h"><span class="es">agilizar</span><span class="lv">B2</span></div><div class="en">to speed up, to expedite</div><div class="ex">Pedimos a la supervisión agilizar la revisión del expediente.</div></div><div class="lex"><div class="lex-h"><span class="es">prever</span><span class="lv">B2</span></div><div class="en">to foresee, to make provision for</div><div class="ex">El cronograma no previó la temporada de lluvias.</div></div><div class="lex"><div class="lex-h"><span class="es">aprobar</span><span class="lv">A2</span></div><div class="en">to approve</div><div class="ex">El supervisor aprobó el cambio de especificación el martes.</div></div><div class="lex"><div class="lex-h"><span class="es">incurrir en</span><span class="lv">C1</span></div><div class="en">to incur (a cost, a delay, a breach)</div><div class="ex">El proyecto incurrió en un retraso de veintidós días calendario.</div></div><div class="lex"><div class="lex-h"><span class="es">ceñirse a</span><span class="lv">C1</span></div><div class="en">to stick to, to adhere to</div><div class="ex">Nos ceñimos a lo establecido en el expediente técnico.</div></div><div class="lex"><div class="lex-h"><span class="es">constatar</span><span class="lv">C1</span></div><div class="en">to verify on site, to ascertain</div><div class="ex">Constatamos en campo que el acero colocado corresponde al plano.</div></div><div class="lex"><div class="lex-h"><span class="es">obedecer a</span><span class="lv">C1</span></div><div class="en">to be due to (a cause)</div><div class="ex">El retraso obedece a la demora en la aprobación del adicional.</div></div><div class="lex"><div class="lex-h"><span class="es">trasladar</span><span class="lv">B2</span></div><div class="en">to pass on (a cost, a delay)</div><div class="ex">Cualquier retraso adicional se traslada directamente a la fecha de entrega.</div></div></div></section><section class="band"><h3 class="band-h">Fixed pairings<span class="count">11</span></h3><p class="band-note">Pairings that are fixed — the second word is not a choice.</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">tomar una decisión</span><span class="lv">B1</span></div><div class="en">to make a decision (never «hacer»)</div><div class="ex">El comité tomó la decisión de postergar el inicio de obra.</div></div><div class="lex"><div class="lex-h"><span class="es">dar seguimiento</span><span class="lv">B2</span></div><div class="en">to monitor, to track</div><div class="ex">Damos seguimiento semanal al avance físico y financiero.</div></div><div class="lex"><div class="lex-h"><span class="es">llevar a cabo</span><span class="lv">B2</span></div><div class="en">to carry out</div><div class="ex">Llevamos a cabo la prueba de estanqueidad el mismo día del vaciado.</div></div><div class="lex"><div class="lex-h"><span class="es">poner en marcha</span><span class="lv">B2</span></div><div class="en">to set in motion, to commission</div><div class="ex">Pusimos en marcha el sistema contra incendios tras las pruebas.</div></div><div class="lex"><div class="lex-h"><span class="es">plantear una propuesta</span><span class="lv">B2</span></div><div class="en">to put forward a proposal</div><div class="ex">Planteamos una propuesta alternativa para reducir el sobrecosto.</div></div><div class="lex"><div class="lex-h"><span class="es">asumir el costo</span><span class="lv">B2</span></div><div class="en">to absorb the cost</div><div class="ex">El contratista asumió el costo del reproceso por su propio error.</div></div><div class="lex"><div class="lex-h"><span class="es">ceñirse al presupuesto</span><span class="lv">B2</span></div><div class="en">to stick to the budget</div><div class="ex">Nos ceñimos al presupuesto aprobado pese a la variación de precios.</div></div><div class="lex"><div class="lex-h"><span class="es">deslindar responsabilidades</span><span class="lv">C1</span></div><div class="en">to establish who is responsible</div><div class="ex">Antes de asumir el costo conviene deslindar responsabilidades por escrito.</div></div><div class="lex"><div class="lex-h"><span class="es">dejar constancia</span><span class="lv">B2</span></div><div class="en">to place on record</div><div class="ex">Dejamos constancia en el acta de que el frente no estaba liberado.</div></div><div class="lex"><div class="lex-h"><span class="es">levantar observaciones</span><span class="lv">B2</span></div><div class="en">to close out defects</div><div class="ex">La cuadrilla levantó las observaciones en menos de una semana.</div></div><div class="lex"><div class="lex-h"><span class="es">liberar el frente</span><span class="lv">B2</span></div><div class="en">to release the work face</div><div class="ex">No podemos iniciar el montaje hasta que liberen el frente.</div></div></div></section><section class="band"><h3 class="band-h">False friends<span class="count">14</span></h3><p class="band-note">The expensive kind, where the wrong word does not sound wrong.</p><div class="lex-grid"><div class="lex"><div class="lex-h"><span class="es">actualmente</span><span class="lv">B1</span></div><div class="en">currently — NOT &quot;actually&quot;</div><div class="ex">Actualmente estamos en la etapa de acabados, no en estructura.</div></div><div class="lex"><div class="lex-h"><span class="es">eventualmente</span><span class="lv">B2</span></div><div class="en">possibly, if the case arises — NOT &quot;eventually&quot;</div><div class="ex">Eventualmente podríamos necesitar una segunda grúa, según el avance.</div></div><div class="lex"><div class="lex-h"><span class="es">realizar</span><span class="lv">B1</span></div><div class="en">to carry out — NOT &quot;to realise&quot; (that is «darse cuenta»)</div><div class="ex">Realizamos la inspección conjunta el miércoles por la mañana.</div></div><div class="lex"><div class="lex-h"><span class="es">asistir a</span><span class="lv">B1</span></div><div class="en">to attend — NOT &quot;to assist&quot;</div><div class="ex">Asistí a la reunión de coordinación en representación del consorcio.</div></div><div class="lex"><div class="lex-h"><span class="es">la carpeta</span><span class="lv">A2</span></div><div class="en">folder — NOT &quot;carpet&quot;</div><div class="ex">Los planos actualizados están en la carpeta compartida del proyecto.</div></div><div class="lex"><div class="lex-h"><span class="es">sensible</span><span class="lv">B2</span></div><div class="en">sensitive — NOT &quot;sensible&quot; (that is «sensato»)</div><div class="ex">El cronograma es sensible a cualquier retraso en la procura.</div></div><div class="lex"><div class="lex-h"><span class="es">la firma</span><span class="lv">B1</span></div><div class="en">signature, or a firm — NOT &quot;firm&quot; as an adjective</div><div class="ex">Falta la firma del residente en el acta de conformidad.</div></div><div class="lex"><div class="lex-h"><span class="es">discutir</span><span class="lv">B2</span></div><div class="en">to argue as often as to discuss — «conversar» is the safer verb</div><div class="ex">No queremos discutir con el cliente; queremos conversar el punto en la reunión.</div></div><div class="lex"><div class="lex-h"><span class="es">comprometerse</span><span class="lv">B2</span></div><div class="en">to commit oneself — NOT &quot;to compromise&quot;</div><div class="ex">El proveedor se comprometió a entregar el material antes del vaciado.</div></div><div class="lex"><div class="lex-h"><span class="es">la agenda</span><span class="lv">B1</span></div><div class="en">diary as well as meeting agenda</div><div class="ex">Envío la agenda de la reunión con los cuatro puntos a tratar.</div></div><div class="lex"><div class="lex-h"><span class="es">asistir</span><span class="lv">B1</span></div><div class="en">to attend — NOT &quot;to assist&quot;</div><div class="ex">Asistí a la reunión de coordinación. («To assist» is «ayudar».)</div></div><div class="lex"><div class="lex-h"><span class="es">pretender</span><span class="lv">B2</span></div><div class="en">to intend, to aim to — NOT &quot;to pretend&quot;</div><div class="ex">Pretendemos cerrar la partida esta semana. («To pretend» is «fingir».)</div></div><div class="lex"><div class="lex-h"><span class="es">la conducta</span><span class="lv">B2</span></div><div class="en">behaviour — NOT &quot;conduct (a pipe)&quot;</div><div class="ex">La conducta del subcontratista en obra fue observada. (A duct is «el ducto».)</div></div><div class="lex"><div class="lex-h"><span class="es">soportar</span><span class="lv">B2</span></div><div class="en">to bear, to withstand — NOT &quot;to support (an idea)&quot;</div><div class="ex">La viga soporta la carga prevista. (To back a proposal is «respaldar».)</div></div></div></section>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="backup">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>Backup</h2>
+      <span class="sec-sub">the only copy is on your laptop</span>
+    </div>
+
+    <p class="lede">
+      There is no account and no cloud — the database file <em>is</em> the account. That is why
+      closing the lid mid-question loses nothing, and why a lost laptop would lose everything.
+    </p>
+
+    <div class="cols">
+      <div>
+        <h4 style="margin:0 0 0.5rem">Weekly, from the app</h4>
+        <ol class="proc">
+          <li>Open <b>Settings</b> (the gear, top right).</li>
+          <li><b>Download backup</b> — one self-contained file. Safe to press mid-session.</li>
+          <li>Drop it in iCloud Drive, or anywhere that outlives the laptop.</li>
+        </ol>
+        <h4 style="margin:1.2rem 0 0.5rem">Or from the terminal</h4>
+        <pre><code>npm run backup
+npm run backup -- --list</code></pre>
+      </div>
+      <div>
+        <h4 style="margin:0 0 0.5rem">Moving to a new MacBook</h4>
+        <ol class="proc">
+          <li>Clone the repo, then <code>npm install</code>.</li>
+          <li><code>npm run dev</code>, open <b>Settings</b>.</li>
+          <li><b>Restore from a backup</b> and pick the file.</li>
+        </ol>
+        <div class="note" style="margin-top:0.9rem">
+          <b>It will not let you overwrite progress by accident.</b> Restore shows what is in
+          the file next to what it would replace, and refuses unless you confirm. Even then the
+          database being replaced is copied aside first, so the wrong file is one restore away
+          from being undone. A backup from an older version still works; one from a newer
+          version is refused rather than half-understood.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><b>Fluencia</b> — built for one learner, one exam, one December.</p>
+    <p>
+      Conjugations on this page are generated by the app's engine and checked against
+      known-correct forms by its test suite. Neutral Latin American Spanish throughout: five
+      persons, «ustedes» for the plural you, and no «vosotros» anywhere.
+    </p>
+  </div>
+</footer>
+
+<script>
+  const DATA = {"tenses":[{"id":"presente","en":"Present","es":"Presente de indicativo","mood":"indicativo","level":"A1","compound":false,"use":"What is true now or habitually — «superviso tres obras», «el plazo vence el viernes». Also the near-certain future in speech: «mañana firmamos»."},{"id":"preterito","en":"Preterite","es":"Pretérito indefinido","mood":"indicativo","level":"A2","compound":false,"use":"A finished event with its own boundaries — «ayer vaciamos la losa», «el cliente aprobó el adicional». The tense of what happened."},{"id":"imperfecto","en":"Imperfect","es":"Pretérito imperfecto","mood":"indicativo","level":"A2","compound":false,"use":"The background: what used to happen, what was going on, how things were. «Antes entregaban los lunes», «llovía cuando llegué»."},{"id":"futuro","en":"Future","es":"Futuro simple","mood":"indicativo","level":"A2","compound":false,"use":"Commitments and predictions — «entregaremos el 30». Also present probability, which surprises English speakers: «¿dónde estará el supervisor?» means \"where can he be?\", not \"where will he be?\"."},{"id":"condicional","en":"Conditional","es":"Condicional simple","mood":"indicativo","level":"A2","compound":false,"use":"The polite register of professional Spanish, and the one that most changes how you land in a meeting — «¿podría revisarlo?», «sería mejor esperar». Also the consequence half of a hypothesis."},{"id":"presente_perfecto","en":"Present perfect","es":"Pretérito perfecto","mood":"indicativo","level":"A2","compound":true,"use":"A past event inside a period that has not closed — «esta semana hemos avanzado», «todavía no ha llegado el material»."},{"id":"pluscuamperfecto","en":"Past perfect","es":"Pretérito pluscuamperfecto","mood":"indicativo","level":"B1","compound":true,"use":"Earlier than another past moment — «cuando llegué, ya habían desencofrado». Orders two past events without a date."},{"id":"futuro_perfecto","en":"Future perfect","es":"Futuro compuesto","mood":"indicativo","level":"B2","compound":true,"use":"Done before a deadline — «para el viernes habremos terminado». Also probability about the recent past: «ya habrá llegado»."},{"id":"condicional_compuesto","en":"Conditional perfect","es":"Condicional compuesto","mood":"indicativo","level":"B2","compound":true,"use":"What would have happened — «habríamos entregado a tiempo si el acero hubiera llegado». The consequence half of a past hypothesis."},{"id":"subj_presente","en":"Present subjunctive","es":"Presente de subjuntivo","mood":"subjuntivo","level":"B1","compound":false,"use":"After wish, influence, doubt, emotion, and after «cuando» pointing at an unrealised future — «espero que apruebe», «cuando llegue el plano». The single biggest B2 gate."},{"id":"subj_imperfecto","en":"Imperfect subjunctive","es":"Imperfecto de subjuntivo","mood":"subjuntivo","level":"B2","compound":false,"use":"Hypotheses and softened requests — «si tuviéramos más plazo, reforzaríamos», «quisiera plantear un punto». Formed from the third-person plural preterite, with no exceptions anywhere in the language."},{"id":"subj_perfecto","en":"Present perfect subjunctive","es":"Pretérito perfecto de subjuntivo","mood":"subjuntivo","level":"B2","compound":true,"use":"A completed action under a trigger — «espero que hayan revisado el expediente», «no creo que haya llegado»."},{"id":"subj_pluscuamperfecto","en":"Past perfect subjunctive","es":"Pluscuamperfecto de subjuntivo","mood":"subjuntivo","level":"C1","compound":true,"use":"The unreal past — «si hubiéramos avisado antes…», «ojalá hubiera sabido». Pairs with the conditional perfect."},{"id":"imperativo","en":"Imperative","es":"Imperativo afirmativo","mood":"imperativo","level":"A2","compound":false,"use":"Direct instruction — «revisa el encofrado», «revisen el expediente». On site it is normal and not rude; in an email, soften it to the conditional."},{"id":"imperativo_negativo","en":"Negative imperative","es":"Imperativo negativo","mood":"imperativo","level":"B1","compound":false,"use":"Telling someone not to — «no firmes todavía», «no vacíen sin la aprobación». Always the subjunctive, which is why it is harder than the affirmative."}],"persons":["yo","tú","él","nosotros","ellos"],"personLabels":["yo","tú","él / ella / usted","nosotros","ellos / ellas / ustedes"],"verbs":[{"inf":"trabajar","en":"to work","irregular":false,"tenses":[{"id":"presente","forms":["trabajo","trabajas","trabaja","trabajamos","trabajan"]},{"id":"preterito","forms":["trabajé","trabajaste","trabajó","trabajamos","trabajaron"]},{"id":"imperfecto","forms":["trabajaba","trabajabas","trabajaba","trabajábamos","trabajaban"]},{"id":"futuro","forms":["trabajaré","trabajarás","trabajará","trabajaremos","trabajarán"]},{"id":"condicional","forms":["trabajaría","trabajarías","trabajaría","trabajaríamos","trabajarían"]},{"id":"presente_perfecto","forms":["he trabajado","has trabajado","ha trabajado","hemos trabajado","han trabajado"]},{"id":"pluscuamperfecto","forms":["había trabajado","habías trabajado","había trabajado","habíamos trabajado","habían trabajado"]},{"id":"futuro_perfecto","forms":["habré trabajado","habrás trabajado","habrá trabajado","habremos trabajado","habrán trabajado"]},{"id":"condicional_compuesto","forms":["habría trabajado","habrías trabajado","habría trabajado","habríamos trabajado","habrían trabajado"]},{"id":"subj_presente","forms":["trabaje","trabajes","trabaje","trabajemos","trabajen"]},{"id":"subj_imperfecto","forms":["trabajara","trabajaras","trabajara","trabajáramos","trabajaran"]},{"id":"subj_perfecto","forms":["haya trabajado","hayas trabajado","haya trabajado","hayamos trabajado","hayan trabajado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera trabajado","hubieras trabajado","hubiera trabajado","hubiéramos trabajado","hubieran trabajado"]},{"id":"imperativo","forms":["—","trabaja","trabaje","trabajemos","trabajen"]},{"id":"imperativo_negativo","forms":["—","no trabajes","no trabaje","no trabajemos","no trabajen"]}]},{"inf":"romper","en":"to break","irregular":false,"tenses":[{"id":"presente","forms":["rompo","rompes","rompe","rompemos","rompen"]},{"id":"preterito","forms":["rompí","rompiste","rompió","rompimos","rompieron"]},{"id":"imperfecto","forms":["rompía","rompías","rompía","rompíamos","rompían"]},{"id":"futuro","forms":["romperé","romperás","romperá","romperemos","romperán"]},{"id":"condicional","forms":["rompería","romperías","rompería","romperíamos","romperían"]},{"id":"presente_perfecto","forms":["he roto","has roto","ha roto","hemos roto","han roto"]},{"id":"pluscuamperfecto","forms":["había roto","habías roto","había roto","habíamos roto","habían roto"]},{"id":"futuro_perfecto","forms":["habré roto","habrás roto","habrá roto","habremos roto","habrán roto"]},{"id":"condicional_compuesto","forms":["habría roto","habrías roto","habría roto","habríamos roto","habrían roto"]},{"id":"subj_presente","forms":["rompa","rompas","rompa","rompamos","rompan"]},{"id":"subj_imperfecto","forms":["rompiera","rompieras","rompiera","rompiéramos","rompieran"]},{"id":"subj_perfecto","forms":["haya roto","hayas roto","haya roto","hayamos roto","hayan roto"]},{"id":"subj_pluscuamperfecto","forms":["hubiera roto","hubieras roto","hubiera roto","hubiéramos roto","hubieran roto"]},{"id":"imperativo","forms":["—","rompe","rompa","rompamos","rompan"]},{"id":"imperativo_negativo","forms":["—","no rompas","no rompa","no rompamos","no rompan"]}]},{"inf":"cumplir","en":"to meet (a deadline), to comply","irregular":false,"tenses":[{"id":"presente","forms":["cumplo","cumples","cumple","cumplimos","cumplen"]},{"id":"preterito","forms":["cumplí","cumpliste","cumplió","cumplimos","cumplieron"]},{"id":"imperfecto","forms":["cumplía","cumplías","cumplía","cumplíamos","cumplían"]},{"id":"futuro","forms":["cumpliré","cumplirás","cumplirá","cumpliremos","cumplirán"]},{"id":"condicional","forms":["cumpliría","cumplirías","cumpliría","cumpliríamos","cumplirían"]},{"id":"presente_perfecto","forms":["he cumplido","has cumplido","ha cumplido","hemos cumplido","han cumplido"]},{"id":"pluscuamperfecto","forms":["había cumplido","habías cumplido","había cumplido","habíamos cumplido","habían cumplido"]},{"id":"futuro_perfecto","forms":["habré cumplido","habrás cumplido","habrá cumplido","habremos cumplido","habrán cumplido"]},{"id":"condicional_compuesto","forms":["habría cumplido","habrías cumplido","habría cumplido","habríamos cumplido","habrían cumplido"]},{"id":"subj_presente","forms":["cumpla","cumplas","cumpla","cumplamos","cumplan"]},{"id":"subj_imperfecto","forms":["cumpliera","cumplieras","cumpliera","cumpliéramos","cumplieran"]},{"id":"subj_perfecto","forms":["haya cumplido","hayas cumplido","haya cumplido","hayamos cumplido","hayan cumplido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera cumplido","hubieras cumplido","hubiera cumplido","hubiéramos cumplido","hubieran cumplido"]},{"id":"imperativo","forms":["—","cumple","cumpla","cumplamos","cumplan"]},{"id":"imperativo_negativo","forms":["—","no cumplas","no cumpla","no cumplamos","no cumplan"]}]},{"inf":"ser","en":"to be (essence)","irregular":true,"tenses":[{"id":"presente","forms":["soy","eres","es","somos","son"]},{"id":"preterito","forms":["fui","fuiste","fue","fuimos","fueron"]},{"id":"imperfecto","forms":["era","eras","era","éramos","eran"]},{"id":"futuro","forms":["seré","serás","será","seremos","serán"]},{"id":"condicional","forms":["sería","serías","sería","seríamos","serían"]},{"id":"presente_perfecto","forms":["he sido","has sido","ha sido","hemos sido","han sido"]},{"id":"pluscuamperfecto","forms":["había sido","habías sido","había sido","habíamos sido","habían sido"]},{"id":"futuro_perfecto","forms":["habré sido","habrás sido","habrá sido","habremos sido","habrán sido"]},{"id":"condicional_compuesto","forms":["habría sido","habrías sido","habría sido","habríamos sido","habrían sido"]},{"id":"subj_presente","forms":["sea","seas","sea","seamos","sean"]},{"id":"subj_imperfecto","forms":["fuera","fueras","fuera","fuéramos","fueran"]},{"id":"subj_perfecto","forms":["haya sido","hayas sido","haya sido","hayamos sido","hayan sido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera sido","hubieras sido","hubiera sido","hubiéramos sido","hubieran sido"]},{"id":"imperativo","forms":["—","sé","sea","seamos","sean"]},{"id":"imperativo_negativo","forms":["—","no seas","no sea","no seamos","no sean"]}]},{"inf":"estar","en":"to be (state, location)","irregular":true,"tenses":[{"id":"presente","forms":["estoy","estás","está","estamos","están"]},{"id":"preterito","forms":["estuve","estuviste","estuvo","estuvimos","estuvieron"]},{"id":"imperfecto","forms":["estaba","estabas","estaba","estábamos","estaban"]},{"id":"futuro","forms":["estaré","estarás","estará","estaremos","estarán"]},{"id":"condicional","forms":["estaría","estarías","estaría","estaríamos","estarían"]},{"id":"presente_perfecto","forms":["he estado","has estado","ha estado","hemos estado","han estado"]},{"id":"pluscuamperfecto","forms":["había estado","habías estado","había estado","habíamos estado","habían estado"]},{"id":"futuro_perfecto","forms":["habré estado","habrás estado","habrá estado","habremos estado","habrán estado"]},{"id":"condicional_compuesto","forms":["habría estado","habrías estado","habría estado","habríamos estado","habrían estado"]},{"id":"subj_presente","forms":["esté","estés","esté","estemos","estén"]},{"id":"subj_imperfecto","forms":["estuviera","estuvieras","estuviera","estuviéramos","estuvieran"]},{"id":"subj_perfecto","forms":["haya estado","hayas estado","haya estado","hayamos estado","hayan estado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera estado","hubieras estado","hubiera estado","hubiéramos estado","hubieran estado"]},{"id":"imperativo","forms":["—","está","esté","estemos","estén"]},{"id":"imperativo_negativo","forms":["—","no estés","no esté","no estemos","no estén"]}]},{"inf":"ir","en":"to go","irregular":true,"tenses":[{"id":"presente","forms":["voy","vas","va","vamos","van"]},{"id":"preterito","forms":["fui","fuiste","fue","fuimos","fueron"]},{"id":"imperfecto","forms":["iba","ibas","iba","íbamos","iban"]},{"id":"futuro","forms":["iré","irás","irá","iremos","irán"]},{"id":"condicional","forms":["iría","irías","iría","iríamos","irían"]},{"id":"presente_perfecto","forms":["he ido","has ido","ha ido","hemos ido","han ido"]},{"id":"pluscuamperfecto","forms":["había ido","habías ido","había ido","habíamos ido","habían ido"]},{"id":"futuro_perfecto","forms":["habré ido","habrás ido","habrá ido","habremos ido","habrán ido"]},{"id":"condicional_compuesto","forms":["habría ido","habrías ido","habría ido","habríamos ido","habrían ido"]},{"id":"subj_presente","forms":["vaya","vayas","vaya","vayamos","vayan"]},{"id":"subj_imperfecto","forms":["fuera","fueras","fuera","fuéramos","fueran"]},{"id":"subj_perfecto","forms":["haya ido","hayas ido","haya ido","hayamos ido","hayan ido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera ido","hubieras ido","hubiera ido","hubiéramos ido","hubieran ido"]},{"id":"imperativo","forms":["—","ve","vaya","vayamos","vayan"]},{"id":"imperativo_negativo","forms":["—","no vayas","no vaya","no vayamos","no vayan"]}]},{"inf":"tener","en":"to have","irregular":true,"tenses":[{"id":"presente","forms":["tengo","tienes","tiene","tenemos","tienen"]},{"id":"preterito","forms":["tuve","tuviste","tuvo","tuvimos","tuvieron"]},{"id":"imperfecto","forms":["tenía","tenías","tenía","teníamos","tenían"]},{"id":"futuro","forms":["tendré","tendrás","tendrá","tendremos","tendrán"]},{"id":"condicional","forms":["tendría","tendrías","tendría","tendríamos","tendrían"]},{"id":"presente_perfecto","forms":["he tenido","has tenido","ha tenido","hemos tenido","han tenido"]},{"id":"pluscuamperfecto","forms":["había tenido","habías tenido","había tenido","habíamos tenido","habían tenido"]},{"id":"futuro_perfecto","forms":["habré tenido","habrás tenido","habrá tenido","habremos tenido","habrán tenido"]},{"id":"condicional_compuesto","forms":["habría tenido","habrías tenido","habría tenido","habríamos tenido","habrían tenido"]},{"id":"subj_presente","forms":["tenga","tengas","tenga","tengamos","tengan"]},{"id":"subj_imperfecto","forms":["tuviera","tuvieras","tuviera","tuviéramos","tuvieran"]},{"id":"subj_perfecto","forms":["haya tenido","hayas tenido","haya tenido","hayamos tenido","hayan tenido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera tenido","hubieras tenido","hubiera tenido","hubiéramos tenido","hubieran tenido"]},{"id":"imperativo","forms":["—","ten","tenga","tengamos","tengan"]},{"id":"imperativo_negativo","forms":["—","no tengas","no tenga","no tengamos","no tengan"]}]},{"inf":"hacer","en":"to do, to make","irregular":true,"tenses":[{"id":"presente","forms":["hago","haces","hace","hacemos","hacen"]},{"id":"preterito","forms":["hice","hiciste","hizo","hicimos","hicieron"]},{"id":"imperfecto","forms":["hacía","hacías","hacía","hacíamos","hacían"]},{"id":"futuro","forms":["haré","harás","hará","haremos","harán"]},{"id":"condicional","forms":["haría","harías","haría","haríamos","harían"]},{"id":"presente_perfecto","forms":["he hecho","has hecho","ha hecho","hemos hecho","han hecho"]},{"id":"pluscuamperfecto","forms":["había hecho","habías hecho","había hecho","habíamos hecho","habían hecho"]},{"id":"futuro_perfecto","forms":["habré hecho","habrás hecho","habrá hecho","habremos hecho","habrán hecho"]},{"id":"condicional_compuesto","forms":["habría hecho","habrías hecho","habría hecho","habríamos hecho","habrían hecho"]},{"id":"subj_presente","forms":["haga","hagas","haga","hagamos","hagan"]},{"id":"subj_imperfecto","forms":["hiciera","hicieras","hiciera","hiciéramos","hicieran"]},{"id":"subj_perfecto","forms":["haya hecho","hayas hecho","haya hecho","hayamos hecho","hayan hecho"]},{"id":"subj_pluscuamperfecto","forms":["hubiera hecho","hubieras hecho","hubiera hecho","hubiéramos hecho","hubieran hecho"]},{"id":"imperativo","forms":["—","haz","haga","hagamos","hagan"]},{"id":"imperativo_negativo","forms":["—","no hagas","no haga","no hagamos","no hagan"]}]},{"inf":"poder","en":"to be able to","irregular":true,"tenses":[{"id":"presente","forms":["puedo","puedes","puede","podemos","pueden"]},{"id":"preterito","forms":["pude","pudiste","pudo","pudimos","pudieron"]},{"id":"imperfecto","forms":["podía","podías","podía","podíamos","podían"]},{"id":"futuro","forms":["podré","podrás","podrá","podremos","podrán"]},{"id":"condicional","forms":["podría","podrías","podría","podríamos","podrían"]},{"id":"presente_perfecto","forms":["he podido","has podido","ha podido","hemos podido","han podido"]},{"id":"pluscuamperfecto","forms":["había podido","habías podido","había podido","habíamos podido","habían podido"]},{"id":"futuro_perfecto","forms":["habré podido","habrás podido","habrá podido","habremos podido","habrán podido"]},{"id":"condicional_compuesto","forms":["habría podido","habrías podido","habría podido","habríamos podido","habrían podido"]},{"id":"subj_presente","forms":["pueda","puedas","pueda","podamos","puedan"]},{"id":"subj_imperfecto","forms":["pudiera","pudieras","pudiera","pudiéramos","pudieran"]},{"id":"subj_perfecto","forms":["haya podido","hayas podido","haya podido","hayamos podido","hayan podido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera podido","hubieras podido","hubiera podido","hubiéramos podido","hubieran podido"]},{"id":"imperativo","forms":["—","puede","pueda","podamos","puedan"]},{"id":"imperativo_negativo","forms":["—","no puedas","no pueda","no podamos","no puedan"]}]},{"inf":"decir","en":"to say, to tell","irregular":true,"tenses":[{"id":"presente","forms":["digo","dices","dice","decimos","dicen"]},{"id":"preterito","forms":["dije","dijiste","dijo","dijimos","dijeron"]},{"id":"imperfecto","forms":["decía","decías","decía","decíamos","decían"]},{"id":"futuro","forms":["diré","dirás","dirá","diremos","dirán"]},{"id":"condicional","forms":["diría","dirías","diría","diríamos","dirían"]},{"id":"presente_perfecto","forms":["he dicho","has dicho","ha dicho","hemos dicho","han dicho"]},{"id":"pluscuamperfecto","forms":["había dicho","habías dicho","había dicho","habíamos dicho","habían dicho"]},{"id":"futuro_perfecto","forms":["habré dicho","habrás dicho","habrá dicho","habremos dicho","habrán dicho"]},{"id":"condicional_compuesto","forms":["habría dicho","habrías dicho","habría dicho","habríamos dicho","habrían dicho"]},{"id":"subj_presente","forms":["diga","digas","diga","digamos","digan"]},{"id":"subj_imperfecto","forms":["dijera","dijeras","dijera","dijéramos","dijeran"]},{"id":"subj_perfecto","forms":["haya dicho","hayas dicho","haya dicho","hayamos dicho","hayan dicho"]},{"id":"subj_pluscuamperfecto","forms":["hubiera dicho","hubieras dicho","hubiera dicho","hubiéramos dicho","hubieran dicho"]},{"id":"imperativo","forms":["—","di","diga","digamos","digan"]},{"id":"imperativo_negativo","forms":["—","no digas","no diga","no digamos","no digan"]}]},{"inf":"venir","en":"to come","irregular":true,"tenses":[{"id":"presente","forms":["vengo","vienes","viene","venimos","vienen"]},{"id":"preterito","forms":["vine","viniste","vino","vinimos","vinieron"]},{"id":"imperfecto","forms":["venía","venías","venía","veníamos","venían"]},{"id":"futuro","forms":["vendré","vendrás","vendrá","vendremos","vendrán"]},{"id":"condicional","forms":["vendría","vendrías","vendría","vendríamos","vendrían"]},{"id":"presente_perfecto","forms":["he venido","has venido","ha venido","hemos venido","han venido"]},{"id":"pluscuamperfecto","forms":["había venido","habías venido","había venido","habíamos venido","habían venido"]},{"id":"futuro_perfecto","forms":["habré venido","habrás venido","habrá venido","habremos venido","habrán venido"]},{"id":"condicional_compuesto","forms":["habría venido","habrías venido","habría venido","habríamos venido","habrían venido"]},{"id":"subj_presente","forms":["venga","vengas","venga","vengamos","vengan"]},{"id":"subj_imperfecto","forms":["viniera","vinieras","viniera","viniéramos","vinieran"]},{"id":"subj_perfecto","forms":["haya venido","hayas venido","haya venido","hayamos venido","hayan venido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera venido","hubieras venido","hubiera venido","hubiéramos venido","hubieran venido"]},{"id":"imperativo","forms":["—","ven","venga","vengamos","vengan"]},{"id":"imperativo_negativo","forms":["—","no vengas","no venga","no vengamos","no vengan"]}]},{"inf":"saber","en":"to know (a fact)","irregular":true,"tenses":[{"id":"presente","forms":["sé","sabes","sabe","sabemos","saben"]},{"id":"preterito","forms":["supe","supiste","supo","supimos","supieron"]},{"id":"imperfecto","forms":["sabía","sabías","sabía","sabíamos","sabían"]},{"id":"futuro","forms":["sabré","sabrás","sabrá","sabremos","sabrán"]},{"id":"condicional","forms":["sabría","sabrías","sabría","sabríamos","sabrían"]},{"id":"presente_perfecto","forms":["he sabido","has sabido","ha sabido","hemos sabido","han sabido"]},{"id":"pluscuamperfecto","forms":["había sabido","habías sabido","había sabido","habíamos sabido","habían sabido"]},{"id":"futuro_perfecto","forms":["habré sabido","habrás sabido","habrá sabido","habremos sabido","habrán sabido"]},{"id":"condicional_compuesto","forms":["habría sabido","habrías sabido","habría sabido","habríamos sabido","habrían sabido"]},{"id":"subj_presente","forms":["sepa","sepas","sepa","sepamos","sepan"]},{"id":"subj_imperfecto","forms":["supiera","supieras","supiera","supiéramos","supieran"]},{"id":"subj_perfecto","forms":["haya sabido","hayas sabido","haya sabido","hayamos sabido","hayan sabido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera sabido","hubieras sabido","hubiera sabido","hubiéramos sabido","hubieran sabido"]},{"id":"imperativo","forms":["—","sabe","sepa","sepamos","sepan"]},{"id":"imperativo_negativo","forms":["—","no sepas","no sepa","no sepamos","no sepan"]}]},{"inf":"dar","en":"to give","irregular":true,"tenses":[{"id":"presente","forms":["doy","das","da","damos","dan"]},{"id":"preterito","forms":["di","diste","dio","dimos","dieron"]},{"id":"imperfecto","forms":["daba","dabas","daba","dábamos","daban"]},{"id":"futuro","forms":["daré","darás","dará","daremos","darán"]},{"id":"condicional","forms":["daría","darías","daría","daríamos","darían"]},{"id":"presente_perfecto","forms":["he dado","has dado","ha dado","hemos dado","han dado"]},{"id":"pluscuamperfecto","forms":["había dado","habías dado","había dado","habíamos dado","habían dado"]},{"id":"futuro_perfecto","forms":["habré dado","habrás dado","habrá dado","habremos dado","habrán dado"]},{"id":"condicional_compuesto","forms":["habría dado","habrías dado","habría dado","habríamos dado","habrían dado"]},{"id":"subj_presente","forms":["dé","des","dé","demos","den"]},{"id":"subj_imperfecto","forms":["diera","dieras","diera","diéramos","dieran"]},{"id":"subj_perfecto","forms":["haya dado","hayas dado","haya dado","hayamos dado","hayan dado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera dado","hubieras dado","hubiera dado","hubiéramos dado","hubieran dado"]},{"id":"imperativo","forms":["—","da","dé","demos","den"]},{"id":"imperativo_negativo","forms":["—","no des","no dé","no demos","no den"]}]},{"inf":"ver","en":"to see","irregular":true,"tenses":[{"id":"presente","forms":["veo","ves","ve","vemos","ven"]},{"id":"preterito","forms":["vi","viste","vio","vimos","vieron"]},{"id":"imperfecto","forms":["veía","veías","veía","veíamos","veían"]},{"id":"futuro","forms":["veré","verás","verá","veremos","verán"]},{"id":"condicional","forms":["vería","verías","vería","veríamos","verían"]},{"id":"presente_perfecto","forms":["he visto","has visto","ha visto","hemos visto","han visto"]},{"id":"pluscuamperfecto","forms":["había visto","habías visto","había visto","habíamos visto","habían visto"]},{"id":"futuro_perfecto","forms":["habré visto","habrás visto","habrá visto","habremos visto","habrán visto"]},{"id":"condicional_compuesto","forms":["habría visto","habrías visto","habría visto","habríamos visto","habrían visto"]},{"id":"subj_presente","forms":["vea","veas","vea","veamos","vean"]},{"id":"subj_imperfecto","forms":["viera","vieras","viera","viéramos","vieran"]},{"id":"subj_perfecto","forms":["haya visto","hayas visto","haya visto","hayamos visto","hayan visto"]},{"id":"subj_pluscuamperfecto","forms":["hubiera visto","hubieras visto","hubiera visto","hubiéramos visto","hubieran visto"]},{"id":"imperativo","forms":["—","ve","vea","veamos","vean"]},{"id":"imperativo_negativo","forms":["—","no veas","no vea","no veamos","no vean"]}]},{"inf":"entregar","en":"to deliver, to hand over","irregular":false,"tenses":[{"id":"presente","forms":["entrego","entregas","entrega","entregamos","entregan"]},{"id":"preterito","forms":["entregué","entregaste","entregó","entregamos","entregaron"]},{"id":"imperfecto","forms":["entregaba","entregabas","entregaba","entregábamos","entregaban"]},{"id":"futuro","forms":["entregaré","entregarás","entregará","entregaremos","entregarán"]},{"id":"condicional","forms":["entregaría","entregarías","entregaría","entregaríamos","entregarían"]},{"id":"presente_perfecto","forms":["he entregado","has entregado","ha entregado","hemos entregado","han entregado"]},{"id":"pluscuamperfecto","forms":["había entregado","habías entregado","había entregado","habíamos entregado","habían entregado"]},{"id":"futuro_perfecto","forms":["habré entregado","habrás entregado","habrá entregado","habremos entregado","habrán entregado"]},{"id":"condicional_compuesto","forms":["habría entregado","habrías entregado","habría entregado","habríamos entregado","habrían entregado"]},{"id":"subj_presente","forms":["entregue","entregues","entregue","entreguemos","entreguen"]},{"id":"subj_imperfecto","forms":["entregara","entregaras","entregara","entregáramos","entregaran"]},{"id":"subj_perfecto","forms":["haya entregado","hayas entregado","haya entregado","hayamos entregado","hayan entregado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera entregado","hubieras entregado","hubiera entregado","hubiéramos entregado","hubieran entregado"]},{"id":"imperativo","forms":["—","entrega","entregue","entreguemos","entreguen"]},{"id":"imperativo_negativo","forms":["—","no entregues","no entregue","no entreguemos","no entreguen"]}]},{"inf":"aprobar","en":"to approve","irregular":true,"tenses":[{"id":"presente","forms":["apruebo","apruebas","aprueba","aprobamos","aprueban"]},{"id":"preterito","forms":["aprobé","aprobaste","aprobó","aprobamos","aprobaron"]},{"id":"imperfecto","forms":["aprobaba","aprobabas","aprobaba","aprobábamos","aprobaban"]},{"id":"futuro","forms":["aprobaré","aprobarás","aprobará","aprobaremos","aprobarán"]},{"id":"condicional","forms":["aprobaría","aprobarías","aprobaría","aprobaríamos","aprobarían"]},{"id":"presente_perfecto","forms":["he aprobado","has aprobado","ha aprobado","hemos aprobado","han aprobado"]},{"id":"pluscuamperfecto","forms":["había aprobado","habías aprobado","había aprobado","habíamos aprobado","habían aprobado"]},{"id":"futuro_perfecto","forms":["habré aprobado","habrás aprobado","habrá aprobado","habremos aprobado","habrán aprobado"]},{"id":"condicional_compuesto","forms":["habría aprobado","habrías aprobado","habría aprobado","habríamos aprobado","habrían aprobado"]},{"id":"subj_presente","forms":["apruebe","apruebes","apruebe","aprobemos","aprueben"]},{"id":"subj_imperfecto","forms":["aprobara","aprobaras","aprobara","aprobáramos","aprobaran"]},{"id":"subj_perfecto","forms":["haya aprobado","hayas aprobado","haya aprobado","hayamos aprobado","hayan aprobado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera aprobado","hubieras aprobado","hubiera aprobado","hubiéramos aprobado","hubieran aprobado"]},{"id":"imperativo","forms":["—","aprueba","apruebe","aprobemos","aprueben"]},{"id":"imperativo_negativo","forms":["—","no apruebes","no apruebe","no aprobemos","no aprueben"]}]},{"inf":"firmar","en":"to sign","irregular":false,"tenses":[{"id":"presente","forms":["firmo","firmas","firma","firmamos","firman"]},{"id":"preterito","forms":["firmé","firmaste","firmó","firmamos","firmaron"]},{"id":"imperfecto","forms":["firmaba","firmabas","firmaba","firmábamos","firmaban"]},{"id":"futuro","forms":["firmaré","firmarás","firmará","firmaremos","firmarán"]},{"id":"condicional","forms":["firmaría","firmarías","firmaría","firmaríamos","firmarían"]},{"id":"presente_perfecto","forms":["he firmado","has firmado","ha firmado","hemos firmado","han firmado"]},{"id":"pluscuamperfecto","forms":["había firmado","habías firmado","había firmado","habíamos firmado","habían firmado"]},{"id":"futuro_perfecto","forms":["habré firmado","habrás firmado","habrá firmado","habremos firmado","habrán firmado"]},{"id":"condicional_compuesto","forms":["habría firmado","habrías firmado","habría firmado","habríamos firmado","habrían firmado"]},{"id":"subj_presente","forms":["firme","firmes","firme","firmemos","firmen"]},{"id":"subj_imperfecto","forms":["firmara","firmaras","firmara","firmáramos","firmaran"]},{"id":"subj_perfecto","forms":["haya firmado","hayas firmado","haya firmado","hayamos firmado","hayan firmado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera firmado","hubieras firmado","hubiera firmado","hubiéramos firmado","hubieran firmado"]},{"id":"imperativo","forms":["—","firma","firme","firmemos","firmen"]},{"id":"imperativo_negativo","forms":["—","no firmes","no firme","no firmemos","no firmen"]}]},{"inf":"llegar","en":"to arrive","irregular":false,"tenses":[{"id":"presente","forms":["llego","llegas","llega","llegamos","llegan"]},{"id":"preterito","forms":["llegué","llegaste","llegó","llegamos","llegaron"]},{"id":"imperfecto","forms":["llegaba","llegabas","llegaba","llegábamos","llegaban"]},{"id":"futuro","forms":["llegaré","llegarás","llegará","llegaremos","llegarán"]},{"id":"condicional","forms":["llegaría","llegarías","llegaría","llegaríamos","llegarían"]},{"id":"presente_perfecto","forms":["he llegado","has llegado","ha llegado","hemos llegado","han llegado"]},{"id":"pluscuamperfecto","forms":["había llegado","habías llegado","había llegado","habíamos llegado","habían llegado"]},{"id":"futuro_perfecto","forms":["habré llegado","habrás llegado","habrá llegado","habremos llegado","habrán llegado"]},{"id":"condicional_compuesto","forms":["habría llegado","habrías llegado","habría llegado","habríamos llegado","habrían llegado"]},{"id":"subj_presente","forms":["llegue","llegues","llegue","lleguemos","lleguen"]},{"id":"subj_imperfecto","forms":["llegara","llegaras","llegara","llegáramos","llegaran"]},{"id":"subj_perfecto","forms":["haya llegado","hayas llegado","haya llegado","hayamos llegado","hayan llegado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera llegado","hubieras llegado","hubiera llegado","hubiéramos llegado","hubieran llegado"]},{"id":"imperativo","forms":["—","llega","llegue","lleguemos","lleguen"]},{"id":"imperativo_negativo","forms":["—","no llegues","no llegue","no lleguemos","no lleguen"]}]},{"inf":"pedir","en":"to ask for, to request","irregular":true,"tenses":[{"id":"presente","forms":["pido","pides","pide","pedimos","piden"]},{"id":"preterito","forms":["pedí","pediste","pidió","pedimos","pidieron"]},{"id":"imperfecto","forms":["pedía","pedías","pedía","pedíamos","pedían"]},{"id":"futuro","forms":["pediré","pedirás","pedirá","pediremos","pedirán"]},{"id":"condicional","forms":["pediría","pedirías","pediría","pediríamos","pedirían"]},{"id":"presente_perfecto","forms":["he pedido","has pedido","ha pedido","hemos pedido","han pedido"]},{"id":"pluscuamperfecto","forms":["había pedido","habías pedido","había pedido","habíamos pedido","habían pedido"]},{"id":"futuro_perfecto","forms":["habré pedido","habrás pedido","habrá pedido","habremos pedido","habrán pedido"]},{"id":"condicional_compuesto","forms":["habría pedido","habrías pedido","habría pedido","habríamos pedido","habrían pedido"]},{"id":"subj_presente","forms":["pida","pidas","pida","pidamos","pidan"]},{"id":"subj_imperfecto","forms":["pidiera","pidieras","pidiera","pidiéramos","pidieran"]},{"id":"subj_perfecto","forms":["haya pedido","hayas pedido","haya pedido","hayamos pedido","hayan pedido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera pedido","hubieras pedido","hubiera pedido","hubiéramos pedido","hubieran pedido"]},{"id":"imperativo","forms":["—","pide","pida","pidamos","pidan"]},{"id":"imperativo_negativo","forms":["—","no pidas","no pida","no pidamos","no pidan"]}]},{"inf":"seguir","en":"to continue, to follow","irregular":true,"tenses":[{"id":"presente","forms":["sigo","sigues","sigue","seguimos","siguen"]},{"id":"preterito","forms":["seguí","seguiste","siguió","seguimos","siguieron"]},{"id":"imperfecto","forms":["seguía","seguías","seguía","seguíamos","seguían"]},{"id":"futuro","forms":["seguiré","seguirás","seguirá","seguiremos","seguirán"]},{"id":"condicional","forms":["seguiría","seguirías","seguiría","seguiríamos","seguirían"]},{"id":"presente_perfecto","forms":["he seguido","has seguido","ha seguido","hemos seguido","han seguido"]},{"id":"pluscuamperfecto","forms":["había seguido","habías seguido","había seguido","habíamos seguido","habían seguido"]},{"id":"futuro_perfecto","forms":["habré seguido","habrás seguido","habrá seguido","habremos seguido","habrán seguido"]},{"id":"condicional_compuesto","forms":["habría seguido","habrías seguido","habría seguido","habríamos seguido","habrían seguido"]},{"id":"subj_presente","forms":["siga","sigas","siga","sigamos","sigan"]},{"id":"subj_imperfecto","forms":["siguiera","siguieras","siguiera","siguiéramos","siguieran"]},{"id":"subj_perfecto","forms":["haya seguido","hayas seguido","haya seguido","hayamos seguido","hayan seguido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera seguido","hubieras seguido","hubiera seguido","hubiéramos seguido","hubieran seguido"]},{"id":"imperativo","forms":["—","sigue","siga","sigamos","sigan"]},{"id":"imperativo_negativo","forms":["—","no sigas","no siga","no sigamos","no sigan"]}]},{"inf":"empezar","en":"to begin","irregular":true,"tenses":[{"id":"presente","forms":["empiezo","empiezas","empieza","empezamos","empiezan"]},{"id":"preterito","forms":["empecé","empezaste","empezó","empezamos","empezaron"]},{"id":"imperfecto","forms":["empezaba","empezabas","empezaba","empezábamos","empezaban"]},{"id":"futuro","forms":["empezaré","empezarás","empezará","empezaremos","empezarán"]},{"id":"condicional","forms":["empezaría","empezarías","empezaría","empezaríamos","empezarían"]},{"id":"presente_perfecto","forms":["he empezado","has empezado","ha empezado","hemos empezado","han empezado"]},{"id":"pluscuamperfecto","forms":["había empezado","habías empezado","había empezado","habíamos empezado","habían empezado"]},{"id":"futuro_perfecto","forms":["habré empezado","habrás empezado","habrá empezado","habremos empezado","habrán empezado"]},{"id":"condicional_compuesto","forms":["habría empezado","habrías empezado","habría empezado","habríamos empezado","habrían empezado"]},{"id":"subj_presente","forms":["empiece","empieces","empiece","empecemos","empiecen"]},{"id":"subj_imperfecto","forms":["empezara","empezaras","empezara","empezáramos","empezaran"]},{"id":"subj_perfecto","forms":["haya empezado","hayas empezado","haya empezado","hayamos empezado","hayan empezado"]},{"id":"subj_pluscuamperfecto","forms":["hubiera empezado","hubieras empezado","hubiera empezado","hubiéramos empezado","hubieran empezado"]},{"id":"imperativo","forms":["—","empieza","empiece","empecemos","empiecen"]},{"id":"imperativo_negativo","forms":["—","no empieces","no empiece","no empecemos","no empiecen"]}]},{"inf":"volver","en":"to return, to go back","irregular":true,"tenses":[{"id":"presente","forms":["vuelvo","vuelves","vuelve","volvemos","vuelven"]},{"id":"preterito","forms":["volví","volviste","volvió","volvimos","volvieron"]},{"id":"imperfecto","forms":["volvía","volvías","volvía","volvíamos","volvían"]},{"id":"futuro","forms":["volveré","volverás","volverá","volveremos","volverán"]},{"id":"condicional","forms":["volvería","volverías","volvería","volveríamos","volverían"]},{"id":"presente_perfecto","forms":["he vuelto","has vuelto","ha vuelto","hemos vuelto","han vuelto"]},{"id":"pluscuamperfecto","forms":["había vuelto","habías vuelto","había vuelto","habíamos vuelto","habían vuelto"]},{"id":"futuro_perfecto","forms":["habré vuelto","habrás vuelto","habrá vuelto","habremos vuelto","habrán vuelto"]},{"id":"condicional_compuesto","forms":["habría vuelto","habrías vuelto","habría vuelto","habríamos vuelto","habrían vuelto"]},{"id":"subj_presente","forms":["vuelva","vuelvas","vuelva","volvamos","vuelvan"]},{"id":"subj_imperfecto","forms":["volviera","volvieras","volviera","volviéramos","volvieran"]},{"id":"subj_perfecto","forms":["haya vuelto","hayas vuelto","haya vuelto","hayamos vuelto","hayan vuelto"]},{"id":"subj_pluscuamperfecto","forms":["hubiera vuelto","hubieras vuelto","hubiera vuelto","hubiéramos vuelto","hubieran vuelto"]},{"id":"imperativo","forms":["—","vuelve","vuelva","volvamos","vuelvan"]},{"id":"imperativo_negativo","forms":["—","no vuelvas","no vuelva","no volvamos","no vuelvan"]}]},{"inf":"construir","en":"to build","irregular":true,"tenses":[{"id":"presente","forms":["construyo","construyes","construye","construimos","construyen"]},{"id":"preterito","forms":["construí","construiste","construyó","construimos","construyeron"]},{"id":"imperfecto","forms":["construía","construías","construía","construíamos","construían"]},{"id":"futuro","forms":["construiré","construirás","construirá","construiremos","construirán"]},{"id":"condicional","forms":["construiría","construirías","construiría","construiríamos","construirían"]},{"id":"presente_perfecto","forms":["he construido","has construido","ha construido","hemos construido","han construido"]},{"id":"pluscuamperfecto","forms":["había construido","habías construido","había construido","habíamos construido","habían construido"]},{"id":"futuro_perfecto","forms":["habré construido","habrás construido","habrá construido","habremos construido","habrán construido"]},{"id":"condicional_compuesto","forms":["habría construido","habrías construido","habría construido","habríamos construido","habrían construido"]},{"id":"subj_presente","forms":["construya","construyas","construya","construyamos","construyan"]},{"id":"subj_imperfecto","forms":["construyera","construyeras","construyera","construyéramos","construyeran"]},{"id":"subj_perfecto","forms":["haya construido","hayas construido","haya construido","hayamos construido","hayan construido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera construido","hubieras construido","hubiera construido","hubiéramos construido","hubieran construido"]},{"id":"imperativo","forms":["—","construye","construya","construyamos","construyan"]},{"id":"imperativo_negativo","forms":["—","no construyas","no construya","no construyamos","no construyan"]}]},{"inf":"conseguir","en":"to obtain, to manage to","irregular":true,"tenses":[{"id":"presente","forms":["consigo","consigues","consigue","conseguimos","consiguen"]},{"id":"preterito","forms":["conseguí","conseguiste","consiguió","conseguimos","consiguieron"]},{"id":"imperfecto","forms":["conseguía","conseguías","conseguía","conseguíamos","conseguían"]},{"id":"futuro","forms":["conseguiré","conseguirás","conseguirá","conseguiremos","conseguirán"]},{"id":"condicional","forms":["conseguiría","conseguirías","conseguiría","conseguiríamos","conseguirían"]},{"id":"presente_perfecto","forms":["he conseguido","has conseguido","ha conseguido","hemos conseguido","han conseguido"]},{"id":"pluscuamperfecto","forms":["había conseguido","habías conseguido","había conseguido","habíamos conseguido","habían conseguido"]},{"id":"futuro_perfecto","forms":["habré conseguido","habrás conseguido","habrá conseguido","habremos conseguido","habrán conseguido"]},{"id":"condicional_compuesto","forms":["habría conseguido","habrías conseguido","habría conseguido","habríamos conseguido","habrían conseguido"]},{"id":"subj_presente","forms":["consiga","consigas","consiga","consigamos","consigan"]},{"id":"subj_imperfecto","forms":["consiguiera","consiguieras","consiguiera","consiguiéramos","consiguieran"]},{"id":"subj_perfecto","forms":["haya conseguido","hayas conseguido","haya conseguido","hayamos conseguido","hayan conseguido"]},{"id":"subj_pluscuamperfecto","forms":["hubiera conseguido","hubieras conseguido","hubiera conseguido","hubiéramos conseguido","hubieran conseguido"]},{"id":"imperativo","forms":["—","consigue","consiga","consigamos","consigan"]},{"id":"imperativo_negativo","forms":["—","no consigas","no consiga","no consigamos","no consigan"]}]}],"vocab":[{"term":"sin embargo","gloss":"however","category":"connector","level":"B1","example":"El diseño está aprobado; sin embargo, el presupuesto sigue en revisión."},{"term":"no obstante","gloss":"nevertheless (formal)","category":"connector","level":"B2","example":"No obstante lo acordado en el acta, el proveedor cambió la especificación."},{"term":"por lo tanto","gloss":"therefore","category":"connector","level":"B1","example":"El proveedor no confirmó la fecha; por lo tanto, reprogramamos el vaciado."},{"term":"en consecuencia","gloss":"consequently (formal)","category":"connector","level":"B2","example":"Se detectó una interferencia en la losa; en consecuencia, se detuvo el encofrado."},{"term":"siempre y cuando","gloss":"provided that","category":"connector","level":"B2","example":"Empezamos el lunes siempre y cuando el cliente confirme el presupuesto."},{"term":"a raíz de","gloss":"as a result of, stemming from","category":"connector","level":"B2","example":"A raíz de la observación de la supervisión, rehicimos el cálculo estructural."},{"term":"en la medida en que","gloss":"insofar as, to the extent that","category":"connector","level":"B2","example":"Podemos comprimir el plazo en la medida en que se libere el frente de trabajo."},{"term":"dado que","gloss":"given that","category":"connector","level":"B2","example":"Dado que el expediente está incompleto, la valorización queda observada."},{"term":"a su vez","gloss":"in turn","category":"connector","level":"B2","example":"El retraso afecta al montaje, y este a su vez a las pruebas de operación."},{"term":"de ahí que","gloss":"hence (takes the subjunctive)","category":"connector","level":"B2","example":"El terreno resultó más blando de lo previsto; de ahí que reforcemos la cimentación."},{"term":"ahora bien","gloss":"that said","category":"connector","level":"B2","example":"El avance físico va bien. Ahora bien, la curva de costos preocupa."},{"term":"en cuanto a","gloss":"as regards","category":"connector","level":"B1","example":"En cuanto a la seguridad, cerramos las tres observaciones de la semana pasada."},{"term":"la valorización","gloss":"progress valuation / payment application","category":"work_noun","level":"B2","example":"Presentamos la valorización del mes con el metrado verificado en campo."},{"term":"la adenda","gloss":"contract addendum","category":"work_noun","level":"B2","example":"La ampliación de plazo se formalizó mediante una adenda al contrato."},{"term":"el adicional","gloss":"variation, change order","category":"work_noun","level":"B2","example":"El adicional por mayores metrados todavía no cuenta con aprobación."},{"term":"la penalidad","gloss":"liquidated damages, contractual penalty","category":"work_noun","level":"B2","example":"El contrato prevé una penalidad diaria por cada día de atraso en la entrega."},{"term":"el expediente técnico","gloss":"technical dossier, design package","category":"work_noun","level":"B2","example":"El expediente técnico se entregó con los planos y la memoria de cálculo."},{"term":"el acta de conformidad","gloss":"sign-off certificate","category":"work_noun","level":"B2","example":"No podemos facturar sin el acta de conformidad firmada por la supervisión."},{"term":"la partida","gloss":"line item, work package","category":"work_noun","level":"B2","example":"La partida de instalaciones eléctricas quedó fuera del alcance original."},{"term":"el metrado","gloss":"quantity take-off","category":"work_noun","level":"B2","example":"Revisamos el metrado antes de facturar para evitar una observación."},{"term":"el alcance","gloss":"scope","category":"work_noun","level":"B1","example":"Cualquier cambio de alcance debe quedar registrado por escrito."},{"term":"la observación","gloss":"formal objection, snag","category":"work_noun","level":"B2","example":"La supervisión levantó dos observaciones sobre el acabado de la fachada."},{"term":"el plazo","gloss":"deadline, term","category":"work_noun","level":"B1","example":"El plazo contractual vence a fin de mes y el frente sigue abierto."},{"term":"la licitación","gloss":"tender, bidding process","category":"work_noun","level":"B2","example":"La licitación se declaró desierta porque ningún postor cumplió los requisitos."},{"term":"el postor","gloss":"bidder","category":"work_noun","level":"B2","example":"Solo dos postores presentaron propuesta técnica y económica."},{"term":"la contingencia","gloss":"contingency (budget or risk)","category":"work_noun","level":"B2","example":"Usamos la contingencia para cubrir el sobrecosto del acero."},{"term":"el sobrecosto","gloss":"cost overrun","category":"work_noun","level":"B2","example":"El sobrecosto se explica por la variación del precio del concreto."},{"term":"el vaciado","gloss":"concrete pour","category":"work_noun","level":"B1","example":"El vaciado de la losa se programó para el jueves a primera hora."},{"term":"el encofrado","gloss":"formwork","category":"work_noun","level":"B1","example":"La cuadrilla de encofrado necesita dos días más en el segundo nivel."},{"term":"la cimentación","gloss":"foundations","category":"work_noun","level":"B1","example":"Reforzamos la cimentación después del estudio de suelos."},{"term":"la cuadrilla","gloss":"work crew","category":"work_noun","level":"B1","example":"La cuadrilla quedó parada porque no llegó el concreto."},{"term":"el capataz","gloss":"foreman","category":"work_noun","level":"B1","example":"El capataz reportó una interferencia entre la tubería y la viga."},{"term":"la movilización","gloss":"mobilisation to site","category":"work_noun","level":"B2","example":"La movilización de equipos es una partida facturable del contrato."},{"term":"el frente de trabajo","gloss":"work front, available work area","category":"work_noun","level":"B2","example":"No podemos avanzar hasta que el cliente libere el frente de trabajo."},{"term":"la interferencia","gloss":"clash (between services)","category":"work_noun","level":"B2","example":"Detectamos una interferencia entre el ducto y la estructura metálica."},{"term":"subsanar","gloss":"to remedy, to put right (a defect or objection)","category":"verb_pattern","level":"B2","example":"Tenemos cinco días hábiles para subsanar las observaciones."},{"term":"incumplir","gloss":"to breach, to fail to meet","category":"verb_pattern","level":"B2","example":"El proveedor incumplió el plazo de entrega por tercera vez."},{"term":"reprogramar","gloss":"to reschedule","category":"verb_pattern","level":"B1","example":"Reprogramamos la reunión de coordinación para el viernes."},{"term":"sustentar","gloss":"to substantiate, to back up with evidence","category":"verb_pattern","level":"B2","example":"Hay que sustentar el adicional con el metrado y las fotos de campo."},{"term":"agilizar","gloss":"to speed up, to expedite","category":"verb_pattern","level":"B2","example":"Pedimos a la supervisión agilizar la revisión del expediente."},{"term":"prever","gloss":"to foresee, to make provision for","category":"verb_pattern","level":"B2","example":"El cronograma no previó la temporada de lluvias."},{"term":"aprobar","gloss":"to approve","category":"verb_pattern","level":"A2","example":"El supervisor aprobó el cambio de especificación el martes."},{"term":"levantar una observación","gloss":"to raise — or to clear — a formal objection","category":"set_phrase","level":"B2","example":"Levantamos la observación con el ensayo de resistencia del concreto."},{"term":"dar por cerrado","gloss":"to consider closed","category":"set_phrase","level":"B2","example":"Damos por cerrado el punto una vez que llegue el acta firmada."},{"term":"quedar pendiente","gloss":"to remain outstanding","category":"set_phrase","level":"B1","example":"Queda pendiente la confirmación del proveedor de encofrados."},{"term":"estar a cargo de","gloss":"to be in charge of","category":"set_phrase","level":"B1","example":"El ingeniero residente está a cargo de la coordinación con la municipalidad."},{"term":"hacer seguimiento","gloss":"to follow up on","category":"set_phrase","level":"B1","example":"Voy a hacer seguimiento a la consulta que enviamos hace dos semanas."},{"term":"tomar una decisión","gloss":"to make a decision (never «hacer»)","category":"collocation","level":"B1","example":"El comité tomó la decisión de postergar el inicio de obra."},{"term":"dar seguimiento","gloss":"to monitor, to track","category":"collocation","level":"B2","example":"Damos seguimiento semanal al avance físico y financiero."},{"term":"llevar a cabo","gloss":"to carry out","category":"collocation","level":"B2","example":"Llevamos a cabo la prueba de estanqueidad el mismo día del vaciado."},{"term":"poner en marcha","gloss":"to set in motion, to commission","category":"collocation","level":"B2","example":"Pusimos en marcha el sistema contra incendios tras las pruebas."},{"term":"plantear una propuesta","gloss":"to put forward a proposal","category":"collocation","level":"B2","example":"Planteamos una propuesta alternativa para reducir el sobrecosto."},{"term":"asumir el costo","gloss":"to absorb the cost","category":"collocation","level":"B2","example":"El contratista asumió el costo del reproceso por su propio error."},{"term":"ceñirse al presupuesto","gloss":"to stick to the budget","category":"collocation","level":"B2","example":"Nos ceñimos al presupuesto aprobado pese a la variación de precios."},{"term":"actualmente","gloss":"currently — NOT \"actually\"","category":"false_friend","level":"B1","example":"Actualmente estamos en la etapa de acabados, no en estructura."},{"term":"eventualmente","gloss":"possibly, if the case arises — NOT \"eventually\"","category":"false_friend","level":"B2","example":"Eventualmente podríamos necesitar una segunda grúa, según el avance."},{"term":"realizar","gloss":"to carry out — NOT \"to realise\" (that is «darse cuenta»)","category":"false_friend","level":"B1","example":"Realizamos la inspección conjunta el miércoles por la mañana."},{"term":"asistir a","gloss":"to attend — NOT \"to assist\"","category":"false_friend","level":"B1","example":"Asistí a la reunión de coordinación en representación del consorcio."},{"term":"la carpeta","gloss":"folder — NOT \"carpet\"","category":"false_friend","level":"A2","example":"Los planos actualizados están en la carpeta compartida del proyecto."},{"term":"sensible","gloss":"sensitive — NOT \"sensible\" (that is «sensato»)","category":"false_friend","level":"B2","example":"El cronograma es sensible a cualquier retraso en la procura."},{"term":"la firma","gloss":"signature, or a firm — NOT \"firm\" as an adjective","category":"false_friend","level":"B1","example":"Falta la firma del residente en el acta de conformidad."},{"term":"discutir","gloss":"to argue as often as to discuss — «conversar» is the safer verb","category":"false_friend","level":"B2","example":"No queremos discutir con el cliente; queremos conversar el punto en la reunión."},{"term":"comprometerse","gloss":"to commit oneself — NOT \"to compromise\"","category":"false_friend","level":"B2","example":"El proveedor se comprometió a entregar el material antes del vaciado."},{"term":"la agenda","gloss":"diary as well as meeting agenda","category":"false_friend","level":"B1","example":"Envío la agenda de la reunión con los cuatro puntos a tratar."},{"term":"en principio","gloss":"in principle, as things stand","category":"set_phrase","level":"B2","example":"En principio mantenemos la fecha, aunque depende de la procura."},{"term":"habría que","gloss":"one would have to (impersonal, softened)","category":"set_phrase","level":"B2","example":"Habría que revisar el metrado antes de comprometer una cifra."},{"term":"cabe señalar","gloss":"it is worth pointing out","category":"set_phrase","level":"B2","example":"Cabe señalar que la demora se originó en la entrega de información."},{"term":"salvo que","gloss":"unless (takes the subjunctive)","category":"set_phrase","level":"B2","example":"Mantenemos el cronograma salvo que el cliente modifique el alcance."},{"term":"a la brevedad","gloss":"as soon as possible (formal)","category":"set_phrase","level":"B2","example":"Agradeceré su respuesta a la brevedad para no afectar el plazo."},{"term":"por nuestra parte","gloss":"for our part","category":"set_phrase","level":"B2","example":"Por nuestra parte, el expediente quedó entregado dentro del plazo."},{"term":"a fin de que","gloss":"so that (+ subjunctive)","category":"connector","level":"B2","example":"Enviamos el expediente hoy a fin de que el cliente lo revise antes del comité."},{"term":"siempre que","gloss":"as long as, provided (+ subjunctive)","category":"connector","level":"B2","example":"Podemos adelantar la partida siempre que se libere el frente."},{"term":"por consiguiente","gloss":"consequently (formal register)","category":"connector","level":"B2","example":"No se levantaron las observaciones; por consiguiente, la valorización queda en suspenso."},{"term":"en todo caso","gloss":"in any case, at any rate","category":"connector","level":"B1","example":"En todo caso, dejaremos constancia en el acta antes de retirarnos."},{"term":"pese a que","gloss":"despite the fact that","category":"connector","level":"B2","example":"Pese a que el plazo se mantiene, el riesgo de penalidad sigue vigente."},{"term":"el hito","gloss":"milestone","category":"work_noun","level":"B2","example":"El siguiente hito contractual es la entrega del casco estructural."},{"term":"la holgura","gloss":"float, slack (in a schedule)","category":"work_noun","level":"B2","example":"La ruta crítica ya no tiene holgura; cualquier retraso se traslada a la entrega."},{"term":"la ruta crítica","gloss":"critical path","category":"work_noun","level":"B2","example":"El montaje de estructura entró a la ruta crítica tras el retraso del acero."},{"term":"el entregable","gloss":"deliverable","category":"work_noun","level":"B2","example":"El entregable de esta etapa es el expediente técnico completo."},{"term":"el replanteo","gloss":"setting out, staking out","category":"work_noun","level":"B2","example":"El replanteo topográfico se ejecutó antes del vaciado de cimientos."},{"term":"la subsanación","gloss":"remedying, correction of defects","category":"work_noun","level":"C1","example":"La subsanación de observaciones tiene un plazo de diez días hábiles."},{"term":"el precedente","gloss":"precedent","category":"work_noun","level":"B2","example":"Aceptar ese cambio sin adenda sentaría un precedente incómodo."},{"term":"la salvedad","gloss":"caveat, qualification","category":"work_noun","level":"C1","example":"Firmamos el acta con la salvedad de que el metrado será revisado."},{"term":"el respaldo","gloss":"backing, supporting documentation","category":"work_noun","level":"B2","example":"El adicional requiere respaldo técnico y sustento de costos."},{"term":"el sustento","gloss":"justification, supporting evidence","category":"work_noun","level":"B2","example":"Presentamos el sustento del mayor metrado con planos as-built."},{"term":"el vencimiento","gloss":"expiry, due date","category":"work_noun","level":"B1","example":"El vencimiento de la carta fianza es el treinta de noviembre."},{"term":"deslindar responsabilidades","gloss":"to establish who is responsible","category":"collocation","level":"C1","example":"Antes de asumir el costo conviene deslindar responsabilidades por escrito."},{"term":"dejar constancia","gloss":"to place on record","category":"collocation","level":"B2","example":"Dejamos constancia en el acta de que el frente no estaba liberado."},{"term":"levantar observaciones","gloss":"to close out defects","category":"collocation","level":"B2","example":"La cuadrilla levantó las observaciones en menos de una semana."},{"term":"liberar el frente","gloss":"to release the work face","category":"collocation","level":"B2","example":"No podemos iniciar el montaje hasta que liberen el frente."},{"term":"incurrir en","gloss":"to incur (a cost, a delay, a breach)","category":"verb_pattern","level":"C1","example":"El proyecto incurrió en un retraso de veintidós días calendario."},{"term":"ceñirse a","gloss":"to stick to, to adhere to","category":"verb_pattern","level":"C1","example":"Nos ceñimos a lo establecido en el expediente técnico."},{"term":"constatar","gloss":"to verify on site, to ascertain","category":"verb_pattern","level":"C1","example":"Constatamos en campo que el acero colocado corresponde al plano."},{"term":"obedecer a","gloss":"to be due to (a cause)","category":"verb_pattern","level":"C1","example":"El retraso obedece a la demora en la aprobación del adicional."},{"term":"trasladar","gloss":"to pass on (a cost, a delay)","category":"verb_pattern","level":"B2","example":"Cualquier retraso adicional se traslada directamente a la fecha de entrega."},{"term":"asistir","gloss":"to attend — NOT \"to assist\"","category":"false_friend","level":"B1","example":"Asistí a la reunión de coordinación. («To assist» is «ayudar».)"},{"term":"pretender","gloss":"to intend, to aim to — NOT \"to pretend\"","category":"false_friend","level":"B2","example":"Pretendemos cerrar la partida esta semana. («To pretend» is «fingir».)"},{"term":"la conducta","gloss":"behaviour — NOT \"conduct (a pipe)\"","category":"false_friend","level":"B2","example":"La conducta del subcontratista en obra fue observada. (A duct is «el ducto».)"},{"term":"soportar","gloss":"to bear, to withstand — NOT \"to support (an idea)\"","category":"false_friend","level":"B2","example":"La viga soporta la carga prevista. (To back a proposal is «respaldar».)"},{"term":"quisiera plantear un punto","gloss":"I would like to raise a point","category":"set_phrase","level":"B2","example":"Antes de cerrar el acta, quisiera plantear un punto sobre el metrado."},{"term":"si me permite","gloss":"if I may","category":"set_phrase","level":"B2","example":"Si me permite, hay un tema de interferencias que conviene revisar."},{"term":"en aras de","gloss":"for the sake of","category":"set_phrase","level":"C1","example":"En aras de cumplir el plazo, proponemos trabajar los sábados."},{"term":"a efectos de","gloss":"for the purposes of","category":"set_phrase","level":"C1","example":"A efectos de la valorización, el avance se corta el día veinticinco."},{"term":"valga la aclaración","gloss":"let me be clear about this","category":"set_phrase","level":"C1","example":"Valga la aclaración: el adicional no cubre el cambio de especificación."},{"term":"corríjame si me equivoco","gloss":"correct me if I am wrong","category":"set_phrase","level":"B2","example":"Corríjame si me equivoco, pero el plazo original vencía el quince."},{"term":"coincido con usted en que","gloss":"I agree with you that","category":"set_phrase","level":"B2","example":"Coincido con usted en que el frente debió liberarse antes."},{"term":"no comparto ese criterio","gloss":"I do not share that view (polite disagreement)","category":"set_phrase","level":"C1","example":"Con todo respeto, no comparto ese criterio sobre la responsabilidad del retraso."},{"term":"entiendo su posición, sin embargo","gloss":"I understand your position, however","category":"set_phrase","level":"B2","example":"Entiendo su posición, sin embargo el contrato es claro en ese punto."},{"term":"lo dejamos para la siguiente sesión","gloss":"let us park it for the next meeting","category":"set_phrase","level":"B2","example":"Si no hay consenso hoy, lo dejamos para la siguiente sesión."}]};
+
+  /* ---------- theme: cycle system → light → dark ---------- */
+  const btn = document.getElementById('theme');
+  const order = ['', 'light', 'dark'];
+  const label = { '': 'Theme · auto', light: 'Theme · light', dark: 'Theme · dark' };
+  let ti = 0;
+  btn.textContent = label[''];
+  btn.addEventListener('click', () => {
+    ti = (ti + 1) % order.length;
+    const v = order[ti];
+    if (v) document.documentElement.setAttribute('data-theme', v);
+    else document.documentElement.removeAttribute('data-theme');
+    btn.textContent = label[v];
+  });
+
+  /* ---------- counts ---------- */
+  document.getElementById('n-tenses').textContent = DATA.tenses.length;
+  document.getElementById('n-verbs').textContent = DATA.verbs.length;
+  document.getElementById('n-vocab').textContent = DATA.vocab.length;
+
+  /* ------------------------------------------------------------
+     Split a paradigm into [shared prefix, varying middle, shared
+     suffix]. For a simple tense the shared prefix is the stem and
+     the varying middle is the ending; for a compound tense the
+     shared suffix is the participle and the varying middle is the
+     auxiliary. One rule, and it makes both cases legible.
+     ------------------------------------------------------------ */
+  function split(forms) {
+    const live = forms.filter((f) => f !== '—');
+    if (live.length < 2) return forms.map((f) => [f, '', '']);
+
+    let pre = 0;
+    const min = Math.min(...live.map((f) => f.length));
+    while (pre < min && live.every((f) => f[pre] === live[0][pre])) pre++;
+
+    let suf = 0;
+    while (
+      suf < min - pre &&
+      live.every((f) => f[f.length - 1 - suf] === live[0][live[0].length - 1 - suf])
+    ) suf++;
+
+    return forms.map((f) => {
+      if (f === '—') return [f, '', ''];
+      const head = f.slice(0, pre);
+      const tail = suf ? f.slice(f.length - suf) : '';
+      return [head, f.slice(pre, f.length - suf), tail];
+    });
+  }
+
+  const esc = (s) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const MOOD_CLASS = { indicativo: 'mood-i', subjuntivo: 'mood-s', imperativo: 'mood-m' };
+
+  function render() {
+    const moods = new Set(
+      [...document.querySelectorAll('.chip[data-mood]')]
+        .filter((c) => c.getAttribute('aria-pressed') === 'true')
+        .map((c) => c.dataset.mood)
+    );
+    const q = document.getElementById('vsearch').value.trim().toLowerCase();
+    const verbs = q
+      ? DATA.verbs.filter((v) => v.inf.includes(q) || v.en.toLowerCase().includes(q))
+      : DATA.verbs;
+
+    const out = [];
+    for (const t of DATA.tenses) {
+      if (!moods.has(t.mood)) continue;
+
+      const rows = verbs.map((v) => {
+        const forms = v.tenses.find((x) => x.id === t.id).forms;
+        const parts = split(forms);
+        const cells = parts
+          .map(([a, b, c]) =>
+            `<td class="form">${esc(a)}<span class="vary">${esc(b)}</span>${esc(c)}</td>`
+          )
+          .join('');
+        return (
+          `<tr><th scope="row"><span class="v-inf">${esc(v.inf)}` +
+          (v.irregular ? ' <span class="irr">irr</span>' : '') +
+          `</span><span class="v-en">${esc(v.en)}</span></th>${cells}</tr>`
+        );
+      });
+
+      if (!rows.length) continue;
+
+      out.push(
+        `<article class="tense-card ${MOOD_CLASS[t.mood]}">` +
+          `<div class="tc-head">` +
+            `<div class="tc-title">` +
+              `<span class="tc-en">${esc(t.en)}</span>` +
+              `<span class="tc-es">${esc(t.es)}</span>` +
+              `<span class="badge b-lvl">${t.level}</span>` +
+              (t.compound ? '<span class="badge b-cmp">haber + participio</span>' : '') +
+            `</div>` +
+            `<p class="tc-use">${esc(t.use).replace(/«([^»]+)»/g, '<span class="es">«$1»</span>')}</p>` +
+          `</div>` +
+          `<div class="tbl-wrap"><table><thead><tr><th>Verb</th>` +
+          DATA.personLabels.map((p) => `<th>${esc(p)}</th>`).join('') +
+          `</tr></thead><tbody>${rows.join('')}</tbody></table></div>` +
+          `<p class="legend">The <span class="sw">tinted</span> span is what changes across ` +
+          `persons; everything around it is shared.</p>` +
+        `</article>`
+      );
+    }
+
+    document.getElementById('tense-list').innerHTML =
+      out.join('') ||
+      '<p class="lede">Nothing matches that filter.</p>';
+  }
+
+  document.querySelectorAll('.chip[data-mood]').forEach((c) =>
+    c.addEventListener('click', () => {
+      c.setAttribute(
+        'aria-pressed',
+        c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'
+      );
+      render();
+    })
+  );
+  document.getElementById('vsearch').addEventListener('input', render);
+  render();
+</script>

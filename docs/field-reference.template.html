@@ -1,0 +1,649 @@
+<title>Fluencia — Field Reference</title>
+<style>
+  /* ============================================================
+     Tokens. Light is the bare :root; dark is redefined twice so
+     both the OS default and an explicit toggle resolve.
+     ============================================================ */
+  :root {
+    --ground: #edf0f1;      /* cool paper, biased toward the accent */
+    --surface: #ffffff;
+    --surface-2: #e4e9eb;
+    --ink: #16232c;         /* drafting ink */
+    --ink-2: #4a5c66;
+    --ink-3: #7d8d95;
+    --accent: #0e6e88;      /* desaturated drafting cyan */
+    --accent-soft: #0e6e881a;
+    --rust: #a85a2b;        /* rebar oxide */
+    --rust-soft: #a85a2b1a;
+    --rule: #c6d0d4;
+    --rule-soft: #d8e0e3;
+
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+    --shell: 74rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d1418;
+      --surface: #131e23;
+      --surface-2: #1a272d;
+      --ink: #dae4e8;
+      --ink-2: #9db0b8;
+      --ink-3: #6d828b;
+      --accent: #56b6d0;
+      --accent-soft: #56b6d022;
+      --rust: #d2874e;
+      --rust-soft: #d2874e22;
+      --rule: #27373e;
+      --rule-soft: #1e2c32;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0d1418;
+    --surface: #131e23;
+    --surface-2: #1a272d;
+    --ink: #dae4e8;
+    --ink-2: #9db0b8;
+    --ink-3: #6d828b;
+    --accent: #56b6d0;
+    --accent-soft: #56b6d022;
+    --rust: #d2874e;
+    --rust-soft: #d2874e22;
+    --rule: #27373e;
+    --rule-soft: #1e2c32;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .shell { max-width: var(--shell); margin: 0 auto; padding: 0 1.25rem; }
+
+  /* ============================================================
+     Title block — the header of an engineering drawing.
+     ============================================================ */
+  .titleblock {
+    border-bottom: 2px solid var(--ink);
+    background: var(--surface);
+  }
+  .tb-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) repeat(3, minmax(0, 1fr));
+    border-left: 1px solid var(--rule);
+  }
+  .tb-cell {
+    border-right: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+    padding: 0.85rem 1rem;
+    min-width: 0;
+  }
+  .tb-cell:first-child { padding: 1.4rem 1rem 1.1rem; }
+  .tb-key {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .tb-val { font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    text-wrap: balance;
+    font-weight: 700;
+  }
+  h1 .thin { color: var(--accent); font-weight: 400; }
+  .tagline {
+    margin: 0.5rem 0 0;
+    color: var(--ink-2);
+    max-width: 46ch;
+    font-size: 0.95rem;
+  }
+
+  /* ============================================================
+     Navigation
+     ============================================================ */
+  .rail {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+  }
+  .rail-in {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    max-width: var(--shell);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+  .rail-in::-webkit-scrollbar { display: none; }
+  .rail a, .theme-btn {
+    flex: none;
+    padding: 0.7rem 0.75rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    border-top: 0; border-left: 0; border-right: 0;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .rail a:hover, .theme-btn:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .rail a:focus-visible, .theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .theme-btn { margin-left: auto; }
+
+  /* ============================================================
+     Sections
+     ============================================================ */
+  section.major { padding: 3rem 0 1rem; }
+  .sec-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; border-bottom: 1px solid var(--rule); padding-bottom: 0.6rem; margin-bottom: 1.5rem; }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+  h2 { margin: 0; font-size: 1.45rem; letter-spacing: -0.01em; font-weight: 700; }
+  .sec-sub { color: var(--ink-3); font-size: 0.85rem; margin-left: auto; }
+
+  p.lede { max-width: 68ch; color: var(--ink-2); }
+
+  /* ---------------- routine ---------------- */
+  .steps { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  @media (min-width: 50rem) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { background: var(--surface); padding: 1.1rem 1.15rem; }
+  .step-k { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); letter-spacing: 0.06em; }
+  .step h4 { margin: 0.35rem 0 0.4rem; font-size: 1rem; }
+  .step p { margin: 0; font-size: 0.875rem; color: var(--ink-2); }
+
+  code, kbd {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.1em 0.4em;
+    border-radius: 2px;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--accent);
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin: 0;
+  }
+  pre code { background: none; padding: 0; }
+
+  /* ---------------- tense reference ---------------- */
+  .controls { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.1rem; align-items: center; }
+  .chip {
+    font-family: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 0.34rem 0.62rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .mood-i { border-left: 3px solid var(--accent); }
+  .mood-s { border-left: 3px solid var(--rust); }
+  .mood-m { border-left: 3px solid var(--ink-3); }
+
+  .search {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.36rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 2px;
+    min-width: 12rem;
+  }
+  .search:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .tense-card { border: 1px solid var(--rule); background: var(--surface); margin-bottom: 1.1rem; }
+  .tc-head { padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--rule-soft); }
+  .tc-title { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .tc-en { font-size: 1.05rem; font-weight: 700; }
+  .tc-es { font-family: var(--serif); font-style: italic; color: var(--ink-2); font-size: 0.95rem; }
+  .badge {
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0.15rem 0.4rem; border: 1px solid currentColor; border-radius: 2px;
+  }
+  .b-lvl { color: var(--ink-3); }
+  .b-cmp { color: var(--rust); }
+  .tc-use { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--ink-2); max-width: 78ch; }
+  .tc-use .es { font-family: var(--serif); color: var(--ink); }
+
+  .tbl-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+  th, td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--rule-soft); }
+  thead th {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.11em;
+    color: var(--ink-3); font-weight: 600; white-space: nowrap;
+    position: sticky; top: 0; background: var(--surface);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--accent-soft); }
+  .v-inf { font-family: var(--serif); font-size: 0.95rem; white-space: nowrap; }
+  .v-en { color: var(--ink-3); font-size: 0.75rem; display: block; }
+  td.form { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+  td.form .vary { color: var(--accent); font-weight: 600; }
+  .irr { color: var(--rust); font-size: 0.7rem; }
+  .legend { font-size: 0.75rem; color: var(--ink-3); padding: 0.6rem 1.1rem; border-top: 1px solid var(--rule-soft); }
+  .legend .sw { color: var(--accent); font-family: var(--mono); font-weight: 600; }
+
+  /* ---------------- lexicon ---------------- */
+  .band { margin-bottom: 2rem; }
+  .band-h { display: flex; align-items: baseline; gap: 0.6rem; margin: 0 0 0.3rem; font-size: 1.05rem; }
+  .count { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); }
+  .band-note { margin: 0 0 0.9rem; font-size: 0.85rem; color: var(--ink-2); max-width: 72ch; }
+  .lex-grid { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  @media (min-width: 44rem) { .lex-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 68rem) { .lex-grid { grid-template-columns: repeat(3, 1fr); } }
+  .lex { background: var(--surface); padding: 0.75rem 0.9rem; }
+  .lex-h { display: flex; align-items: baseline; gap: 0.5rem; }
+  .lex .es { font-family: var(--serif); font-size: 1rem; }
+  .lv { font-family: var(--mono); font-size: 0.62rem; color: var(--ink-3); margin-left: auto; }
+  .lex .en { font-size: 0.8rem; color: var(--ink-2); }
+  .sub { color: var(--rust); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .lex .ex { font-family: var(--serif); font-size: 0.85rem; color: var(--ink); margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px dotted var(--rule); }
+
+  /* ---------------- notes / callouts ---------------- */
+  .note {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--rust);
+    background: var(--surface);
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    max-width: 76ch;
+  }
+  .note b { color: var(--ink); }
+
+  .cols { display: grid; gap: 1.25rem; }
+  @media (min-width: 52rem) { .cols { grid-template-columns: 1fr 1fr; } }
+
+  footer {
+    margin-top: 3rem;
+    border-top: 2px solid var(--ink);
+    background: var(--surface);
+    padding: 1.5rem 0 2.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+  footer .shell > p { margin: 0.3rem 0; max-width: 70ch; }
+
+  ol.proc { padding-left: 1.1rem; max-width: 70ch; }
+  ol.proc li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--ink-2); }
+  ol.proc li b { color: var(--ink); }
+
+  .hide { display: none !important; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tense-card { transition: border-color 0.15s ease; }
+  }
+</style>
+
+<header class="titleblock">
+  <div class="shell">
+    <div class="tb-grid">
+      <div class="tb-cell">
+        <span class="tb-key">Reference</span>
+        <h1>Fluen<span class="thin">cia</span></h1>
+        <p class="tagline">
+          Field reference for the Spanish drilling app — every tense, the meeting
+          lexicon, and the procedure for moving it to a new machine.
+        </p>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Target</span>
+        <span class="tb-val">CEFR B2</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Exam</span>
+        <span class="tb-val">Dec 2026</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Register</span>
+        <span class="tb-val">LatAm neutral</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Tenses</span>
+        <span class="tb-val" id="n-tenses">15</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Verbs tabled</span>
+        <span class="tb-val" id="n-verbs">24</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Lexicon</span>
+        <span class="tb-val" id="n-vocab">109</span>
+      </div>
+      <div class="tb-cell">
+        <span class="tb-key">Domain</span>
+        <span class="tb-val">Obra / consultoría</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="rail">
+  <div class="rail-in">
+    <a href="#routine">Routine</a>
+    <a href="#tenses">Tenses</a>
+    <a href="#lexicon">Lexicon</a>
+    <a href="#backup">Backup</a>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch theme">Theme</button>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <!-- ============================================================ -->
+  <section class="major" id="routine">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>The routine</h2>
+      <span class="sec-sub">12 minutes on a bad day</span>
+    </div>
+
+    <p class="lede">
+      The app runs on your own machine and keeps everything in one SQLite file, so it
+      remembers exactly where you stopped — mid-question, mid-session, mid-week. Start it
+      with <code>npm run dev</code> and open <code>localhost:3000</code>.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-k">Every day</span>
+        <h4>One warm-up</h4>
+        <p>
+          Six to ten items drawn from the errors you are actually still making, weighted by
+          severity and how recently you made them. This alone keeps the streak.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-k">Most days</span>
+        <h4>A topic block</h4>
+        <p>
+          Ten items on whatever the prerequisite graph says is next. Recognition first,
+          unaided production last.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step-k">When it fits</span>
+        <h4>A Gauntlet Run</h4>
+        <p>
+          Ten items, three lives, timed, drawn only from live errors. Scored against your own
+          previous runs.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:1.25rem">
+      <div class="note">
+        <b>After every class with Lorena.</b> Upload the transcript. The app segments your
+        turns, proposes findings, and waits — nothing reaches the error log until you accept
+        it. A correct form used unprompted is what unlocks a topic's boss fight, and it can
+        only come from a transcript, never from a drill.
+      </div>
+      <div class="note">
+        <b>What «mastered» costs.</b> Twelve attempts at 80%, then two clean spaced reviews at
+        +3 and +10 days, then one spontaneous correct use in a real conversation, and finally a
+        twelve-item unaided challenge with no hints and no retries. Fail that last one and the
+        topic goes back to studying. It is meant to be expensive.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="tenses">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>Tenses</h2>
+      <span class="sec-sub">generated from the app's own engine</span>
+    </div>
+
+    <p class="lede">
+      Every form below is produced by the same tested conjugation engine the drills use, so
+      what you read here is what the app will mark you against. In each table the
+      <span class="sw" style="color:var(--accent);font-weight:600">tinted</span> span is the
+      part that changes across persons — read it down a column and the pattern is the lesson.
+    </p>
+
+    <div class="controls">
+      <button class="chip mood-i" data-mood="indicativo" aria-pressed="true" type="button">Indicative</button>
+      <button class="chip mood-s" data-mood="subjuntivo" aria-pressed="true" type="button">Subjunctive</button>
+      <button class="chip mood-m" data-mood="imperativo" aria-pressed="true" type="button">Imperative</button>
+      <input class="search" id="vsearch" type="search" placeholder="filter verbs — tener, to approve…" aria-label="Filter verbs" />
+    </div>
+
+    <div id="tense-list"></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="lexicon">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>Lexicon</h2>
+      <span class="sec-sub">chosen for the job, not for a frequency list</span>
+    </div>
+    <p class="lede">
+      A word earns a place here if it appears in a Lima infrastructure consultant's week and
+      its absence would force a paraphrase. That excludes plenty of ordinary B2 vocabulary and
+      includes some a general course would call C1 — «adenda», «valorización», «penalidad» are
+      not advanced, they are Tuesday.
+    </p>
+    <!--__VOCAB__-->
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="major" id="backup">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>Backup</h2>
+      <span class="sec-sub">the only copy is on your laptop</span>
+    </div>
+
+    <p class="lede">
+      There is no account and no cloud — the database file <em>is</em> the account. That is why
+      closing the lid mid-question loses nothing, and why a lost laptop would lose everything.
+    </p>
+
+    <div class="cols">
+      <div>
+        <h4 style="margin:0 0 0.5rem">Weekly, from the app</h4>
+        <ol class="proc">
+          <li>Open <b>Settings</b> (the gear, top right).</li>
+          <li><b>Download backup</b> — one self-contained file. Safe to press mid-session.</li>
+          <li>Drop it in iCloud Drive, or anywhere that outlives the laptop.</li>
+        </ol>
+        <h4 style="margin:1.2rem 0 0.5rem">Or from the terminal</h4>
+        <pre><code>npm run backup
+npm run backup -- --list</code></pre>
+      </div>
+      <div>
+        <h4 style="margin:0 0 0.5rem">Moving to a new MacBook</h4>
+        <ol class="proc">
+          <li>Clone the repo, then <code>npm install</code>.</li>
+          <li><code>npm run dev</code>, open <b>Settings</b>.</li>
+          <li><b>Restore from a backup</b> and pick the file.</li>
+        </ol>
+        <div class="note" style="margin-top:0.9rem">
+          <b>It will not let you overwrite progress by accident.</b> Restore shows what is in
+          the file next to what it would replace, and refuses unless you confirm. Even then the
+          database being replaced is copied aside first, so the wrong file is one restore away
+          from being undone. A backup from an older version still works; one from a newer
+          version is refused rather than half-understood.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><b>Fluencia</b> — built for one learner, one exam, one December.</p>
+    <p>
+      Conjugations on this page are generated by the app's engine and checked against
+      known-correct forms by its test suite. Neutral Latin American Spanish throughout: five
+      persons, «ustedes» for the plural you, and no «vosotros» anywhere.
+    </p>
+  </div>
+</footer>
+
+<script>
+  const DATA = /*__DATA__*/;
+
+  /* ---------- theme: cycle system → light → dark ---------- */
+  const btn = document.getElementById('theme');
+  const order = ['', 'light', 'dark'];
+  const label = { '': 'Theme · auto', light: 'Theme · light', dark: 'Theme · dark' };
+  let ti = 0;
+  btn.textContent = label[''];
+  btn.addEventListener('click', () => {
+    ti = (ti + 1) % order.length;
+    const v = order[ti];
+    if (v) document.documentElement.setAttribute('data-theme', v);
+    else document.documentElement.removeAttribute('data-theme');
+    btn.textContent = label[v];
+  });
+
+  /* ---------- counts ---------- */
+  document.getElementById('n-tenses').textContent = DATA.tenses.length;
+  document.getElementById('n-verbs').textContent = DATA.verbs.length;
+  document.getElementById('n-vocab').textContent = DATA.vocab.length;
+
+  /* ------------------------------------------------------------
+     Split a paradigm into [shared prefix, varying middle, shared
+     suffix]. For a simple tense the shared prefix is the stem and
+     the varying middle is the ending; for a compound tense the
+     shared suffix is the participle and the varying middle is the
+     auxiliary. One rule, and it makes both cases legible.
+     ------------------------------------------------------------ */
+  function split(forms) {
+    const live = forms.filter((f) => f !== '—');
+    if (live.length < 2) return forms.map((f) => [f, '', '']);
+
+    let pre = 0;
+    const min = Math.min(...live.map((f) => f.length));
+    while (pre < min && live.every((f) => f[pre] === live[0][pre])) pre++;
+
+    let suf = 0;
+    while (
+      suf < min - pre &&
+      live.every((f) => f[f.length - 1 - suf] === live[0][live[0].length - 1 - suf])
+    ) suf++;
+
+    return forms.map((f) => {
+      if (f === '—') return [f, '', ''];
+      const head = f.slice(0, pre);
+      const tail = suf ? f.slice(f.length - suf) : '';
+      return [head, f.slice(pre, f.length - suf), tail];
+    });
+  }
+
+  const esc = (s) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const MOOD_CLASS = { indicativo: 'mood-i', subjuntivo: 'mood-s', imperativo: 'mood-m' };
+
+  function render() {
+    const moods = new Set(
+      [...document.querySelectorAll('.chip[data-mood]')]
+        .filter((c) => c.getAttribute('aria-pressed') === 'true')
+        .map((c) => c.dataset.mood)
+    );
+    const q = document.getElementById('vsearch').value.trim().toLowerCase();
+    const verbs = q
+      ? DATA.verbs.filter((v) => v.inf.includes(q) || v.en.toLowerCase().includes(q))
+      : DATA.verbs;
+
+    const out = [];
+    for (const t of DATA.tenses) {
+      if (!moods.has(t.mood)) continue;
+
+      const rows = verbs.map((v) => {
+        const forms = v.tenses.find((x) => x.id === t.id).forms;
+        const parts = split(forms);
+        const cells = parts
+          .map(([a, b, c]) =>
+            `<td class="form">${esc(a)}<span class="vary">${esc(b)}</span>${esc(c)}</td>`
+          )
+          .join('');
+        return (
+          `<tr><th scope="row"><span class="v-inf">${esc(v.inf)}` +
+          (v.irregular ? ' <span class="irr">irr</span>' : '') +
+          `</span><span class="v-en">${esc(v.en)}</span></th>${cells}</tr>`
+        );
+      });
+
+      if (!rows.length) continue;
+
+      out.push(
+        `<article class="tense-card ${MOOD_CLASS[t.mood]}">` +
+          `<div class="tc-head">` +
+            `<div class="tc-title">` +
+              `<span class="tc-en">${esc(t.en)}</span>` +
+              `<span class="tc-es">${esc(t.es)}</span>` +
+              `<span class="badge b-lvl">${t.level}</span>` +
+              (t.compound ? '<span class="badge b-cmp">haber + participio</span>' : '') +
+            `</div>` +
+            `<p class="tc-use">${esc(t.use).replace(/«([^»]+)»/g, '<span class="es">«$1»</span>')}</p>` +
+          `</div>` +
+          `<div class="tbl-wrap"><table><thead><tr><th>Verb</th>` +
+          DATA.personLabels.map((p) => `<th>${esc(p)}</th>`).join('') +
+          `</tr></thead><tbody>${rows.join('')}</tbody></table></div>` +
+          `<p class="legend">The <span class="sw">tinted</span> span is what changes across ` +
+          `persons; everything around it is shared.</p>` +
+        `</article>`
+      );
+    }
+
+    document.getElementById('tense-list').innerHTML =
+      out.join('') ||
+      '<p class="lede">Nothing matches that filter.</p>';
+  }
+
+  document.querySelectorAll('.chip[data-mood]').forEach((c) =>
+    c.addEventListener('click', () => {
+      c.setAttribute(
+        'aria-pressed',
+        c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'
+      );
+      render();
+    })
+  );
+  document.getElementById('vsearch').addEventListener('input', render);
+  render();
+</script>
