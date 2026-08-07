@@ -60,6 +60,160 @@ const GREEK_MA =
 /** Feminine nouns this learner reliably treats as masculine, and the reverse. */
 const FEM_ION = 'demostración|fusión|licitación|valorización|supervisión|instalación|ampliación';
 
+/* ------------------------------------------------------------------ *
+ * Complements, and how to tell one from a clause
+ * ------------------------------------------------------------------ */
+
+/**
+ * What can legitimately follow «después de».
+ *
+ * The rule is whitelisted rather than blacklisted, and that is the whole fix.
+ * The first version excluded «de» and «que» and fired on everything else,
+ * which meant it fired on «después revisamos las juntas» — correct Spanish
+ * that the rule's own explanation calls correct ("bare después is correct only
+ * when nothing follows it"; a conjugated verb is a clause, not a complement).
+ * It also fired on «después del vaciado», because there is no word boundary
+ * between the «e» and the «l» of «del» for `(?!de\b)` to find, and then
+ * proposed «después de del vaciado».
+ *
+ * Telling a noun from a conjugated verb by suffix alone is not possible in
+ * Spanish. Naming the things that introduce a complement is, and a determiner,
+ * a stressed pronoun or an infinitive covers essentially every real one.
+ */
+const DETERMINER =
+  'el|la|los|las|un|una|unos|unas|mi|mis|tu|tus|su|sus|' +
+  'nuestro|nuestra|nuestros|nuestras|' +
+  'este|esta|estos|estas|ese|esa|esos|esas|aquel|aquella|aquellos|aquellas|' +
+  'todo|toda|todos|todas|cada|otro|otra|otros|otras';
+
+const STRESSED_PRONOUN = 'eso|esto|aquello|mí|ti|él|ella|ellos|ellas|usted|ustedes|nosotros';
+
+const INFINITIVE = '[a-záéíóúñü]{3,}(?:ar|er|ir)';
+
+/**
+ * Verb endings that only a conjugated verb can carry.
+ *
+ * `verb.infinitive_after_prep` used to accept `o|as|es|an|en` too, which are
+ * also the endings of ordinary nouns and adjectives — so «para trabajo
+ * nocturno», «sin acceso directo» and «por retraso del proveedor» were all
+ * reported as errors. In construction Spanish a preposition is followed by a
+ * noun far more often than by anything else, so that one alternation produced
+ * more false findings than the rest of the file combined.
+ *
+ * These endings mark person and tense, and no Spanish noun carries them.
+ * Recall drops — «para firmo» is no longer caught — and that is the right
+ * trade: an unreported error costs one missed drill, while a reported
+ * non-error that the learner accepts writes a `committed` event for a mistake
+ * they never made, and §4 then weights it and reorders the whole curriculum
+ * around it.
+ */
+const CONJUGATED_ONLY = 'amos|emos|imos|aste|iste|aron|ieron|ábamos|íamos|aban|ían';
+
+/* ------------------------------------------------------------------ *
+ * Present subjunctive, by verb rather than by suffix
+ * ------------------------------------------------------------------ */
+
+/**
+ * Why this table exists instead of a suffix pattern.
+ *
+ * The `cuando + subjunctive` positive used to match the endings
+ * `e|es|emos|en|a|as|amos|an`, which is every present-tense ending in the
+ * language. For an -ar verb the subjunctive is «llegue» and the indicative is
+ * «llega»; for an -er/-ir verb it is exactly the other way round — «suba» is
+ * subjunctive, «sube» is indicative. A suffix cannot tell them apart without
+ * knowing the conjugation class, so the rule accepted «cuando llega el
+ * supervisor» — plain indicative — as evidence of subjunctive control.
+ *
+ * That is the most expensive false positive in the file. §4 forbids marking an
+ * error resolved without spontaneous evidence, and this rule *is* that
+ * evidence for `mood.cuando_subj`. Accepting the indicative would close a live
+ * error on something the learner never did.
+ *
+ * So the class is looked up rather than guessed. The list is the vocabulary of
+ * this learner's domain, not of Spanish — a verb that is not on it produces no
+ * finding, which costs a missed positive and never a false one.
+ */
+const AR_VERBS = [
+  'llegar', 'terminar', 'firmar', 'entregar', 'acabar', 'vaciar', 'enviar', 'revisar',
+  'instalar', 'pagar', 'avisar', 'coordinar', 'levantar', 'montar', 'llamar', 'hablar',
+  'trabajar', 'comprar', 'mandar', 'dejar', 'quedar', 'pasar', 'llevar', 'tomar',
+  'usar', 'cambiar', 'arreglar', 'marcar', 'presentar', 'aprobar', 'autorizar',
+  'ejecutar', 'contratar', 'demorar', 'retrasar', 'reparar', 'colocar', 'verificar',
+];
+
+const ER_IR_VERBS = [
+  'subir', 'recibir', 'abrir', 'escribir', 'deber', 'aprender', 'responder', 'decidir',
+  'permitir', 'cumplir', 'ocurrir', 'suceder', 'romper', 'meter', 'correr', 'vender',
+  'resolver', 'proceder', 'admitir', 'existir', 'ceder',
+];
+
+/**
+ * Present-subjunctive forms of a regular -ar verb.
+ *
+ * The orthographic changes are not optional decoration: `llegar` becomes
+ * `llegue`, not `llege`, and a table without them would reject the single most
+ * likely word this rule will ever see.
+ */
+function arSubjunctive(infinitive: string): string[] {
+  let stem = infinitive.slice(0, -2);
+  if (stem.endsWith('g')) stem += 'u';                          // llegar  → llegue
+  else if (stem.endsWith('c')) stem = stem.slice(0, -1) + 'qu'; // marcar  → marque
+  else if (stem.endsWith('z')) stem = stem.slice(0, -1) + 'c';  // autorizar → autorice
+  return [`${stem}e`, `${stem}es`, `${stem}emos`, `${stem}en`];
+}
+
+function erIrSubjunctive(infinitive: string): string[] {
+  const stem = infinitive.slice(0, -2);
+  return [`${stem}a`, `${stem}as`, `${stem}amos`, `${stem}an`];
+}
+
+/**
+ * The irregulars, written out.
+ *
+ * Every one of these is high-frequency, and several are stem-changing in a way
+ * no rule derives — «poder» → «pueda», «empezar» → «empiece». Listing them is
+ * shorter and more honest than a conjugator that would be wrong at the edges.
+ */
+const IRREGULAR_SUBJUNCTIVE = [
+  'tenga', 'tengas', 'tengamos', 'tengan',
+  'venga', 'vengas', 'vengamos', 'vengan',
+  'haga', 'hagas', 'hagamos', 'hagan',
+  'pueda', 'puedas', 'podamos', 'puedan',
+  'salga', 'salgas', 'salgamos', 'salgan',
+  'ponga', 'pongas', 'pongamos', 'pongan',
+  'vea', 'veas', 'veamos', 'vean',
+  'esté', 'estés', 'estemos', 'estén',
+  'sea', 'seas', 'seamos', 'sean',
+  'vaya', 'vayas', 'vayamos', 'vayan',
+  'haya', 'hayas', 'hayamos', 'hayan',
+  'dé', 'des', 'demos', 'den',
+  'sepa', 'sepas', 'sepamos', 'sepan',
+  'diga', 'digas', 'digamos', 'digan',
+  'traiga', 'traigas', 'traigamos', 'traigan',
+  'quiera', 'quieras', 'queramos', 'quieran',
+  'empiece', 'empieces', 'empecemos', 'empiecen',
+  'cierre', 'cierres', 'cerremos', 'cierren',
+  'apruebe', 'apruebes', 'aprobemos', 'aprueben',
+  'vuelva', 'vuelvas', 'volvamos', 'vuelvan',
+  'cuente', 'cuentes', 'contemos', 'cuenten',
+  'encuentre', 'encuentres', 'encontremos', 'encuentren',
+  'pida', 'pidas', 'pidamos', 'pidan',
+  'siga', 'sigas', 'sigamos', 'sigan',
+  'consiga', 'consigas', 'consigamos', 'consigan',
+  'llueva', 'sirva', 'sirvan', 'salga',
+];
+
+/** Every form the `cuando` positive will accept, as one alternation. */
+const PRESENT_SUBJUNCTIVE = [
+  ...AR_VERBS.flatMap(arSubjunctive),
+  ...ER_IR_VERBS.flatMap(erIrSubjunctive),
+  ...IRREGULAR_SUBJUNCTIVE,
+]
+  .filter((v, i, a) => a.indexOf(v) === i)
+  .sort((a, b) => b.length - a.length) // longest first, so «tengamos» wins over «tenga»
+  .join('|');
+
+
 const RULES: Rule[] = [
   {
     code: 'noun.greek_ma',
@@ -87,7 +241,10 @@ const RULES: Rule[] = [
   },
   {
     code: 'prep.despues_de',
-    pattern: new RegExp(`\\bdespu[eé]s\\s+(?!de\\b|que\\b|,|\\.|$)([a-záéíóúñü]+)`, 'gi'),
+    pattern: new RegExp(
+      `\\bdespu[eé]s\\s+((?:${DETERMINER}|${STRESSED_PRONOUN})${EOW}|${INFINITIVE}${EOW})`,
+      'gi',
+    ),
     fix: (m) => `después de ${m[1]}`,
     explain:
       'Después is an adverb, so it needs «de» before any complement — a noun, a pronoun or an infinitive: después de la inspección, después de firmar, después de eso.\n\nBare «después» is correct only when nothing follows it: «primero vaciamos la losa y después revisamos». The same pattern governs a whole family — antes de, dentro de, cerca de, lejos de, además de, a pesar de. English attaches its complement directly ("after the inspection"), so there is nothing in the source to translate the «de» from.\n\nWhen a full clause with its own verb follows, the form is «después de que», and that clause takes the subjunctive when it points at an unrealised future.',
@@ -136,7 +293,10 @@ const RULES: Rule[] = [
   },
   {
     code: 'verb.infinitive_after_prep',
-    pattern: new RegExp(`\\b(para|sin|antes de|despu[eé]s de|al|por)\\s+([a-záéíóúñü]{3,}(?:amos|emos|imos|as|es|an|en|o|as))${EOW}(?=\\s)`, 'gi'),
+    pattern: new RegExp(
+      `\\b(para|sin|antes de|despu[eé]s de|al|por)\\s+([a-záéíóúñü]{3,}(?:${CONJUGATED_ONLY}))${EOW}`,
+      'gi',
+    ),
     fix: () => null,
     explain:
       'Every preposition in Spanish takes the infinitive: para iniciar, sin firmar, antes de revisar, al llegar, por no avisar. There are no exceptions.\n\nWhere English uses "-ing" after a preposition ("before starting", "without signing"), Spanish uses the bare infinitive. A conjugated verb only becomes possible when you insert «que» and build a full clause with its own subject — «para que el cliente inicie los trabajos» — and that clause then takes the subjunctive.\n\nThat is the choice point: same subject takes preposition + infinitive; different subject takes «que» + a conjugated verb.',
@@ -209,10 +369,7 @@ const POSITIVES: PositiveRule[] = [
   {
     topicId: 'b1.mood.subj_cuando',
     errorCode: 'mood.cuando_subj',
-    pattern: new RegExp(
-      `\\bcuando\\s+([a-záéíóúñü]{3,}(?:e|es|emos|en|a|as|amos|an))${EOW}\\s`,
-      'gi',
-    ),
+    pattern: new RegExp(`\\bcuando\\s+(${PRESENT_SUBJUNCTIVE})${EOW}`, 'gi'),
     explain:
       'Cuando + subjunctive pointing at an unrealised future. This error was marked resolved on exactly this kind of evidence, so each fresh instance confirms it is holding rather than merely dormant.',
     confidence: 0.55,

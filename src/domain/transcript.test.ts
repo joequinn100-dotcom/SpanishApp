@@ -362,3 +362,146 @@ describe('single-speaker class recordings', () => {
     expect(learnerTurns(segment(labelled), 'Joe')).toHaveLength(1);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * Precision
+ * ------------------------------------------------------------------ */
+
+/**
+ * Correct Spanish that must never be flagged.
+ *
+ * This suite exists because the first run against real class transcripts
+ * produced roughly one false positive for every true one, and a false positive
+ * here is not a cosmetic problem: the review UI offers Accept, and accepting a
+ * bad finding writes a `committed` event for an error the learner never made.
+ * §4 then weights that error by log(1 + occurrences) and moves it up the
+ * recommendation order — so the app spends the learner's time drilling a
+ * mistake invented by a regex.
+ *
+ * Every sentence below is in the register the transcripts actually use.
+ */
+describe('analyze — precision on correct Spanish', () => {
+  const fires = (s: string) => analyze(s).filter((f) => f.kind === 'error');
+
+  const clean = [
+    // «después» with a contracted complement — already correct.
+    'Después del vaciado revisamos el encofrado.',
+    'Coordinamos la entrega después del feriado.',
+    // «después» adverbially, with a clause after it. The rule's own
+    // explanation says this is correct: "bare después is correct only when
+    // nothing follows it" — and a conjugated verb is not a complement.
+    'Primero vaciamos la losa y después revisamos las juntas.',
+    'Terminamos el turno y después coordinamos con el cliente.',
+    // Preposition + noun. Nouns are not conjugated verbs, and construction
+    // Spanish is full of them in exactly this position.
+    'Solicitamos permiso para trabajo nocturno.',
+    'La cuadrilla entró sin acceso directo a la zona.',
+    'Reclamamos por retraso del proveedor.',
+    'El vaciado quedó listo al inicio del turno.',
+    'Avanzamos con la estructura; sin embargo, falta el acabado.',
+    // Preposition + infinitive, which is the correct form the rule teaches.
+    'Firmamos el acta antes de salir de obra.',
+    'Enviamos la valorización para iniciar el trámite.',
+  ];
+
+  for (const s of clean) {
+    it(`stays quiet on «${s}»`, () => {
+      expect(fires(s).map((f) => f.errorCode)).toEqual([]);
+    });
+  }
+});
+
+describe('analyze — recall on the errors those rules exist for', () => {
+  const codesIn = (s: string) => analyze(s).map((f) => f.errorCode);
+
+  it('still catches «después» with a bare noun complement', () => {
+    expect(codesIn('Después la inspección firmamos el acta.')).toContain('prep.despues_de');
+  });
+
+  it('still catches «después» with a bare infinitive complement', () => {
+    expect(codesIn('Después terminar el turno nos fuimos.')).toContain('prep.despues_de');
+  });
+
+  it('corrects it to «después de», not to «después de de»', () => {
+    const f = analyze('Después la inspección firmamos el acta.').find(
+      (x) => x.errorCode === 'prep.despues_de',
+    )!;
+    expect(f.correction).toMatch(/después de la inspección/i);
+    expect(f.correction).not.toMatch(/de de|de del/i);
+  });
+
+  it('still catches a conjugated verb after a preposition', () => {
+    expect(codesIn('Lo enviamos para firmamos el acta.')).toContain(
+      'verb.infinitive_after_prep',
+    );
+  });
+});
+
+/**
+ * The positive rules decide whether an error may be marked resolved (§4), so a
+ * false positive here is the most expensive mistake in the file: it closes a
+ * live error on evidence the learner never produced.
+ */
+describe('analyze — positives must not accept the indicative as subjunctive', () => {
+  const positivesFor = (s: string) =>
+    analyze(s)
+      .filter((f) => f.kind === 'positive')
+      .map((f) => f.errorCode);
+
+  it('accepts «cuando llegue» — subjunctive, unrealised future', () => {
+    expect(positivesFor('Cuando llegue el supervisor firmamos el acta.')).toContain(
+      'mood.cuando_subj',
+    );
+  });
+
+  it('rejects «cuando llega» — indicative, and not evidence of anything', () => {
+    expect(positivesFor('Cuando llega el supervisor firmamos el acta.')).not.toContain(
+      'mood.cuando_subj',
+    );
+  });
+
+  it('accepts «cuando termine»', () => {
+    expect(positivesFor('Cuando termine el vaciado revisamos las juntas.')).toContain(
+      'mood.cuando_subj',
+    );
+  });
+
+  it('rejects «cuando termina»', () => {
+    expect(positivesFor('Cuando termina el turno cerramos la obra.')).not.toContain(
+      'mood.cuando_subj',
+    );
+  });
+
+  it('handles the -er/-ir flip, where the endings swap', () => {
+    // For -ar verbs the subjunctive is -e; for -er/-ir it is -a. A rule keyed
+    // on the suffix alone cannot tell «llega» (indicative) from «suba»
+    // (subjunctive), which is why the class has to be known.
+    expect(positivesFor('Cuando suba el encofrado avisamos al cliente.')).toContain(
+      'mood.cuando_subj',
+    );
+    expect(positivesFor('Cuando sube el encofrado avisamos al cliente.')).not.toContain(
+      'mood.cuando_subj',
+    );
+  });
+
+  it('accepts the common irregulars', () => {
+    for (const s of [
+      'Cuando tenga los planos empezamos.',
+      'Cuando venga el proveedor revisamos el material.',
+      'Cuando esté firmado el contrato iniciamos.',
+      'Cuando pueda el cliente coordinamos la visita.',
+    ]) {
+      expect(positivesFor(s), s).toContain('mood.cuando_subj');
+    }
+  });
+
+  it('rejects their indicative counterparts', () => {
+    for (const s of [
+      'Cuando tiene los planos empieza.',
+      'Cuando viene el proveedor revisamos el material.',
+      'Cuando está firmado el contrato iniciamos.',
+    ]) {
+      expect(positivesFor(s), s).not.toContain('mood.cuando_subj');
+    }
+  });
+});
