@@ -2,6 +2,8 @@ import 'server-only';
 import { tx } from '@/db';
 import { db } from './queries';
 import {
+  TOPIC,
+  bossReady,
   errorTransition,
   topicTransition,
   newErrorState,
@@ -443,7 +445,8 @@ function applyReview(
   const row = database
     .prepare(
       `SELECT status, accuracy, attempts, correct, spontaneous, first_seen, last_seen,
-              mastered_at, consolidating_since, reviews_passed, next_review_at
+              mastered_at, consolidating_since, reviews_passed, next_review_at,
+              boss_cleared_at
          FROM topic_state WHERE topic_id = ?`,
     )
     .get(topicId) as
@@ -459,6 +462,7 @@ function applyReview(
         consolidating_since: string | null;
         reviews_passed: number;
         next_review_at: string | null;
+        boss_cleared_at: string | null;
       }
     | undefined;
   if (!row || row.status !== 'consolidating') return;
@@ -475,14 +479,19 @@ function applyReview(
     consolidatingSince: row.consolidating_since,
     reviewsPassed: row.reviews_passed,
     nextReviewAt: row.next_review_at,
+    bossClearedAt: row.boss_cleared_at,
   };
   const after = topicTransition(before, { type: 'review', passed }, now);
 
+  // boss_cleared_at is written back even though a review never sets it: a
+  // failed review can regress the topic, and regressTopic clears it. Leaving
+  // it out would strand a cleared flag on a topic that is back in `studying`,
+  // and the next pass through consolidating would skip the challenge.
   database
     .prepare(
       `UPDATE topic_state
           SET status = ?, mastered_at = ?, consolidating_since = ?,
-              reviews_passed = ?, next_review_at = ?
+              reviews_passed = ?, next_review_at = ?, boss_cleared_at = ?
         WHERE topic_id = ?`,
     )
     .run(
@@ -491,17 +500,22 @@ function applyReview(
       after.consolidatingSince,
       after.reviewsPassed,
       after.nextReviewAt,
+      after.bossClearedAt,
       topicId,
     );
 
   if (!passed) {
     notes.push('Review not clean — the two-review sequence restarts. Next one in 3 days.');
   } else if (after.status === 'mastered') {
-    notes.push('Topic mastered. Two clean reviews and spontaneous evidence, both cleared.');
+    notes.push('Topic mastered. Reviews, spontaneous evidence and the boss fight, all cleared.');
     onMastered();
   } else if (after.spontaneous < 1) {
     notes.push(
       `Review passed (${after.reviewsPassed}/2). Mastery also needs one spontaneous correct use — that comes from a transcript, not a drill.`,
+    );
+  } else if (bossReady(after)) {
+    notes.push(
+      `Review passed (${after.reviewsPassed}/2). Boss fight unlocked: ${TOPIC.BOSS_ITEMS} items, no hints, no retries, ${TOPIC.BOSS_PASS} to clear.`,
     );
   } else {
     notes.push(`Review passed (${after.reviewsPassed}/2). Next one in 10 days.`);
@@ -534,7 +548,8 @@ function applyTopic(
   const row = database
     .prepare(
       `SELECT status, accuracy, attempts, correct, spontaneous, first_seen, last_seen,
-              mastered_at, consolidating_since, reviews_passed, next_review_at
+              mastered_at, consolidating_since, reviews_passed, next_review_at,
+              boss_cleared_at
          FROM topic_state WHERE topic_id = ?`,
     )
     .get(topicId) as
@@ -550,6 +565,7 @@ function applyTopic(
         consolidating_since: string | null;
         reviews_passed: number;
         next_review_at: string | null;
+        boss_cleared_at: string | null;
       }
     | undefined;
   if (!row) return;
@@ -566,6 +582,7 @@ function applyTopic(
     consolidatingSince: row.consolidating_since,
     reviewsPassed: row.reviews_passed,
     nextReviewAt: row.next_review_at,
+    bossClearedAt: row.boss_cleared_at,
   };
 
   // The attempt is already inserted, so this window includes it.
@@ -580,7 +597,7 @@ function applyTopic(
       `UPDATE topic_state
           SET status = ?, accuracy = ?, attempts = ?, correct = ?, first_seen = ?,
               last_seen = ?, mastered_at = ?, consolidating_since = ?,
-              reviews_passed = ?, next_review_at = ?
+              reviews_passed = ?, next_review_at = ?, boss_cleared_at = ?
         WHERE topic_id = ?`,
     )
     .run(
@@ -594,6 +611,7 @@ function applyTopic(
       after.consolidatingSince,
       after.reviewsPassed,
       after.nextReviewAt,
+      after.bossClearedAt,
       topicId,
     );
 

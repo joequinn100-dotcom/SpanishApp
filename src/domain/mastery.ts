@@ -26,6 +26,22 @@ export const TOPIC = {
   REVIEW_OFFSETS_DAYS: [3, 10] as const,
   REQUIRED_REVIEWS: 2,
   REQUIRED_SPONTANEOUS: 1,
+  /**
+   * §8's boss fight: "a 12-item unaided challenge with no hints and no
+   * retries", and the last gate before `mastered`.
+   */
+  BOSS_ITEMS: 12,
+  /**
+   * How many of the twelve must be right to clear.
+   *
+   * §8 says "clear" without giving a number, so this is a judgement call, and
+   * it is set to match MIN_ACCURACY rather than invented: 0.8 x 12 = 9.6, so
+   * ten. That keeps one standard for what counts as knowing a topic — the boss
+   * fight raises the *stakes* (unaided, one sitting, no retries) rather than
+   * moving the bar. Demanding 12/12 would make `mastered` unreachable for a B2
+   * learner and turn the strongest claim the app makes into a lottery.
+   */
+  BOSS_PASS: 10,
 } as const;
 
 export const ERR = {
@@ -80,6 +96,8 @@ export interface TopicState {
   consolidatingSince: string | null;
   reviewsPassed: number;
   nextReviewAt: string | null;
+  /** When §8's boss fight was cleared. Null until it is. */
+  bossClearedAt: string | null;
 }
 
 export type TopicEvent =
@@ -87,6 +105,7 @@ export type TopicEvent =
   | { type: 'attempt'; correct: boolean; rollingAccuracy: number }
   | { type: 'spontaneous_use' }
   | { type: 'review'; passed: boolean }
+  | { type: 'boss_fight'; passed: boolean }
   | { type: 'transcript_error' };
 
 export function newTopicState(status: TopicStatus = 'locked'): TopicState {
@@ -102,6 +121,7 @@ export function newTopicState(status: TopicStatus = 'locked'): TopicState {
     consolidatingSince: null,
     reviewsPassed: 0,
     nextReviewAt: null,
+    bossClearedAt: null,
   };
 }
 
@@ -114,14 +134,43 @@ function regressTopic(s: TopicState): TopicState {
     consolidatingSince: null,
     reviewsPassed: 0,
     nextReviewAt: null,
+    // A cleared boss does not survive a demotion. Keeping it would let the
+    // topic walk back into `mastered` on the strength of a challenge it passed
+    // before the regression — exactly the evidence the regression says is no
+    // longer good.
+    bossClearedAt: null,
   };
 }
 
-/** consolidating → mastered, when both halves of §4's gate are satisfied. */
+/**
+ * Is the topic ready to face §8's boss fight?
+ *
+ * The spaced reviews and the spontaneous use are what *unlock* the challenge,
+ * not what replace it. Offering the boss earlier would let a topic be mastered
+ * off one good sitting, which is the thing §4 exists to prevent.
+ */
+export function bossReady(s: TopicState): boolean {
+  return (
+    s.status === 'consolidating' &&
+    s.bossClearedAt === null &&
+    s.reviewsPassed >= TOPIC.REQUIRED_REVIEWS &&
+    s.spontaneous >= TOPIC.REQUIRED_SPONTANEOUS
+  );
+}
+
+/**
+ * consolidating → mastered.
+ *
+ * Three pieces of evidence, from two sections of the spec that both have to
+ * hold: §4's spaced reviews and spontaneous use, and §8's unaided challenge.
+ * `mastered` is the strongest claim this app makes about the learner and the
+ * thing the timeline projection is built on, so it takes all three.
+ */
 function checkTopicMastery(s: TopicState, now: string): TopicState {
   if (s.status !== 'consolidating') return s;
   if (s.reviewsPassed < TOPIC.REQUIRED_REVIEWS) return s;
   if (s.spontaneous < TOPIC.REQUIRED_SPONTANEOUS) return s;
+  if (s.bossClearedAt === null) return s;
   return { ...s, status: 'mastered', masteredAt: now, nextReviewAt: null };
 }
 
@@ -169,6 +218,22 @@ export function topicTransition(state: TopicState, event: TopicEvent, now: strin
         };
       }
       return s;
+    }
+
+    case 'boss_fight': {
+      // The challenge is only offered from `consolidating` (see bossReady), so
+      // a boss event against any other status is a stale replay — a resubmitted
+      // form, a double-tapped button after the topic already moved. Ignoring it
+      // matters most on the failure path: without this guard a late-arriving
+      // loss could demote a topic that had since been mastered by other means.
+      if (state.status !== 'consolidating') return state;
+
+      // §8: "Failing sends the topic back to studying." Not back to
+      // consolidating — a failed unaided challenge says the consolidation
+      // itself did not hold, so the review progress goes with it.
+      if (!event.passed) return regressTopic(state);
+
+      return checkTopicMastery({ ...state, bossClearedAt: now }, now);
     }
 
     case 'spontaneous_use':

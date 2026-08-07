@@ -315,17 +315,22 @@ describe('handoff (SPEC §7)', () => {
 
 describe('spaced reviews — the consolidating → mastered gate', () => {
   /** Put a topic into consolidation with a review already due. */
-  function consolidate(topicId: string, opts: { spontaneous?: number; reviewsPassed?: number } = {}) {
+  function consolidate(
+    topicId: string,
+    opts: { spontaneous?: number; reviewsPassed?: number; bossClearedAt?: string | null } = {},
+  ) {
     db.prepare(
       `UPDATE topic_state
           SET status = 'consolidating', accuracy = 0.9, attempts = 14, correct = 13,
-              spontaneous = ?, reviews_passed = ?, consolidating_since = ?, next_review_at = ?
+              spontaneous = ?, reviews_passed = ?, consolidating_since = ?, next_review_at = ?,
+              boss_cleared_at = ?
         WHERE topic_id = ?`,
     ).run(
       opts.spontaneous ?? 0,
       opts.reviewsPassed ?? 0,
       '2026-07-01T00:00:00.000Z',
       '2026-07-04T00:00:00.000Z',
+      opts.bossClearedAt ?? null,
       topicId,
     );
   }
@@ -381,9 +386,30 @@ describe('spaced reviews — the consolidating → mastered gate', () => {
     expect(st.status).toBe('consolidating');
   });
 
-  it('masters the topic on the second clean review once spontaneous evidence exists', async () => {
+  it('completes the review sequence without mastering while the boss fight is outstanding', async () => {
+    // §8 adds a third gate on this same transition: a 12-item unaided
+    // challenge. Two reviews and a spontaneous use now *unlock* it rather than
+    // finishing the job.
     const { startSession } = await practice();
     consolidate('b1.verb.imperfecto', { spontaneous: 1, reviewsPassed: 1 });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, true);
+
+    const st = db
+      .prepare('SELECT status, reviews_passed, mastered_at FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as { status: string; reviews_passed: number; mastered_at: string };
+    expect(st.reviews_passed).toBe(2);
+    expect(st.status).toBe('consolidating');
+    expect(st.mastered_at).toBeNull();
+  });
+
+  it('masters the topic on the second clean review when the boss is already cleared', async () => {
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', {
+      spontaneous: 1,
+      reviewsPassed: 1,
+      bossClearedAt: '2026-07-02T00:00:00.000Z',
+    });
     const s = startSession(null);
     await answerReviewBlock(s.id, true);
 
@@ -393,6 +419,31 @@ describe('spaced reviews — the consolidating → mastered gate', () => {
     expect(st.status).toBe('mastered');
     expect(st.reviews_passed).toBe(2);
     expect(st.mastered_at).toBeTruthy();
+  });
+
+  it('a failed review clears a boss already cleared', async () => {
+    // The failure demotes nothing on its own — the topic stays consolidating —
+    // but if it did regress, the cleared flag must not survive it. This pins
+    // the write-back so the column cannot drift out of step with the machine.
+    const { startSession } = await practice();
+    consolidate('b1.verb.imperfecto', {
+      spontaneous: 1,
+      reviewsPassed: 1,
+      bossClearedAt: '2026-07-02T00:00:00.000Z',
+    });
+    const s = startSession(null);
+    await answerReviewBlock(s.id, false);
+
+    const st = db
+      .prepare('SELECT status, reviews_passed, boss_cleared_at FROM topic_state WHERE topic_id = ?')
+      .get('b1.verb.imperfecto') as {
+      status: string;
+      reviews_passed: number;
+      boss_cleared_at: string | null;
+    };
+    expect(st.reviews_passed).toBe(0);
+    expect(st.status).toBe('consolidating');
+    expect(st.boss_cleared_at).toBe('2026-07-02T00:00:00.000Z');
   });
 
   it('an unclean review restarts the sequence rather than pausing it', async () => {

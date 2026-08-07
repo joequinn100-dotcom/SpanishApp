@@ -3,6 +3,7 @@ import {
   ERR,
   TOPIC,
   addDays,
+  bossReady,
   errorTransition,
   newErrorState,
   newTopicState,
@@ -100,14 +101,16 @@ describe('topic: consolidating → mastered', () => {
   const consolidating = (): TopicState =>
     drill(newTopicState('studying'), TOPIC.MIN_ATTEMPTS, true, 0.9);
 
-  it('needs two clean reviews AND a spontaneous use', () => {
+  it('needs two clean reviews AND a spontaneous use AND the boss fight', () => {
     let s = consolidating();
     s = topicTransition(s, { type: 'review', passed: true }, at(3));
     s = topicTransition(s, { type: 'review', passed: true }, at(13));
     expect(s.status).toBe('consolidating'); // reviews alone are not enough
     s = topicTransition(s, { type: 'spontaneous_use' }, at(14));
+    expect(s.status).toBe('consolidating'); // §8's challenge is still outstanding
+    s = topicTransition(s, { type: 'boss_fight', passed: true }, at(15));
     expect(s.status).toBe('mastered');
-    expect(s.masteredAt).toBe(at(14));
+    expect(s.masteredAt).toBe(at(15));
   });
 
   it('does not master on a spontaneous use without the reviews', () => {
@@ -140,12 +143,93 @@ describe('topic: consolidating → mastered', () => {
   });
 });
 
+describe('topic: the boss fight (SPEC §8)', () => {
+  const consolidating = (): TopicState =>
+    drill(newTopicState('studying'), TOPIC.MIN_ATTEMPTS, true, 0.9);
+
+  /** Consolidating, with both §4 gates satisfied and the boss outstanding. */
+  const unlocked = (): TopicState => {
+    let s = consolidating();
+    s = topicTransition(s, { type: 'review', passed: true }, at(3));
+    s = topicTransition(s, { type: 'review', passed: true }, at(13));
+    s = topicTransition(s, { type: 'spontaneous_use' }, at(14));
+    return s;
+  };
+
+  it('is not offered until the reviews and the spontaneous use are in', () => {
+    expect(bossReady(consolidating())).toBe(false);
+
+    let s = consolidating();
+    s = topicTransition(s, { type: 'review', passed: true }, at(3));
+    s = topicTransition(s, { type: 'spontaneous_use' }, at(4));
+    expect(bossReady(s)).toBe(false); // one review short
+
+    let t = consolidating();
+    t = topicTransition(t, { type: 'review', passed: true }, at(3));
+    t = topicTransition(t, { type: 'review', passed: true }, at(13));
+    expect(bossReady(t)).toBe(false); // no spontaneous evidence
+
+    expect(bossReady(unlocked())).toBe(true);
+  });
+
+  it('is not offered to a topic that is not consolidating', () => {
+    for (const st of ['locked', 'available', 'studying', 'mastered'] as const) {
+      expect(bossReady({ ...unlocked(), status: st })).toBe(false);
+    }
+  });
+
+  it('is not offered twice — a cleared boss closes it', () => {
+    const s = topicTransition(unlocked(), { type: 'boss_fight', passed: true }, at(15));
+    expect(s.bossClearedAt).toBe(at(15));
+    expect(bossReady(s)).toBe(false);
+  });
+
+  it('clearing it masters the topic', () => {
+    const s = topicTransition(unlocked(), { type: 'boss_fight', passed: true }, at(15));
+    expect(s.status).toBe('mastered');
+    expect(s.masteredAt).toBe(at(15));
+    expect(s.nextReviewAt).toBeNull();
+  });
+
+  it('failing it sends the topic back to studying, not to consolidating', () => {
+    const s = topicTransition(unlocked(), { type: 'boss_fight', passed: false }, at(15));
+    expect(s.status).toBe('studying');
+    expect(s.bossClearedAt).toBeNull();
+    expect(s.reviewsPassed).toBe(0);
+    expect(s.consolidatingSince).toBeNull();
+    expect(s.nextReviewAt).toBeNull();
+  });
+
+  it('keeps the spontaneous evidence through a failure', () => {
+    // The failure says the drilled knowledge did not hold unaided. It says
+    // nothing about the transcript in which the learner used the form
+    // correctly and unprompted — that happened, and §4 treats spontaneous use
+    // as a historical fact rather than a renewable credential.
+    const s = topicTransition(unlocked(), { type: 'boss_fight', passed: false }, at(15));
+    expect(s.spontaneous).toBe(1);
+  });
+
+  it('a stale result against a non-consolidating topic is ignored', () => {
+    // A double-submitted loss must not be able to demote a topic that has
+    // since been mastered.
+    const mastered = topicTransition(unlocked(), { type: 'boss_fight', passed: true }, at(15));
+    const s = topicTransition(mastered, { type: 'boss_fight', passed: false }, at(16));
+    expect(s.status).toBe('mastered');
+  });
+
+  it('BOSS_PASS matches the accuracy gate rather than demanding perfection', () => {
+    expect(TOPIC.BOSS_PASS).toBe(Math.ceil(TOPIC.BOSS_ITEMS * TOPIC.MIN_ACCURACY));
+    expect(TOPIC.BOSS_PASS).toBeLessThan(TOPIC.BOSS_ITEMS);
+  });
+});
+
 describe('topic: mastered → studying (regression)', () => {
   const mastered = (): TopicState => {
     let s = drill(newTopicState('studying'), TOPIC.MIN_ATTEMPTS, true, 0.9);
     s = topicTransition(s, { type: 'review', passed: true }, at(3));
     s = topicTransition(s, { type: 'review', passed: true }, at(13));
     s = topicTransition(s, { type: 'spontaneous_use' }, at(14));
+    s = topicTransition(s, { type: 'boss_fight', passed: true }, at(15));
     return s;
   };
 
@@ -163,6 +247,19 @@ describe('topic: mastered → studying (regression)', () => {
   it('regresses on a transcript error', () => {
     const s = topicTransition(mastered(), { type: 'transcript_error' }, at(20));
     expect(s.status).toBe('studying');
+  });
+
+  it('a cleared boss does not survive the regression', () => {
+    // Otherwise the topic walks back into `mastered` on two reviews and a
+    // spontaneous use alone, having never re-faced the challenge — the
+    // regression would cost it less than a failed review does.
+    const s = topicTransition(
+      mastered(),
+      { type: 'attempt', correct: false, rollingAccuracy: 0.9 },
+      at(20),
+    );
+    expect(s.bossClearedAt).toBeNull();
+    expect(bossReady(s)).toBe(false);
   });
 
   it('stays mastered on a correct attempt', () => {

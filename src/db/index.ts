@@ -44,6 +44,12 @@ export function getDb(): DB {
  * Migrations
  * ------------------------------------------------------------------ */
 
+/**
+ * Opt-in marker for a migration that rebuilds a table other tables reference.
+ * Deliberately ugly and deliberately explicit — see the comment at its use.
+ */
+const REBUILD_MARKER = /^--\s*fluencia:rebuild-tables\s*$/m;
+
 export interface AppliedMigration {
   name: string;
   applied_at: string;
@@ -77,16 +83,45 @@ export function migrate(db: DB, dir: string = MIGRATIONS_DIR): string[] {
 
   for (const file of pending) {
     const sql = readFileSync(join(dir, file), 'utf8');
+    const rebuild = REBUILD_MARKER.test(sql);
     // better-sqlite3 cannot run `exec` inside its own transaction() wrapper when
     // the SQL contains its own BEGIN, so migrations must not declare one.
     if (/^\s*BEGIN\b/im.test(sql)) {
       throw new Error(`Migration ${file} declares its own transaction; the runner owns that.`);
     }
-    const run = db.transaction(() => {
-      db.exec(sql);
-      record.run(file, new Date().toISOString());
-    });
-    run();
+    // SQLite cannot alter a CHECK constraint, so widening one means rebuilding
+    // the table. Dropping the old parent increments the deferred foreign-key
+    // counter once per child row, and putting a table back under the same name
+    // does not decrement it — the transaction fails at COMMIT no matter how the
+    // statements are ordered, and `defer_foreign_keys` cannot help because the
+    // violation is counted, not merely postponed. SQLite's own documented
+    // recipe turns enforcement off around the rebuild, and `PRAGMA
+    // foreign_keys` is a silent no-op inside a transaction, so only the runner
+    // is in a position to do it.
+    //
+    // The relaxation is paid for immediately: a full `foreign_key_check` runs
+    // inside the same transaction, so a rebuild that orphans a single row
+    // rolls back and the ledger stays untouched. That is a stronger check than
+    // the constraint it replaces, which would only have seen the rows it
+    // happened to touch.
+    if (rebuild) db.pragma('foreign_keys = OFF');
+    try {
+      const run = db.transaction(() => {
+        db.exec(sql);
+        if (rebuild) {
+          const orphans = db.pragma('foreign_key_check') as unknown[];
+          if (orphans.length > 0) {
+            throw new Error(
+              `Migration ${file} left ${orphans.length} orphaned row(s): ${JSON.stringify(orphans.slice(0, 5))}`,
+            );
+          }
+        }
+        record.run(file, new Date().toISOString());
+      });
+      run();
+    } finally {
+      if (rebuild) db.pragma('foreign_keys = ON');
+    }
   }
 
   return pending;
