@@ -466,7 +466,7 @@ describe('vocabulary', () => {
 
   it('sits every example in a work context', () => {
     const domain =
-      /obra|plano|cliente|proveedor|contratista|presupuesto|cronograma|informe|reuni[óo]n|expediente|valoriz|supervis|ingenier|concreto|cimentaci|encofrado|vaciado|licitaci|adenda|contrato|partida|alcance|metrado|cuadrilla|equipo|entrega|material|seguridad|acta|consulta|costo|plazo|capataz|proyecto|estructura|tuber|instalaci|acabado|avance|obra|montaje|procura|grúa|fachada|losa|suelos|municipalidad|consorcio|residente|postor|comit[ée]|frente|ducto|acero|ensayo|prueba|inspecci|coordinaci|facturar|especificaci|riesgo|contingencia|sobrecosto|penalidad|observaci|firma|carpeta|agenda|decisi[óo]n|sistema|nivel|campo/i;
+      /obra|plano|cliente|proveedor|contratista|presupuesto|cronograma|informe|reuni[óo]n|expediente|valoriz|supervis|ingenier|concreto|cimentaci|encofrado|vaciado|licitaci|adenda|contrato|partida|alcance|metrado|cuadrilla|equipo|entrega|material|seguridad|acta|consulta|costo|plazo|capataz|proyecto|estructura|tuber|instalaci|acabado|avance|obra|montaje|procura|grúa|fachada|losa|suelos|municipalidad|consorcio|residente|postor|comit[ée]|frente|ducto|acero|ensayo|prueba|inspecci|coordinaci|facturar|especificaci|riesgo|contingencia|sobrecosto|penalidad|observaci|firma|carpeta|agenda|decisi[óo]n|sistema|nivel|campo|fianza|garant[íi]a|hito|holgura|entregable|subsanaci|salvedad|sustento|respaldo|replanteo|aprobaci[óo]n|adicional|retraso|demora|adelanto|viga|carga|interferencia|sesi[óo]n|consenso/i;
     for (const v of VOCAB) {
       expect(domain.test(v.example), `${v.term}: ${v.example}`).toBe(true);
     }

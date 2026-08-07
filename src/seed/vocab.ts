@@ -169,4 +169,101 @@ export const VOCAB: SeedVocab[] = [
     example: 'Agradeceré su respuesta a la brevedad para no afectar el plazo.' },
   { term: 'por nuestra parte', gloss: 'for our part', category: 'set_phrase', level: 'B2',
     example: 'Por nuestra parte, el expediente quedó entregado dentro del plazo.' },
+  /* =================================================================== *
+   * Second pass: the words a B2 speaker needs to be *precise* rather
+   * than merely understood.
+   *
+   * The first pass covered what you cannot say without. This one covers
+   * what separates «hubo un problema» from «se detectó una interferencia
+   * que obligó a reprogramar el vaciado» — the difference an examiner
+   * hears immediately and a client hears without knowing why.
+   * =================================================================== */
+
+  /* ---------------- connectors: precision about relationships ---------------- */
+  { term: 'a fin de que', gloss: 'so that (+ subjunctive)', category: 'connector', level: 'B2',
+    example: 'Enviamos el expediente hoy a fin de que el cliente lo revise antes del comité.' },
+  { term: 'siempre que', gloss: 'as long as, provided (+ subjunctive)', category: 'connector', level: 'B2',
+    example: 'Podemos adelantar la partida siempre que se libere el frente.' },
+  { term: 'por consiguiente', gloss: 'consequently (formal register)', category: 'connector', level: 'B2',
+    example: 'No se levantaron las observaciones; por consiguiente, la valorización queda en suspenso.' },
+  { term: 'en todo caso', gloss: 'in any case, at any rate', category: 'connector', level: 'B1',
+    example: 'En todo caso, dejaremos constancia en el acta antes de retirarnos.' },
+  { term: 'pese a que', gloss: 'despite the fact that', category: 'connector', level: 'B2',
+    example: 'Pese a que el plazo se mantiene, el riesgo de penalidad sigue vigente.' },
+
+  /* ---------------- the words that make a claim precise ---------------- */
+  { term: 'el hito', gloss: 'milestone', category: 'work_noun', level: 'B2',
+    example: 'El siguiente hito contractual es la entrega del casco estructural.' },
+  { term: 'la holgura', gloss: 'float, slack (in a schedule)', category: 'work_noun', level: 'B2',
+    example: 'La ruta crítica ya no tiene holgura; cualquier retraso se traslada a la entrega.' },
+  { term: 'la ruta crítica', gloss: 'critical path', category: 'work_noun', level: 'B2',
+    example: 'El montaje de estructura entró a la ruta crítica tras el retraso del acero.' },
+  { term: 'el entregable', gloss: 'deliverable', category: 'work_noun', level: 'B2',
+    example: 'El entregable de esta etapa es el expediente técnico completo.' },
+  { term: 'el replanteo', gloss: 'setting out, staking out', category: 'work_noun', level: 'B2',
+    example: 'El replanteo topográfico se ejecutó antes del vaciado de cimientos.' },
+  { term: 'la subsanación', gloss: 'remedying, correction of defects', category: 'work_noun', level: 'C1',
+    example: 'La subsanación de observaciones tiene un plazo de diez días hábiles.' },
+  { term: 'el precedente', gloss: 'precedent', category: 'work_noun', level: 'B2',
+    example: 'Aceptar ese cambio sin adenda sentaría un precedente incómodo.' },
+  { term: 'la salvedad', gloss: 'caveat, qualification', category: 'work_noun', level: 'C1',
+    example: 'Firmamos el acta con la salvedad de que el metrado será revisado.' },
+  { term: 'el respaldo', gloss: 'backing, supporting documentation', category: 'work_noun', level: 'B2',
+    example: 'El adicional requiere respaldo técnico y sustento de costos.' },
+  { term: 'el sustento', gloss: 'justification, supporting evidence', category: 'work_noun', level: 'B2',
+    example: 'Presentamos el sustento del mayor metrado con planos as-built.' },
+  { term: 'el vencimiento', gloss: 'expiry, due date', category: 'work_noun', level: 'B1',
+    example: 'El vencimiento de la carta fianza es el treinta de noviembre.' },
+
+  /* ---------------- verbs that carry a precise claim ---------------- */
+  { term: 'deslindar responsabilidades', gloss: 'to establish who is responsible', category: 'collocation', level: 'C1',
+    example: 'Antes de asumir el costo conviene deslindar responsabilidades por escrito.' },
+  { term: 'dejar constancia', gloss: 'to place on record', category: 'collocation', level: 'B2',
+    example: 'Dejamos constancia en el acta de que el frente no estaba liberado.' },
+  { term: 'levantar observaciones', gloss: 'to close out defects', category: 'collocation', level: 'B2',
+    example: 'La cuadrilla levantó las observaciones en menos de una semana.' },
+  { term: 'liberar el frente', gloss: 'to release the work face', category: 'collocation', level: 'B2',
+    example: 'No podemos iniciar el montaje hasta que liberen el frente.' },
+  { term: 'incurrir en', gloss: 'to incur (a cost, a delay, a breach)', category: 'verb_pattern', level: 'C1',
+    example: 'El proyecto incurrió en un retraso de veintidós días calendario.' },
+  { term: 'ceñirse a', gloss: 'to stick to, to adhere to', category: 'verb_pattern', level: 'C1',
+    example: 'Nos ceñimos a lo establecido en el expediente técnico.' },
+  { term: 'constatar', gloss: 'to verify on site, to ascertain', category: 'verb_pattern', level: 'C1',
+    example: 'Constatamos en campo que el acero colocado corresponde al plano.' },
+  { term: 'obedecer a', gloss: 'to be due to (a cause)', category: 'verb_pattern', level: 'C1',
+    example: 'El retraso obedece a la demora en la aprobación del adicional.' },
+  { term: 'trasladar', gloss: 'to pass on (a cost, a delay)', category: 'verb_pattern', level: 'B2',
+    example: 'Cualquier retraso adicional se traslada directamente a la fecha de entrega.' },
+
+  /* ---------------- false friends that cost money ---------------- */
+  { term: 'asistir', gloss: 'to attend — NOT "to assist"', category: 'false_friend', level: 'B1',
+    example: 'Asistí a la reunión de coordinación. («To assist» is «ayudar».)' },
+  { term: 'pretender', gloss: 'to intend, to aim to — NOT "to pretend"', category: 'false_friend', level: 'B2',
+    example: 'Pretendemos cerrar la partida esta semana. («To pretend» is «fingir».)' },
+  { term: 'la conducta', gloss: 'behaviour — NOT "conduct (a pipe)"', category: 'false_friend', level: 'B2',
+    example: 'La conducta del subcontratista en obra fue observada. (A duct is «el ducto».)' },
+  { term: 'soportar', gloss: 'to bear, to withstand — NOT "to support (an idea)"', category: 'false_friend', level: 'B2',
+    example: 'La viga soporta la carga prevista. (To back a proposal is «respaldar».)' },
+
+  /* ---------------- set phrases for meetings ---------------- */
+  { term: 'quisiera plantear un punto', gloss: 'I would like to raise a point', category: 'set_phrase', level: 'B2',
+    example: 'Antes de cerrar el acta, quisiera plantear un punto sobre el metrado.' },
+  { term: 'si me permite', gloss: 'if I may', category: 'set_phrase', level: 'B2',
+    example: 'Si me permite, hay un tema de interferencias que conviene revisar.' },
+  { term: 'en aras de', gloss: 'for the sake of', category: 'set_phrase', level: 'C1',
+    example: 'En aras de cumplir el plazo, proponemos trabajar los sábados.' },
+  { term: 'a efectos de', gloss: 'for the purposes of', category: 'set_phrase', level: 'C1',
+    example: 'A efectos de la valorización, el avance se corta el día veinticinco.' },
+  { term: 'valga la aclaración', gloss: 'let me be clear about this', category: 'set_phrase', level: 'C1',
+    example: 'Valga la aclaración: el adicional no cubre el cambio de especificación.' },
+  { term: 'corríjame si me equivoco', gloss: 'correct me if I am wrong', category: 'set_phrase', level: 'B2',
+    example: 'Corríjame si me equivoco, pero el plazo original vencía el quince.' },
+  { term: 'coincido con usted en que', gloss: 'I agree with you that', category: 'set_phrase', level: 'B2',
+    example: 'Coincido con usted en que el frente debió liberarse antes.' },
+  { term: 'no comparto ese criterio', gloss: 'I do not share that view (polite disagreement)', category: 'set_phrase', level: 'C1',
+    example: 'Con todo respeto, no comparto ese criterio sobre la responsabilidad del retraso.' },
+  { term: 'entiendo su posición, sin embargo', gloss: 'I understand your position, however', category: 'set_phrase', level: 'B2',
+    example: 'Entiendo su posición, sin embargo el contrato es claro en ese punto.' },
+  { term: 'lo dejamos para la siguiente sesión', gloss: 'let us park it for the next meeting', category: 'set_phrase', level: 'B2',
+    example: 'Si no hay consenso hoy, lo dejamos para la siguiente sesión.' },
 ];
