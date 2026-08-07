@@ -34,6 +34,23 @@ const LABEL =
   /^[ \t]*(?:\[?\d{1,2}:\d{2}(?::\d{2})?\]?[ \t]*)?([\p{Lu}][\p{L}\p{N}._'-]*(?:[ \t]+[\p{L}\p{N}._'-]+){0,3})[ \t]*:[ \t]+/u;
 
 /**
+ * A bare timestamp at the start of a line, with no speaker after it.
+ *
+ * This is what an ASR export of a class actually looks like — Otter, Zoom and
+ * the rest emit a timestamp per utterance and no names at all. Real recordings
+ * supplied for this app carried 1,332 of them across six files and not one
+ * speaker label.
+ *
+ * Two things go wrong if this is not handled. The timestamps end up inside the
+ * quoted text of every finding, so the review screen shows «0:02:45 Y señora
+ * Joy también…» instead of the sentence. And segmentation falls back to
+ * splitting on blank lines, which an ASR export does not have — one file
+ * collapsed 1,035 lines into 21 turns, which makes the per-turn offsets useless
+ * for pointing a finding at its context.
+ */
+const TIMESTAMP = /^[ \t]*\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?[ \t]*/;
+
+/**
  * Which line-initial labels are really speakers.
  *
  * The pattern alone cannot tell «Joe: hola» from «Revisamos tres puntos: el
@@ -80,6 +97,28 @@ export function segment(raw: string): Turn[] {
         text: line.slice(m[0].length),
         start: textStart,
         end: textStart + line.length - m[0].length,
+      };
+      turns.push(current);
+      continue;
+    }
+
+    // A bare timestamp starts a new utterance. The timestamp itself is never
+    // part of the text — `start` points past it, so a quote drawn from this
+    // turn reads as Spanish rather than as a log line.
+    const ts = TIMESTAMP.exec(line);
+    if (ts) {
+      const rest = line.slice(ts[0].length);
+      if (rest.trim() === '') {
+        // Timestamp alone on its line: it delimits, it does not carry text.
+        current = null;
+        continue;
+      }
+      const textStart = lineStart + ts[0].length;
+      current = {
+        speaker: null,
+        text: rest,
+        start: textStart,
+        end: textStart + rest.length,
       };
       turns.push(current);
       continue;

@@ -254,3 +254,74 @@ describe('analyze — repeated errors in one sentence', () => {
     expect(found.filter((x) => x.errorCode === 'noun.greek_ma')).toHaveLength(1);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * ASR exports
+ *
+ * Every one of these reproduces a defect found by running the segmenter over
+ * real class recordings. The sentences are written for the test rather than
+ * lifted, so nothing from a real class enters the repository — but the shapes
+ * are exactly what an Otter/Zoom-style export produces: a timestamp per
+ * utterance, no speaker names anywhere, and no blank lines to segment on.
+ * ------------------------------------------------------------------ */
+
+describe('timestamped exports with no speaker labels', () => {
+  const ASR = [
+    '0:00:15',
+    'Hola, ¿cómo estás?',
+    '0:01:24 Sí, tenemos un feriado el lunes.',
+    '0:02:45 La cuadrilla llegó tarde a la obra',
+    'porque el material no estaba listo.',
+  ].join('\n');
+
+  it('starts a new turn at each timestamp instead of collapsing the file', () => {
+    // Blank-line segmentation gives one turn for the whole export, which makes
+    // every per-turn offset useless for quoting a finding in context.
+    const turns = segment(ASR);
+    expect(turns).toHaveLength(3);
+  });
+
+  it('keeps the timestamp out of the text', () => {
+    // Otherwise the review screen quotes «0:02:45 La cuadrilla llegó tarde…»
+    // and the learner is asked to judge a log line.
+    for (const t of segment(ASR)) {
+      expect(t.text).not.toMatch(/\d{1,2}:\d{2}/);
+    }
+    expect(segment(ASR)[1]!.text).toBe('Sí, tenemos un feriado el lunes.');
+  });
+
+  it('attaches an unstamped continuation line to the turn before it', () => {
+    const last = segment(ASR)[2]!;
+    expect(last.text).toContain('La cuadrilla llegó tarde');
+    expect(last.text).toContain('porque el material no estaba listo');
+  });
+
+  it('points start past the timestamp, so a quote maps back to the Spanish', () => {
+    const turns = segment(ASR);
+    for (const t of turns) {
+      expect(ASR.slice(t.start, t.start + 3)).not.toMatch(/^\d/);
+    }
+    const second = turns[1]!;
+    expect(ASR.slice(second.start, second.end)).toBe('Sí, tenemos un feriado el lunes.');
+  });
+
+  it('reports no speakers, because there are none to report', () => {
+    // The upload screen has to be able to say "this file names nobody" rather
+    // than inventing a name or silently assuming one.
+    expect(speakers(segment(ASR))).toEqual([]);
+  });
+
+  it('still finds a real speaker label when the export has one', () => {
+    const labelled = ['0:00:15 Lorena: ¿Cómo estás?', '0:01:02 Joe: Bien, gracias.'].join('\n');
+    const turns = segment(labelled);
+    expect(turns.map((t) => t.speaker)).toEqual(['Lorena', 'Joe']);
+    expect(turns[0]!.text).toBe('¿Cómo estás?');
+  });
+
+  it('does not mistake a time of day inside a sentence for a turn boundary', () => {
+    const line = 'La reunión es a las 9:30 y el vaciado empieza después.';
+    const turns = segment(line);
+    expect(turns).toHaveLength(1);
+    expect(turns[0]!.text).toBe(line);
+  });
+});

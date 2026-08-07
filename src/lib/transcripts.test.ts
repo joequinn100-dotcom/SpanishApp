@@ -259,3 +259,82 @@ describe('review lifecycle', () => {
     expect(pendingCount()).toBe(r.errors + r.positives);
   });
 });
+
+describe('duplicate transcripts', () => {
+  /**
+   * Real usage found this: of nine transcript files supplied across two
+   * batches, three were byte-identical to earlier ones under different names.
+   * That is what a folder of exports looks like, not user error — but a class
+   * counted twice doubles every error drawn from it, and §4 weights errors by
+   * log(1 + occurrences), so the duplicate quietly promotes a topic up the
+   * recommendation order.
+   */
+  it('refuses to import the same class twice and says which one it is', async () => {
+    const { ingest } = await mod();
+    const first = ingest({ raw: CLASS, learner: 'Joe', source: 'lorena', classDate: '2026-08-05' });
+    expect(first.duplicateOf).toBeUndefined();
+    expect(first.errors).toBeGreaterThan(0);
+
+    const again = ingest({
+      raw: CLASS,
+      learner: 'Joe',
+      source: 'lorena',
+      classDate: '2026-08-11', // re-filed under a different date, same content
+      title: 'Spanish Class 6',
+    });
+
+    expect(again.duplicateOf?.id).toBe(first.transcriptId);
+    expect(again.transcriptId).toBe(first.transcriptId);
+    // Nothing was analysed a second time.
+    expect(again.errors).toBe(0);
+    expect(again.positives).toBe(0);
+  });
+
+  it('inserts no second row and no second set of findings', async () => {
+    const { ingest } = await mod();
+    ingest({ raw: CLASS, learner: 'Joe', source: 'lorena', classDate: '2026-08-05' });
+    const rows = () =>
+      (db.prepare('SELECT COUNT(*) AS n FROM transcript').get() as { n: number }).n;
+    const findings = () =>
+      (db.prepare('SELECT COUNT(*) AS n FROM transcript_finding').get() as { n: number }).n;
+    const t = rows();
+    const f = findings();
+
+    ingest({ raw: CLASS, learner: 'Joe', source: 'lorena', classDate: '2026-08-05' });
+    expect(rows()).toBe(t);
+    expect(findings()).toBe(f);
+  });
+
+  it('ignores line endings, trailing spaces and blank lines', async () => {
+    // A re-export of the same class should not read as a new one.
+    const { ingest } = await mod();
+    const first = ingest({ raw: CLASS, learner: 'Joe', source: 'lorena', classDate: '2026-08-05' });
+    const reExported = CLASS.split('\n').map((l) => `${l}  `).join('\r\n') + '\r\n\r\n';
+    const again = ingest({
+      raw: reExported,
+      learner: 'Joe',
+      source: 'lorena',
+      classDate: '2026-08-05',
+    });
+    expect(again.duplicateOf?.id).toBe(first.transcriptId);
+  });
+
+  it('treats a genuinely different class as new', async () => {
+    const { ingest } = await mod();
+    const first = ingest({ raw: CLASS, learner: 'Joe', source: 'lorena', classDate: '2026-08-05' });
+    const other = ingest({
+      raw: CLASS.replace('la obra', 'el expediente'),
+      learner: 'Joe',
+      source: 'lorena',
+      classDate: '2026-08-12',
+    });
+    expect(other.duplicateOf).toBeUndefined();
+    expect(other.transcriptId).not.toBe(first.transcriptId);
+  });
+
+  it('hashes content, not case or accents — those are the Spanish', async () => {
+    const { contentHash } = await mod();
+    expect(contentHash('Tenemos un problema')).not.toBe(contentHash('tenemos un problema'));
+    expect(contentHash('el análisis')).not.toBe(contentHash('el analisis'));
+  });
+});

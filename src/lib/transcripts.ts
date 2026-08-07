@@ -2,6 +2,7 @@ import 'server-only';
 import { tx } from '@/db';
 import { db } from './queries';
 import { analyze, wordCount } from '@/domain/detectors';
+import { createHash } from 'node:crypto';
 import { segment, speakers, learnerTurns, flatten } from '@/domain/transcript';
 import { errorTransition, topicTransition, newErrorState, newTopicState } from '@/domain/mastery';
 import { markVocabSpontaneous, vocabUsedIn } from './vocab';
@@ -71,6 +72,11 @@ export function preview(raw: string): Preview {
 
 export interface IngestResult {
   transcriptId: number;
+  /**
+   * True when this text was already imported. The existing transcript's id is
+   * returned rather than a new one, and nothing is inserted.
+   */
+  duplicateOf?: { id: number; classDate: string; importedAt: string };
   learnerWords: number;
   errors: number;
   positives: number;
@@ -91,6 +97,30 @@ export function ingest(input: {
   title?: string;
 }): IngestResult {
   const database = db();
+
+  // Same class, imported twice. Hashing the text rather than the file means a
+  // re-export to another format is still recognised, and a PDF that differs
+  // only in metadata does not read as new. Ingesting it again would double
+  // every error count drawn from that class, and §4 weights by
+  // log(1 + occurrences) — so a duplicate silently promotes a topic.
+  const hash = contentHash(input.raw);
+  const existing = database
+    .prepare(
+      `SELECT id, class_date AS classDate, imported_at AS importedAt
+         FROM transcript WHERE content_hash = ? LIMIT 1`,
+    )
+    .get(hash) as { id: number; classDate: string; importedAt: string } | undefined;
+  if (existing) {
+    return {
+      transcriptId: existing.id,
+      duplicateOf: existing,
+      learnerWords: 0,
+      errors: 0,
+      positives: 0,
+      vocabPromoted: 0,
+    };
+  }
+
   const turns = learnerTurns(segment(input.raw), input.learner);
   const { text } = flatten(turns);
   const findings = analyze(text);
@@ -100,8 +130,8 @@ export function ingest(input: {
     const info = database
       .prepare(
         `INSERT INTO transcript (source, class_date, raw_text, learner_text, title,
-                                 analysis_json, imported_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                                 analysis_json, imported_at, content_hash)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         input.source,
@@ -117,6 +147,7 @@ export function ingest(input: {
           vocab_used: vocabUsedIn(text),
         }),
         now,
+        hash,
       );
 
     const id = Number(info.lastInsertRowid);
@@ -507,4 +538,22 @@ export function forLorena(transcriptId: number, limit = 3): ForLorena[] {
             : `Committed ${row.hits}× in this class at severity ${row.severity}. Ask her to push you into contexts that force it.`,
       };
     });
+}
+
+/**
+ * Identity of a transcript's content.
+ *
+ * Normalised before hashing so trivial differences — a re-export with CRLF line
+ * endings, trailing whitespace, a blank line more or less — do not read as a
+ * different class. Not normalised so far that two genuinely different classes
+ * could collide: case and accents are preserved, because they are the content.
+ */
+export function contentHash(raw: string): string {
+  const normalised = raw
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l !== '')
+    .join('\n');
+  return createHash('sha256').update(normalised, 'utf8').digest('hex');
 }
