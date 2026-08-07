@@ -21,7 +21,7 @@ export interface RunnerItem {
   sessionId: number;
   index: number;
   total: number;
-  source: 'warmup' | 'topic' | 'review';
+  source: 'warmup' | 'topic' | 'review' | 'boss' | 'sprint';
   kind: string;
   difficulty: number;
   topicName: string;

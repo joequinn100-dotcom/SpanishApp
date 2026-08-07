@@ -13,6 +13,13 @@
 
 import { selectWarmup, type ErrorState } from './mastery';
 
+/**
+ * Where an item in a queue came from. Both challenges of §8 plan a queue too,
+ * and both are stored as sessions, so their items are planned items like any
+ * other — see migrations/007.
+ */
+export type ItemSource = 'warmup' | 'topic' | 'review' | 'boss' | 'sprint';
+
 export interface ContentRef {
   id: number;
   topicId: string;
@@ -28,8 +35,10 @@ export interface PlannedItem {
    * `warmup` — error work, chosen by §4's weighting.
    * `topic`  — the new material the session is about.
    * `review` — a spaced review of a consolidating topic, due today.
+   * `boss`   — §8's unaided challenge, the last gate before `mastered`.
+   * `sprint` — an item in a Gauntlet Run (§8), drawn from the active errors.
    */
-  source: 'warmup' | 'topic' | 'review';
+  source: ItemSource;
   topicId: string;
   errorCode: string | null;
 }

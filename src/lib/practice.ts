@@ -9,10 +9,17 @@ import {
   newErrorState,
   type ErrorState,
   type ErrorStatus,
-  type TopicState,
-  type TopicStatus,
 } from '@/domain/mastery';
 import { grade, errorOutcome, rollingAccuracy, type DrillPayload, type Grade } from '@/domain/grading';
+import { contentByError, contentForTopic, liveErrors } from './pools';
+import { readTopicState, writeTopicState } from './topic-state';
+import { applyChallengeAnswer } from './challenge';
+import { dayOf, touchStreak } from './streak';
+
+// The streak moved to its own module so the §8 challenges can record activity
+// without importing this one. Re-exported so its callers did not all have to
+// change at the same time as the move.
+export { FREEZES_PER_MONTH, streak, touchStreak } from './streak';
 import {
   planSession,
   reviewOutcome,
@@ -20,6 +27,7 @@ import {
   warmupGuaranteeHeld,
   type ContentRef,
   type DueReview,
+  type ItemSource,
   type SessionPlan,
 } from '@/domain/session';
 
@@ -50,10 +58,32 @@ export interface SessionRow {
   handoff_md: string | null;
 }
 
-/** The session in progress, if there is one. There is at most one. */
+/**
+ * The practice session in progress, if there is one. There is at most one.
+ *
+ * Deliberately blind to the §8 challenges, which are sessions too since
+ * migration 007. A boss fight is not something `startSession` may hand back as
+ * "your session" and resume as ordinary practice — its queue is fixed, its
+ * stakes are different, and §8 gives it no retries.
+ */
 export function openSession(): SessionRow | undefined {
   return db()
-    .prepare('SELECT * FROM session WHERE ended_at IS NULL ORDER BY id DESC LIMIT 1')
+    .prepare(
+      `SELECT * FROM session
+        WHERE ended_at IS NULL AND kind NOT IN ('boss','sprint')
+        ORDER BY id DESC LIMIT 1`,
+    )
+    .get() as SessionRow | undefined;
+}
+
+/** Any open run of either challenge, which blocks starting ordinary practice. */
+export function openChallengeSession(): SessionRow | undefined {
+  return db()
+    .prepare(
+      `SELECT * FROM session
+        WHERE ended_at IS NULL AND kind IN ('boss','sprint')
+        ORDER BY id DESC LIMIT 1`,
+    )
     .get() as SessionRow | undefined;
 }
 
@@ -65,18 +95,6 @@ export function planOf(s: SessionRow): SessionPlan {
   return s.plan_json
     ? (JSON.parse(s.plan_json) as SessionPlan)
     : { items: [], focusTopicId: null, warmupErrors: [] };
-}
-
-/** Content available for a topic, excluding retired rows. */
-function contentForTopic(topicId: string): ContentRef[] {
-  return (
-    db()
-      .prepare(
-        `SELECT id, topic_id AS topicId, kind, difficulty, targets_error AS targetsError
-           FROM content WHERE topic_id = ? AND retired = 0`,
-      )
-      .all(topicId) as ContentRef[]
-  ).filter((c) => c.targetsError === null);
 }
 
 /**
@@ -138,55 +156,7 @@ export function dueReviewCount(now: string = new Date().toISOString()): number {
   return r.n;
 }
 
-function contentByError(): Map<string, ContentRef[]> {
-  const rows = db()
-    .prepare(
-      `SELECT id, topic_id AS topicId, kind, difficulty, targets_error AS targetsError
-         FROM content WHERE targets_error IS NOT NULL AND retired = 0`,
-    )
-    .all() as ContentRef[];
-  const map = new Map<string, ContentRef[]>();
-  for (const r of rows) {
-    const list = map.get(r.targetsError!) ?? [];
-    list.push(r);
-    map.set(r.targetsError!, list);
-  }
-  return map;
-}
 
-function liveErrors(): { code: string; state: ErrorState }[] {
-  const rows = db()
-    .prepare(
-      `SELECT code, status, severity, occurrences, clean_streak, spontaneous_ok,
-              last_occurred, consolidating_since, resolved_at
-         FROM error WHERE status <> 'resolved'`,
-    )
-    .all() as {
-    code: string;
-    status: ErrorStatus;
-    severity: number;
-    occurrences: number;
-    clean_streak: number;
-    spontaneous_ok: number;
-    last_occurred: string | null;
-    consolidating_since: string | null;
-    resolved_at: string | null;
-  }[];
-
-  return rows.map((r) => ({
-    code: r.code,
-    state: {
-      status: r.status,
-      severity: r.severity,
-      occurrences: r.occurrences,
-      cleanStreak: r.clean_streak,
-      spontaneousOk: r.spontaneous_ok,
-      lastOccurred: r.last_occurred,
-      consolidatingSince: r.consolidating_since,
-      resolvedAt: r.resolved_at,
-    },
-  }));
-}
 
 /**
  * Start a session, or return the one already open.
@@ -197,6 +167,13 @@ function liveErrors(): { code: string; state: ErrorState }[] {
 export function startSession(focusTopicId: string | null): SessionRow {
   const existing = openSession();
   if (existing) return existing;
+
+  const challenge = openChallengeSession();
+  if (challenge) {
+    throw new Error(
+      `Finish the ${challenge.kind === 'boss' ? 'boss fight' : 'Gauntlet Run'} first — it has no retries, so leaving it open is a loss.`,
+    );
+  }
 
   const database = db();
   const now = new Date().toISOString();
@@ -244,7 +221,7 @@ export interface CurrentItem {
   index: number;
   total: number;
   fraction: number;
-  source: 'warmup' | 'topic' | 'review';
+  source: ItemSource;
   contentId: number;
   kind: string;
   difficulty: number;
@@ -391,6 +368,16 @@ export function submitAnswer(sessionId: number, answer: string, latencyMs?: numb
       });
     }
 
+    // §8's challenges are sessions too (migration 007), so their scoring and
+    // their ending happen here, in the same transaction as the attempt that
+    // decided them. A cleared boss fight and the answer that cleared it commit
+    // together or not at all.
+    const challenge = applyChallengeAnswer(sessionId, s.kind, now);
+    if (challenge) {
+      notes.push(...challenge.notes);
+      if (challenge.kind === 'boss' && challenge.passed) xp += XP.TOPIC_MASTERED;
+    }
+
     if (xp > 0) {
       database
         .prepare('INSERT INTO xp_event (session_id, amount, reason, occurred_at) VALUES (?,?,?,?)')
@@ -442,67 +429,11 @@ function applyReview(
   const passed = reviewOutcome(answers, plan, topicId);
   if (passed === null) return; // block not finished yet
 
-  const row = database
-    .prepare(
-      `SELECT status, accuracy, attempts, correct, spontaneous, first_seen, last_seen,
-              mastered_at, consolidating_since, reviews_passed, next_review_at,
-              boss_cleared_at
-         FROM topic_state WHERE topic_id = ?`,
-    )
-    .get(topicId) as
-    | {
-        status: TopicStatus;
-        accuracy: number;
-        attempts: number;
-        correct: number;
-        spontaneous: number;
-        first_seen: string | null;
-        last_seen: string | null;
-        mastered_at: string | null;
-        consolidating_since: string | null;
-        reviews_passed: number;
-        next_review_at: string | null;
-        boss_cleared_at: string | null;
-      }
-    | undefined;
-  if (!row || row.status !== 'consolidating') return;
+  const before = readTopicState(topicId);
+  if (!before || before.status !== 'consolidating') return;
 
-  const before: TopicState = {
-    status: row.status,
-    accuracy: row.accuracy,
-    attempts: row.attempts,
-    correct: row.correct,
-    spontaneous: row.spontaneous,
-    firstSeen: row.first_seen,
-    lastSeen: row.last_seen,
-    masteredAt: row.mastered_at,
-    consolidatingSince: row.consolidating_since,
-    reviewsPassed: row.reviews_passed,
-    nextReviewAt: row.next_review_at,
-    bossClearedAt: row.boss_cleared_at,
-  };
   const after = topicTransition(before, { type: 'review', passed }, now);
-
-  // boss_cleared_at is written back even though a review never sets it: a
-  // failed review can regress the topic, and regressTopic clears it. Leaving
-  // it out would strand a cleared flag on a topic that is back in `studying`,
-  // and the next pass through consolidating would skip the challenge.
-  database
-    .prepare(
-      `UPDATE topic_state
-          SET status = ?, mastered_at = ?, consolidating_since = ?,
-              reviews_passed = ?, next_review_at = ?, boss_cleared_at = ?
-        WHERE topic_id = ?`,
-    )
-    .run(
-      after.status,
-      after.masteredAt,
-      after.consolidatingSince,
-      after.reviewsPassed,
-      after.nextReviewAt,
-      after.bossClearedAt,
-      topicId,
-    );
+  writeTopicState(topicId, after);
 
   if (!passed) {
     notes.push('Review not clean — the two-review sequence restarts. Next one in 3 days.');
@@ -544,46 +475,8 @@ function applyTopic(
   notes: string[],
   onMastered: () => void,
 ) {
-  const database = db();
-  const row = database
-    .prepare(
-      `SELECT status, accuracy, attempts, correct, spontaneous, first_seen, last_seen,
-              mastered_at, consolidating_since, reviews_passed, next_review_at,
-              boss_cleared_at
-         FROM topic_state WHERE topic_id = ?`,
-    )
-    .get(topicId) as
-    | {
-        status: TopicStatus;
-        accuracy: number;
-        attempts: number;
-        correct: number;
-        spontaneous: number;
-        first_seen: string | null;
-        last_seen: string | null;
-        mastered_at: string | null;
-        consolidating_since: string | null;
-        reviews_passed: number;
-        next_review_at: string | null;
-        boss_cleared_at: string | null;
-      }
-    | undefined;
-  if (!row) return;
-
-  const before: TopicState = {
-    status: row.status,
-    accuracy: row.accuracy,
-    attempts: row.attempts,
-    correct: row.correct,
-    spontaneous: row.spontaneous,
-    firstSeen: row.first_seen,
-    lastSeen: row.last_seen,
-    masteredAt: row.mastered_at,
-    consolidatingSince: row.consolidating_since,
-    reviewsPassed: row.reviews_passed,
-    nextReviewAt: row.next_review_at,
-    bossClearedAt: row.boss_cleared_at,
-  };
+  const before = readTopicState(topicId);
+  if (!before) return;
 
   // The attempt is already inserted, so this window includes it.
   const after = topicTransition(
@@ -592,28 +485,7 @@ function applyTopic(
     now,
   );
 
-  database
-    .prepare(
-      `UPDATE topic_state
-          SET status = ?, accuracy = ?, attempts = ?, correct = ?, first_seen = ?,
-              last_seen = ?, mastered_at = ?, consolidating_since = ?,
-              reviews_passed = ?, next_review_at = ?, boss_cleared_at = ?
-        WHERE topic_id = ?`,
-    )
-    .run(
-      after.status,
-      after.accuracy,
-      after.attempts,
-      after.correct,
-      after.firstSeen,
-      after.lastSeen,
-      after.masteredAt,
-      after.consolidatingSince,
-      after.reviewsPassed,
-      after.nextReviewAt,
-      after.bossClearedAt,
-      topicId,
-    );
+  writeTopicState(topicId, after);
 
   if (after.status !== before.status) {
     if (after.status === 'consolidating') {
@@ -714,93 +586,6 @@ function applyError(
 /* ------------------------------------------------------------------ *
  * Streak (SPEC §8 — recorded now because §7's handoff reports it)
  * ------------------------------------------------------------------ */
-
-function dayOf(iso: string): string {
-  return iso.slice(0, 10);
-}
-
-/** §8: two freezes a month, so travel and a bad week do not break the streak. */
-export const FREEZES_PER_MONTH = 2;
-
-/**
- * Record activity for today, spending a freeze to bridge a missed day if one
- * is available.
- *
- * §8 is emphatic that "a broken streak is where these apps lose users", and
- * the freeze is the mechanism. It is spent silently for gaps of one or two
- * days: a freeze the learner has to remember to activate is a freeze that
- * never gets used on the day it was needed.
- */
-export function touchStreak(now: string): void {
-  const database = db();
-  database
-    .prepare(
-      'INSERT OR IGNORE INTO streak (id, current, longest, freezes, freezes_reset_at) VALUES (1, 0, 0, ?, ?)',
-    )
-    .run(FREEZES_PER_MONTH, now);
-
-  const s = database.prepare('SELECT * FROM streak WHERE id = 1').get() as {
-    current: number;
-    longest: number;
-    last_active: string | null;
-    freezes: number;
-    freezes_reset_at: string | null;
-  };
-
-  const today = dayOf(now);
-  if (s.last_active && dayOf(s.last_active) === today) return;
-
-  // Freezes replenish on a calendar month boundary.
-  let freezes = s.freezes;
-  let resetAt = s.freezes_reset_at;
-  if (!resetAt || resetAt.slice(0, 7) !== now.slice(0, 7)) {
-    freezes = FREEZES_PER_MONTH;
-    resetAt = now;
-  }
-
-  let current = 1;
-  let spent = 0;
-  if (s.last_active) {
-    const gap = Math.round(
-      (new Date(today).getTime() - new Date(dayOf(s.last_active)).getTime()) / 86_400_000,
-    );
-    if (gap === 1) {
-      current = s.current + 1;
-    } else if (gap > 1) {
-      // One freeze per missed day. Bridge only if every gap day can be paid for.
-      const missed = gap - 1;
-      if (missed <= freezes) {
-        spent = missed;
-        current = s.current + 1;
-      }
-    }
-  }
-
-  database
-    .prepare(
-      `UPDATE streak
-          SET current = ?, longest = max(longest, ?), last_active = ?,
-              freezes = ?, freezes_reset_at = ?
-        WHERE id = 1`,
-    )
-    .run(current, current, now, freezes - spent, resetAt);
-}
-
-export function streak(): {
-  current: number;
-  longest: number;
-  freezes: number;
-  lastActive: string | null;
-} {
-  const row = db()
-    .prepare('SELECT current, longest, freezes, last_active FROM streak WHERE id = 1')
-    .get() as
-    | { current: number; longest: number; freezes: number; last_active: string | null }
-    | undefined;
-  return row
-    ? { current: row.current, longest: row.longest, freezes: row.freezes, lastActive: row.last_active }
-    : { current: 0, longest: 0, freezes: FREEZES_PER_MONTH, lastActive: null };
-}
 
 /** What has been done today, for §8's daily quest. */
 export function todayActivity(now: string = new Date().toISOString()): {
