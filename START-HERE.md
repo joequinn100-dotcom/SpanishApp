@@ -139,13 +139,21 @@ Find your version: **Apple menu → About This Mac**, or in Terminal type
 
 | Your macOS | What to install |
 |---|---|
-| 13 Ventura, 14 Sonoma, 15 Sequoia or newer | The **LTS** button on nodejs.org — any recent version works |
-| 12 Monterey or 11 Big Sur | **Node 20**, specifically. Get it from https://nodejs.org/dist/latest-v20.x/ — the file ending `.pkg` |
+| 13 Ventura, 14 Sonoma, 15 Sequoia or newer | The **LTS** button on nodejs.org is fine |
+| 12 Monterey or **11 Big Sur** | **Node 22**, from https://nodejs.org/dist/latest-v22.x/ — the file ending `.pkg`. **Not** the LTS button. |
 | 10.15 Catalina or older | Fluencia cannot run on this Mac. Tell me and we will host it instead, so you reach it from any browser including the iPad. |
 
-That last row is not a fudge. Fluencia is built on Next.js 16, which needs Node
-20 or newer, and no build of Node 20 runs on macOS 10.15 or below. There is no
-combination that works, and pretending otherwise would waste an afternoon.
+The middle row is the trap, and it is nodejs.org's doing rather than yours. The
+**LTS** button currently hands out Node 24, and Node 24 requires macOS 13.5 or
+newer — so on Big Sur it installs perfectly and then dies the first time
+anything runs it. Node 22 is built with a minimum of macOS 11.0 and is what you
+want.
+
+Fluencia needs Node 22 or newer either way: `better-sqlite3`, the database
+layer, requires it.
+
+The last row is not a fudge — on macOS 10.15 and below there is no Node that is
+both new enough for Fluencia and old enough for the machine.
 
 **Nothing happens when I double-click** — right-click → **Open** → **Open**.
 

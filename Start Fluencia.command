@@ -71,12 +71,14 @@ if [ $NODE_RC -ne 0 ] || [ -z "${NODE_VERSION##*[Ss]ymbol not found*}" ] || [ "$
   echo "macOS than this one${MACOS:+ (you are on macOS $MACOS)}. The fix is to install an"
   echo "older Node that matches — not to reinstall the same one."
   echo ""
-  echo "  macOS 11 (Big Sur) or 12 (Monterey) → Node 20 LTS"
-  echo "  macOS 10.15 (Catalina) or older     → see START-HERE.md, the section"
-  echo "                                        headed 'If your Mac is older'"
+  echo "  macOS 11 Big Sur / 12 Monterey → ${BOLD}Node 22${OFF}, from nodejs.org/dist/latest-v22.x"
+  echo "  macOS 13 Ventura or newer      → the LTS button on nodejs.org is fine"
+  echo "  macOS 10.15 Catalina or older  → see START-HERE.md, 'If your Mac is older'"
   echo ""
-  read -r -p "Press return to open the page with every Node version… " _
-  open "https://nodejs.org/en/download/prebuilt-binaries"
+  echo "${DIM}The LTS button currently gives you Node 24, which needs macOS 13.5.${OFF}"
+  echo ""
+  read -r -p "Press return to open the Node 22 downloads… " _
+  open "https://nodejs.org/dist/latest-v22.x/"
   exit 1
 fi
 
