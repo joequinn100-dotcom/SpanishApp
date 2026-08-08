@@ -96,33 +96,70 @@ fi
 echo "${GREEN}✓${OFF} Node $NODE_VERSION"
 
 # --- Dependencies -----------------------------------------------------------
-if [ ! -d node_modules ]; then
+# A directory is not an installation. A run that died half way leaves
+# node_modules behind, and checking only for its existence would skip the
+# repair and fail later, further from the cause. The database driver is the
+# thing that actually has to load, so ask it.
+deps_ok() {
+  [ -d node_modules ] && node -e "require('better-sqlite3')" >/dev/null 2>&1
+}
+
+if ! deps_ok; then
   echo ""
   echo "First run — installing the app's dependencies."
   echo "${DIM}A few minutes, once. Every run after this is instant.${OFF}"
   echo ""
   if ! npm install; then
     echo ""
-    echo "${RED}Installing the dependencies did not finish.${OFF}"
     echo ""
-    echo "Scroll up and read the first error, not the last one — the useful"
-    echo "message is usually near the top. Common causes, in order:"
-    echo "  · Node cannot run on this macOS  (look for 'Symbol not found')"
-    echo "  · No network, or a proxy in the way"
-    echo "  · The disk is full"
+    echo "${DIM}First attempt failed. Retrying without the native build step —${OFF}"
+    echo "${DIM}the database driver ships a ready-made binary for this Mac.${OFF}"
     echo ""
-    echo "Send me what is printed above and I will tell you which it is."
-    read -r -p "Press return to close… " _
-    exit 1
+    # npm runs `node-gyp rebuild` for any package carrying a binding.gyp and no
+    # install script of its own, which means it tries to compile better-sqlite3
+    # from source even though the tarball already contains darwin-x64.node.
+    # Compiling needs Python and the Xcode command line tools; the prebuilt
+    # binary needs neither, and is the one used on every other platform anyway.
+    if ! npm install --ignore-scripts; then
+      echo ""
+      echo "${RED}Installing the dependencies did not finish.${OFF}"
+      echo ""
+      echo "Scroll up and read the ${BOLD}first${OFF} error, not the last — the useful"
+      echo "message is usually near the top. Common causes, in order:"
+      echo "  · No network, or a proxy in the way"
+      echo "  · The disk is full"
+      echo "  · Node cannot run on this macOS  (look for 'Symbol not found')"
+      echo ""
+      echo "Send me what is printed above and I will tell you which it is."
+      read -r -p "Press return to close… " _
+      exit 1
+    fi
   fi
+fi
+
+if ! deps_ok; then
+  echo "${RED}The database driver will not load.${OFF}"
+  echo "Send me everything printed above — this one I need to see."
+  read -r -p "Press return to close… " _
+  exit 1
 fi
 echo "${GREEN}✓${OFF} Dependencies ready"
 
 # --- Port -------------------------------------------------------------------
 # 3000 is a popular port. Rather than failing with an error most people cannot
 # act on, find one that is free and use it.
+# `lsof` only sees processes the current user owns, so a port held by another
+# account looks free. It said 3000 was available, Next.js disagreed and moved
+# itself to 3001, and this script then opened a browser at 3000 — a running app
+# that the user could not find. Probing the port by connecting to it does not
+# care who owns it.
+port_busy() {
+  (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null && exec 3<&- 3>&- && return 0
+  return 1
+}
+
 PORT=3000
-while lsof -i ":$PORT" >/dev/null 2>&1; do
+while port_busy "$PORT"; do
   PORT=$((PORT + 1))
   if [ "$PORT" -gt 3010 ]; then
     echo "${RED}No free port between 3000 and 3010.${OFF} Restarting the Mac will clear it."

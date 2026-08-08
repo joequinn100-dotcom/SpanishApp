@@ -124,6 +124,20 @@ Once a week is plenty. On a new Mac: repeat steps 1–3 above, then
 
 ## If something goes wrong
 
+**It mentions `node-gyp`, `find Python`, or Python crashes** — npm tried to
+compile the database driver from source, which needs developer tools you should
+not have to install. You do not need Python at all. The launcher now retries
+automatically without that step, using the ready-made binary that ships with the
+driver. If you are on an older copy, this one command fixes it:
+
+```
+cd ~/Documents/SpanishApp-claude-fluencia-v2 && npm install --ignore-scripts && npm run dev
+```
+
+**The browser opens to a page that will not load** — check the Terminal window
+for the line beginning `- Local:`. If something else on your Mac is using port
+3000, the app moves to 3001 and that line tells you where it really is.
+
 **The Terminal window says Node.js is not installed** — do Step 1, then
 double-click the file again.
 
