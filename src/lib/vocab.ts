@@ -7,6 +7,7 @@ import {
   promptDirection,
   reviewVocab,
   selectVocab,
+  RECALL_VALUES,
   type Recall,
   type VocabStage,
   type VocabState,
@@ -135,9 +136,24 @@ export function reviewCard(
       | undefined;
     if (!row) throw new Error(`No vocabulary card ${vocabId}.`);
 
+    // A server action is reached over the wire, so the `Recall` type is a
+    // compile-time promise the runtime does not get to rely on. An unrecognised
+    // value used to fall through the quality table as `undefined`, turn the
+    // ease into NaN, and write NULL over the card's schedule — losing the
+    // card's entire review history to a typo.
+    if (!RECALL_VALUES.includes(recall)) {
+      throw new Error(`Not a recall grade: ${String(recall)}. Expected one of ${RECALL_VALUES.join(', ')}.`);
+    }
+
     const now = new Date().toISOString();
     const before = stateOf(row);
     const after = reviewVocab(before, recall, now);
+
+    // Belt and braces: the scheduler is pure and tested, but this row is the
+    // card's memory and a NaN reaching it is unrecoverable.
+    if (!Number.isFinite(after.ease) || !Number.isFinite(after.intervalDays)) {
+      throw new Error(`Scheduler produced a non-finite schedule for card ${vocabId}.`);
+    }
 
     database
       .prepare(

@@ -48,6 +48,9 @@ export const SRS = {
   MAX_INTERVAL_DAYS: 120,
 } as const;
 
+/** The grades, at runtime. Server actions cross the wire, where types do not. */
+export const RECALL_VALUES: readonly Recall[] = ['again', 'good', 'easy'] as const;
+
 const QUALITY: Record<Recall, number> = { again: 2, good: 4, easy: 5 };
 
 const DAY_MS = 86_400_000;

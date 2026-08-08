@@ -196,3 +196,28 @@ describe('spontaneous use', () => {
     expect(v.n).toBe(r.vocabPromoted);
   });
 });
+
+describe('a bad grade cannot corrupt a card', () => {
+  it('rejects a recall value that is not one of the three grades', async () => {
+    // `Recall` is a compile-time promise, and a server action is reached over
+    // the wire where that promise does not hold. An unrecognised grade used to
+    // fall through the quality table as undefined, make the ease NaN, and write
+    // NULL over the card's schedule — losing its whole review history.
+    const { reviewCard } = await mod();
+    const id = idOf('sin embargo');
+    const before = db.prepare('SELECT ease FROM vocab WHERE id = ?').get(id) as { ease: number };
+
+    expect(() => reviewCard(id, 'hard' as never)).toThrow(/recall grade/i);
+
+    const after = db.prepare('SELECT ease FROM vocab WHERE id = ?').get(id) as { ease: number };
+    expect(after.ease).toBe(before.ease);
+    expect(db.prepare('SELECT count(*) AS n FROM vocab_review').get()).toEqual({ n: 0 });
+  });
+
+  it('still accepts all three real grades', async () => {
+    const { reviewCard } = await mod();
+    for (const g of ['again', 'good', 'easy'] as const) {
+      expect(() => reviewCard(idOf('sin embargo'), g)).not.toThrow();
+    }
+  });
+});

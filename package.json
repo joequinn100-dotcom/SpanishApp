@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "setup": "npm install && npm run db:migrate && next build",
+    "app": "next build && next start",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
