@@ -12,6 +12,17 @@
 
 cd "$(dirname "$0")" || exit 1
 
+# --- Gatekeeper -------------------------------------------------------------
+# Everything unzipped from a download carries com.apple.quarantine, and macOS
+# refuses to launch a quarantined script from Finder — "cannot be opened
+# because it is from an unidentified developer". Getting past it the first time
+# needs a right-click, or running this from Terminal.
+#
+# Once we are running we can clear the flag from this folder, so the first time
+# is the only time. Scoped to the app's own directory, which the user
+# downloaded deliberately; it touches nothing else on the machine.
+xattr -dr com.apple.quarantine "$(pwd)" 2>/dev/null
+
 BOLD=$'\033[1m'; DIM=$'\033[2m'; GREEN=$'\033[32m'; RED=$'\033[31m'; OFF=$'\033[0m'
 
 echo ""

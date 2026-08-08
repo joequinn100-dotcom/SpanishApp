@@ -42,10 +42,43 @@ A black Terminal window appears, and after a few seconds your browser opens at
 The first start takes a few minutes — it is fetching what the app needs, once.
 Every start after that takes seconds.
 
-> **If macOS says it "cannot be opened because it is from an unidentified
-> developer":** right-click the file → **Open** → **Open**. You only do this
-> once. macOS asks because the file came from the internet, not because
-> anything is wrong with it.
+### macOS will block it the first time
+
+You will almost certainly see:
+
+> *"Start Fluencia.command" cannot be opened because it is from an unidentified
+> developer.*
+
+This is expected, and it is not a sign anything is wrong. macOS flags
+**everything** that arrives in a downloaded ZIP, whatever is inside it. Click
+**OK** to dismiss it, then use either route below. You only do this once — the
+launcher clears the flag from its own folder on first run, so every later
+double-click just works.
+
+**Route 1 — right-click**
+
+1. **Right-click** (or Control-click) `Start Fluencia.command`
+2. Choose **Open**
+3. A similar box appears, but this one has an **Open** button. Click it.
+
+**Route 2 — if there is no Open button**
+
+Newer macOS versions moved this:
+
+1. Open **System Settings** → **Privacy & Security**
+2. Scroll to the bottom. There is a line saying *"Start Fluencia.command" was
+   blocked*, with an **Open Anyway** button. Click it.
+3. Double-click the file again.
+
+**Route 3 — the one that always works**
+
+This skips Gatekeeper entirely:
+
+1. Open **Terminal** (press ⌘-Space, type `Terminal`, press return)
+2. Type `bash ` — the word bash, then **one space**. Do not press return yet.
+3. **Drag** `Start Fluencia.command` from your Finder window into the Terminal
+   window. It fills in the location for you.
+4. Press **return**.
 
 Leave the Terminal window open while you study. Closing it stops the app and
 loses nothing — every answer is already on disk.
