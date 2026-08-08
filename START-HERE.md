@@ -127,6 +127,26 @@ Once a week is plenty. On a new Mac: repeat steps 1–3 above, then
 **The Terminal window says Node.js is not installed** — do Step 1, then
 double-click the file again.
 
+**It says "Symbol not found" or "Node is installed but cannot run on this
+Mac"** — the Node you downloaded was built for a newer macOS than yours. The
+newest Node always assumes a recent macOS, and nodejs.org offers you the newest
+by default. See the next section.
+
+### If your Mac is older
+
+Find your version: **Apple menu → About This Mac**, or in Terminal type
+`sw_vers -productVersion` and press return.
+
+| Your macOS | What to install |
+|---|---|
+| 13 Ventura, 14 Sonoma, 15 Sequoia or newer | The **LTS** button on nodejs.org — any recent version works |
+| 12 Monterey or 11 Big Sur | **Node 20**, specifically. Get it from https://nodejs.org/dist/latest-v20.x/ — the file ending `.pkg` |
+| 10.15 Catalina or older | Fluencia cannot run on this Mac. Tell me and we will host it instead, so you reach it from any browser including the iPad. |
+
+That last row is not a fudge. Fluencia is built on Next.js 16, which needs Node
+20 or newer, and no build of Node 20 runs on macOS 10.15 or below. There is no
+combination that works, and pretending otherwise would waste an afternoon.
+
 **Nothing happens when I double-click** — right-click → **Open** → **Open**.
 
 **The browser says it cannot connect** — give it another ten seconds and

@@ -54,9 +54,36 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
-NODE_MAJOR=$(node -p "process.versions.node.split('.')[0]")
-if [ "$NODE_MAJOR" -lt 20 ]; then
-  echo "${RED}Node $(node -v) is too old${OFF} — Fluencia needs 20 or newer."
+# Node existing on disk is not the same as Node working. A build made for a
+# newer macOS than this Mac is running installs perfectly and then dies on
+# launch with a dyld symbol error — so run it once and check, rather than
+# trusting that `command -v` found something usable.
+NODE_VERSION=$(node -v 2>&1)
+NODE_RC=$?
+if [ $NODE_RC -ne 0 ] || [ -z "${NODE_VERSION##*[Ss]ymbol not found*}" ] || [ "${NODE_VERSION#v}" = "$NODE_VERSION" ]; then
+  MACOS=$(sw_vers -productVersion 2>/dev/null)
+  echo "${RED}Node is installed but cannot run on this Mac.${OFF}"
+  echo ""
+  echo "It reported:"
+  echo "${DIM}  ${NODE_VERSION}${OFF}"
+  echo ""
+  echo "This means the version of Node that was installed was built for a newer"
+  echo "macOS than this one${MACOS:+ (you are on macOS $MACOS)}. The fix is to install an"
+  echo "older Node that matches — not to reinstall the same one."
+  echo ""
+  echo "  macOS 11 (Big Sur) or 12 (Monterey) → Node 20 LTS"
+  echo "  macOS 10.15 (Catalina) or older     → see START-HERE.md, the section"
+  echo "                                        headed 'If your Mac is older'"
+  echo ""
+  read -r -p "Press return to open the page with every Node version… " _
+  open "https://nodejs.org/en/download/prebuilt-binaries"
+  exit 1
+fi
+
+NODE_MAJOR=${NODE_VERSION#v}
+NODE_MAJOR=${NODE_MAJOR%%.*}
+if [ "$NODE_MAJOR" -lt 20 ] 2>/dev/null; then
+  echo "${RED}Node $NODE_VERSION is too old${OFF} — Fluencia needs 20 or newer."
   echo "Install the LTS version from nodejs.org, then run this again."
   echo ""
   read -r -p "Press return to open the download page… " _
@@ -64,7 +91,7 @@ if [ "$NODE_MAJOR" -lt 20 ]; then
   exit 1
 fi
 
-echo "${GREEN}✓${OFF} Node $(node -v)"
+echo "${GREEN}✓${OFF} Node $NODE_VERSION"
 
 # --- Dependencies -----------------------------------------------------------
 if [ ! -d node_modules ]; then
@@ -74,8 +101,15 @@ if [ ! -d node_modules ]; then
   echo ""
   if ! npm install; then
     echo ""
-    echo "${RED}That did not finish.${OFF} The most likely cause is the network."
-    echo "Try again, and if it keeps failing, send me what is printed above."
+    echo "${RED}Installing the dependencies did not finish.${OFF}"
+    echo ""
+    echo "Scroll up and read the first error, not the last one — the useful"
+    echo "message is usually near the top. Common causes, in order:"
+    echo "  · Node cannot run on this macOS  (look for 'Symbol not found')"
+    echo "  · No network, or a proxy in the way"
+    echo "  · The disk is full"
+    echo ""
+    echo "Send me what is printed above and I will tell you which it is."
     read -r -p "Press return to close… " _
     exit 1
   fi
